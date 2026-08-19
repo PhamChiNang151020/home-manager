@@ -27,6 +27,10 @@ class PeriodListTile extends StatelessWidget {
     final colors = context.appColors;
     final monthLabel = DateFormat("MM/yyyy").format(period.periodMonth);
     final hasPhoto = period.photoPath != null && period.photoPath!.isNotEmpty;
+    final hasNote = period.note != null && period.note!.isNotEmpty;
+    final recordedLabel = DateFormat(
+      "dd/MM/yyyy HH:mm",
+    ).format(period.recordedAt.toLocal());
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
@@ -35,25 +39,11 @@ class PeriodListTile extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Text(
-                    monthLabel,
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                StatusBadge(
-                  label: hasPhoto ? S.hasPhoto : S.noPhoto,
-                  variant:
-                      hasPhoto
-                          ? StatusBadgeVariant.success
-                          : StatusBadgeVariant.warning,
-                ),
-              ],
+            Text(
+              monthLabel,
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: AppSpacing.sm),
             MoneyText(amount: period.amountVnd, large: true),
@@ -66,13 +56,44 @@ class PeriodListTile extends StatelessWidget {
                 style: TextStyle(color: colors.textSecondary),
               ),
             ],
-            if (period.note != null && period.note!.isNotEmpty) ...[
+            if (hasNote) ...[
               const SizedBox(height: AppSpacing.xs),
               Text(
                 period.note!,
                 style: TextStyle(color: colors.textMuted, fontSize: 13),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
+            const SizedBox(height: AppSpacing.sm),
+            Wrap(
+              spacing: AppSpacing.xs,
+              runSpacing: AppSpacing.xs,
+              children: [
+                StatusBadge(
+                  label: hasPhoto ? S.hasPhoto : S.noPhoto,
+                  variant:
+                      hasPhoto
+                          ? StatusBadgeVariant.success
+                          : StatusBadgeVariant.warning,
+                ),
+                if (home.trackingMode == TrackingMode.meter &&
+                    period.consumptionKwh != null)
+                  StatusBadge(
+                    label: "${period.consumptionKwh!.toStringAsFixed(0)} kWh",
+                    variant: StatusBadgeVariant.accent,
+                  ),
+                if (hasNote)
+                  const StatusBadge(
+                    label: S.hasNote,
+                    variant: StatusBadgeVariant.neutral,
+                  ),
+                StatusBadge(
+                  label: recordedLabel,
+                  variant: StatusBadgeVariant.neutral,
+                ),
+              ],
+            ),
           ],
         ),
       ),

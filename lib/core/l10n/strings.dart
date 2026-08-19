@@ -84,4 +84,14 @@ abstract final class S {
   static const themeModeDark = "Tối";
   static const themeAccent = "Màu nhấn";
   static const history = "Lịch sử";
+  static const filterAll = "Tất cả";
+  static const filterYear = "Năm";
+  static const filterMonth = "Tháng";
+  static const sortNewest = "Mới nhất";
+  static const sortOldest = "Cũ nhất";
+  static const sortLabel = "Sắp xếp";
+  static const recordedAt = "Ngày ghi";
+  static const selectRecordedAt = "Chọn ngày giờ ghi";
+  static const hasNote = "Có ghi chú";
+  static const noHistoryMatch = "Không có kỳ điện phù hợp bộ lọc";
 }

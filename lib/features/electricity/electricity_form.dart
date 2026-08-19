@@ -12,6 +12,7 @@ import "package:home_manager/core/services/electricity_service.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/electricity/period_month_conflict.dart";
+import "package:home_manager/features/shared/datetime_picker.dart";
 import "package:home_manager/features/shared/form_title.dart";
 import "package:home_manager/features/shared/labeled_money_field.dart";
 import "package:home_manager/features/shared/labeled_text_field.dart";
@@ -122,6 +123,7 @@ class _ElectricityAddSheetState extends State<_ElectricityAddSheet> {
   late final TextEditingController _amount;
   late final TextEditingController _note;
   late DateTime _month;
+  late DateTime _recordedAt;
   Uint8List? _photoBytes;
   String? _error;
   String? _duplicateHint;
@@ -143,6 +145,7 @@ class _ElectricityAddSheetState extends State<_ElectricityAddSheet> {
   void initState() {
     super.initState();
     _month = DateTime(DateTime.now().year, DateTime.now().month);
+    _recordedAt = DateTime.now();
     _previous = TextEditingController(
       text: widget.previousPeriod?.newKwh?.toString() ?? "",
     );
@@ -220,6 +223,7 @@ class _ElectricityAddSheetState extends State<_ElectricityAddSheet> {
         consumptionKwh: used,
         photoPath: photoPath,
         note: _note.text.trim().isEmpty ? null : _note.text.trim(),
+        recordedAt: _recordedAt,
       );
       if (!mounted) return;
       Navigator.pop(context);
@@ -236,6 +240,16 @@ class _ElectricityAddSheetState extends State<_ElectricityAddSheet> {
         _month = DateTime(picked.year, picked.month);
         _updateDuplicateHint();
       });
+    }
+  }
+
+  Future<void> _pickRecordedAt() async {
+    final picked = await showDateTimePicker(
+      context: context,
+      initialDateTime: _recordedAt,
+    );
+    if (picked != null) {
+      setState(() => _recordedAt = picked);
     }
   }
 
@@ -279,6 +293,13 @@ class _ElectricityAddSheetState extends State<_ElectricityAddSheet> {
                   style: TextStyle(color: colors.warning),
                 ),
               ),
+            const SizedBox(height: AppSpacing.formFieldGap),
+            LabeledPickerField(
+              label: S.recordedAt,
+              value: DateFormat("dd/MM/yyyy HH:mm").format(_recordedAt),
+              onTap: _pickRecordedAt,
+              trailing: const Icon(Icons.schedule_outlined),
+            ),
             if (_isMeter) ...[
               if (widget.previousPeriod == null)
                 Padding(
@@ -372,6 +393,7 @@ class _ElectricityPeriodDialogState extends State<_ElectricityPeriodDialog> {
   late final TextEditingController _amount;
   late final TextEditingController _note;
   late DateTime _month;
+  late DateTime _recordedAt;
   Uint8List? _photoBytes;
   String? _error;
   String? _duplicateHint;
@@ -404,6 +426,7 @@ class _ElectricityPeriodDialogState extends State<_ElectricityPeriodDialog> {
     super.initState();
     final existing = widget.existing;
     _month = existing.periodMonth;
+    _recordedAt = existing.recordedAt.toLocal();
     _previous = TextEditingController(
       text: existing.previousKwh?.toString() ?? "",
     );
@@ -486,6 +509,7 @@ class _ElectricityPeriodDialogState extends State<_ElectricityPeriodDialog> {
         note: _note.text.trim().isEmpty ? null : _note.text.trim(),
         editingId: widget.existing.id,
         editingOriginalMonth: widget.existing.periodMonth,
+        recordedAt: _recordedAt,
       );
       if (!mounted) return;
       Navigator.pop(context);
@@ -505,6 +529,17 @@ class _ElectricityPeriodDialogState extends State<_ElectricityPeriodDialog> {
         _month = DateTime(picked.year, picked.month);
         _updateDuplicateHint();
       });
+    }
+  }
+
+  Future<void> _pickRecordedAt() async {
+    if (!_editing) return;
+    final picked = await showDateTimePicker(
+      context: context,
+      initialDateTime: _recordedAt,
+    );
+    if (picked != null) {
+      setState(() => _recordedAt = picked);
     }
   }
 
@@ -576,6 +611,14 @@ class _ElectricityPeriodDialogState extends State<_ElectricityPeriodDialog> {
                   style: TextStyle(color: colors.warning),
                 ),
               ),
+            const SizedBox(height: AppSpacing.formFieldGap),
+            LabeledPickerField(
+              label: S.recordedAt,
+              value: DateFormat("dd/MM/yyyy HH:mm").format(_recordedAt),
+              enabled: _editing,
+              onTap: _pickRecordedAt,
+              trailing: const Icon(Icons.schedule_outlined),
+            ),
             if (_isMeter) ...[
               const SizedBox(height: AppSpacing.formFieldGap),
               LabeledTextField(

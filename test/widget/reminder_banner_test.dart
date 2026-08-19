@@ -35,7 +35,9 @@ void main() {
     expect(find.byIcon(Icons.notifications_active_outlined), findsOneWidget);
   });
 
-  testWidgets("hides banner when no reminder day matches today", (tester) async {
+  testWidgets("hides banner when no reminder day matches today", (
+    tester,
+  ) async {
     const home = Home(
       id: "h1",
       name: "Nhà tôi",

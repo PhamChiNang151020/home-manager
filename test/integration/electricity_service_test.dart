@@ -14,6 +14,7 @@ const _periodRow = {
   "consumption_kwh": 20,
   "photo_path": null,
   "note": null,
+  "recorded_at": "2026-03-15T10:30:00.000Z",
 };
 
 void main() {
@@ -32,22 +33,25 @@ void main() {
     service = ElectricityService(client);
   });
 
-  test("upsert returns parsed period without delete when month unchanged", () async {
-    stubPeriodUpsert(client: client, table: table, row: _periodRow);
-    final deletedIds = <String>[];
-    stubPeriodDelete(table: table, deletedIds: deletedIds);
+  test(
+    "upsert returns parsed period without delete when month unchanged",
+    () async {
+      stubPeriodUpsert(client: client, table: table, row: _periodRow);
+      final deletedIds = <String>[];
+      stubPeriodDelete(table: table, deletedIds: deletedIds);
 
-    final period = await service.upsert(
-      homeId: "h1",
-      periodMonth: DateTime(2026, 3),
-      amountVnd: 70000,
-      editingId: "p1",
-      editingOriginalMonth: DateTime(2026, 3),
-    );
+      final period = await service.upsert(
+        homeId: "h1",
+        periodMonth: DateTime(2026, 3),
+        amountVnd: 70000,
+        editingId: "p1",
+        editingOriginalMonth: DateTime(2026, 3),
+      );
 
-    expect(period.id, "p1");
-    expect(deletedIds, isEmpty);
-  });
+      expect(period.id, "p1");
+      expect(deletedIds, isEmpty);
+    },
+  );
 
   test("upsert deletes original row when edit changes month", () async {
     stubPeriodUpsert(client: client, table: table, row: _periodRow);

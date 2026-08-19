@@ -4,6 +4,7 @@ class ElectricityPeriod {
     required this.homeId,
     required this.periodMonth,
     required this.amountVnd,
+    required this.recordedAt,
     this.previousKwh,
     this.newKwh,
     this.consumptionKwh,
@@ -15,6 +16,7 @@ class ElectricityPeriod {
   final String homeId;
   final DateTime periodMonth;
   final double amountVnd;
+  final DateTime recordedAt;
   final double? previousKwh;
   final double? newKwh;
   final double? consumptionKwh;
@@ -27,6 +29,10 @@ class ElectricityPeriod {
       homeId: json["home_id"] as String,
       periodMonth: DateTime.parse(json["period_month"] as String),
       amountVnd: (json["amount_vnd"] as num).toDouble(),
+      recordedAt: DateTime.parse(
+        json["recorded_at"] as String? ??
+            DateTime.now().toUtc().toIso8601String(),
+      ),
       previousKwh: (json["previous_kwh"] as num?)?.toDouble(),
       newKwh: (json["new_kwh"] as num?)?.toDouble(),
       consumptionKwh: (json["consumption_kwh"] as num?)?.toDouble(),

@@ -56,6 +56,7 @@ class ElectricityService {
     String? note,
     String? editingId,
     DateTime? editingOriginalMonth,
+    DateTime? recordedAt,
   }) async {
     final row =
         await _client
@@ -69,7 +70,8 @@ class ElectricityService {
               "consumption_kwh": consumptionKwh,
               "photo_path": photoPath,
               "note": note,
-              "recorded_at": DateTime.now().toUtc().toIso8601String(),
+              "recorded_at":
+                  (recordedAt ?? DateTime.now()).toUtc().toIso8601String(),
             }, onConflict: "home_id,period_month")
             .select()
             .single();

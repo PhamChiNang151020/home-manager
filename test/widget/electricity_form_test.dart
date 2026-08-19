@@ -81,26 +81,29 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets("meter form shows invalidReadings when new kWh less than previous", (
+  testWidgets(
+    "meter form shows invalidReadings when new kWh less than previous",
+    (tester) async {
+      await tester.binding.setSurfaceSize(const Size(800, 1200));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await pumpAddForm(tester, home: _meterHome);
+
+      final fields = find.byType(TextField);
+      await tester.enterText(fields.at(0), "120");
+      await tester.enterText(fields.at(1), "100");
+      await tester.ensureVisible(find.widgetWithText(FilledButton, S.save));
+      await tester.tap(find.widgetWithText(FilledButton, S.save));
+      await tester.pump();
+
+      expect(find.text(S.invalidReadings), findsOneWidget);
+      verifyZeroInteractions(electricity);
+    },
+  );
+
+  testWidgets("invoice form shows invalidAmount for zero amount", (
     tester,
   ) async {
-    await tester.binding.setSurfaceSize(const Size(800, 1200));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
-
-    await pumpAddForm(tester, home: _meterHome);
-
-    final fields = find.byType(TextField);
-    await tester.enterText(fields.at(0), "120");
-    await tester.enterText(fields.at(1), "100");
-    await tester.ensureVisible(find.widgetWithText(FilledButton, S.save));
-    await tester.tap(find.widgetWithText(FilledButton, S.save));
-    await tester.pump();
-
-    expect(find.text(S.invalidReadings), findsOneWidget);
-    verifyZeroInteractions(electricity);
-  });
-
-  testWidgets("invoice form shows invalidAmount for zero amount", (tester) async {
     await tester.binding.setSurfaceSize(const Size(800, 1200));
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
@@ -115,21 +118,20 @@ void main() {
     verifyZeroInteractions(electricity);
   });
 
-  testWidgets("meter form shows duplicate hint for existing month", (tester) async {
+  testWidgets("meter form shows duplicate hint for existing month", (
+    tester,
+  ) async {
     final existing = [
       ElectricityPeriod(
         id: "p1",
         homeId: "h1",
         periodMonth: DateTime(DateTime.now().year, DateTime.now().month),
         amountVnd: 70000,
+        recordedAt: DateTime.now(),
       ),
     ];
 
-    await pumpAddForm(
-      tester,
-      home: _meterHome,
-      existingPeriods: existing,
-    );
+    await pumpAddForm(tester, home: _meterHome, existingPeriods: existing);
 
     expect(find.text(S.duplicatePeriodHint), findsOneWidget);
   });

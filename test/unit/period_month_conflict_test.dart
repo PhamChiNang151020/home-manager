@@ -8,6 +8,7 @@ ElectricityPeriod _period({required String id, required DateTime month}) {
     homeId: "h1",
     periodMonth: month,
     amountVnd: 70000,
+    recordedAt: DateTime(2026, 1, 15),
   );
 }
 

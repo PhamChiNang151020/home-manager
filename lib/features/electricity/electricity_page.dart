@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:home_manager/core/domain/period_history_filter.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/logging/app_log.dart";
 import "package:home_manager/core/models/electricity_period.dart";
@@ -8,6 +9,7 @@ import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/electricity/electricity_form.dart";
 import "package:home_manager/features/electricity/electricity_summary_card.dart";
 import "package:home_manager/features/electricity/electricity_trend_chart.dart";
+import "package:home_manager/features/electricity/period_history_filter_bar.dart";
 import "package:home_manager/features/electricity/period_list_tile.dart";
 import "package:home_manager/features/electricity/reminder_banner.dart";
 import "package:home_manager/features/shared/empty_state_view.dart";
@@ -35,6 +37,16 @@ class ElectricityPageState extends State<ElectricityPage> {
   List<ElectricityPeriod> _items = [];
   bool _loading = true;
   String? _error;
+  int? _filterYear;
+  int? _filterMonth;
+  PeriodSortOrder _sortOrder = PeriodSortOrder.newestFirst;
+
+  List<ElectricityPeriod> get _filteredItems => filterPeriodHistory(
+    _items,
+    year: _filterYear,
+    month: _filterMonth,
+    sortOrder: _sortOrder,
+  );
 
   @override
   void initState() {
@@ -136,12 +148,27 @@ class ElectricityPageState extends State<ElectricityPage> {
             const SizedBox(height: AppSpacing.sm),
             ElectricityTrendChart(periods: _items),
             const SectionHeader(title: S.history),
-            for (final item in _items)
-              PeriodListTile(
-                period: item,
-                home: widget.home,
-                onTap: () => _openPeriodDialog(item),
-              ),
+            PeriodHistoryFilterBar(
+              years: distinctPeriodYears(_items),
+              filterYear: _filterYear,
+              filterMonth: _filterMonth,
+              sortOrder: _sortOrder,
+              onYearChanged: (value) => setState(() => _filterYear = value),
+              onMonthChanged: (value) => setState(() => _filterMonth = value),
+              onSortChanged: (value) => setState(() => _sortOrder = value),
+            ),
+            if (_filteredItems.isEmpty)
+              const Padding(
+                padding: EdgeInsets.only(bottom: AppSpacing.md),
+                child: EmptyStateView(message: S.noHistoryMatch),
+              )
+            else
+              for (final item in _filteredItems)
+                PeriodListTile(
+                  period: item,
+                  home: widget.home,
+                  onTap: () => _openPeriodDialog(item),
+                ),
           ],
         ],
       ),
