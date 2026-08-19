@@ -3,8 +3,10 @@ import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/models/electricity_period.dart";
 import "package:home_manager/core/models/home.dart";
 import "package:home_manager/core/models/tracking_mode.dart";
+import "package:home_manager/core/services/electricity_service.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/features/electricity/bill_photo_viewer.dart";
 import "package:home_manager/features/shared/app_card.dart";
 import "package:home_manager/features/shared/money_text.dart";
 import "package:home_manager/features/shared/status_badge.dart";
@@ -23,11 +25,13 @@ class PeriodListTile extends StatelessWidget {
     super.key,
     required this.period,
     required this.home,
+    required this.photos,
     required this.onTap,
   });
 
   final ElectricityPeriod period;
   final Home home;
+  final BillPhotoService photos;
   final VoidCallback onTap;
 
   @override
@@ -84,12 +88,22 @@ class PeriodListTile extends StatelessWidget {
                     label: "${_fmtKwh(period.consumptionKwh!)} kWh",
                     variant: StatusBadgeVariant.accent,
                   ),
-                StatusBadge(
-                  label: hasPhoto ? S.hasPhoto : S.noPhoto,
-                  variant:
+                GestureDetector(
+                  onTap:
                       hasPhoto
-                          ? StatusBadgeVariant.success
-                          : StatusBadgeVariant.neutral,
+                          ? () => showBillPhotoViewer(
+                            context: context,
+                            photoPath: period.photoPath!,
+                            photos: photos,
+                          )
+                          : null,
+                  child: StatusBadge(
+                    label: hasPhoto ? S.hasPhoto : S.noPhoto,
+                    variant:
+                        hasPhoto
+                            ? StatusBadgeVariant.success
+                            : StatusBadgeVariant.neutral,
+                  ),
                 ),
                 if (hasNote)
                   const StatusBadge(

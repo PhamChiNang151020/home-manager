@@ -167,6 +167,7 @@ class ElectricityPageState extends State<ElectricityPage> {
                 PeriodListTile(
                   period: item,
                   home: widget.home,
+                  photos: widget.photos,
                   onTap: () => _openPeriodDialog(item),
                 ),
           ],

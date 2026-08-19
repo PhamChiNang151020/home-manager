@@ -15,6 +15,11 @@ class InviteService {
     );
   }
 
+  Future<void> cancel(String inviteId) {
+    AppLog.i("Cancelling invite $inviteId");
+    return _client.from("home_invites").delete().eq("id", inviteId);
+  }
+
   Future<List<HomeInvite>> listPending(String homeId) async {
     final rows = await _client
         .from("home_invites")
@@ -23,7 +28,9 @@ class InviteService {
         .eq("status", "pending")
         .order("created_at");
     return (rows as List)
-        .map((row) => HomeInvite.fromJson(Map<String, dynamic>.from(row as Map)))
+        .map(
+          (row) => HomeInvite.fromJson(Map<String, dynamic>.from(row as Map)),
+        )
         .toList();
   }
 }

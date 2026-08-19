@@ -94,4 +94,8 @@ abstract final class S {
   static const selectRecordedAt = "Chọn ngày giờ ghi";
   static const hasNote = "Có ghi chú";
   static const noHistoryMatch = "Không có kỳ điện phù hợp bộ lọc";
+  static const cancelInvite = "Huỷ lời mời";
+  static const cancelInviteConfirm = "Huỷ lời mời đã gửi đến";
+  static const pendingInviteHint = "Đang chờ chấp nhận";
+  static const sending = "Đang gửi…";
 }

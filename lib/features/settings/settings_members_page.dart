@@ -3,8 +3,10 @@ import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/models/home.dart";
 import "package:home_manager/core/services/home_service.dart";
 import "package:home_manager/core/services/invite_service.dart";
+import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/shared/labeled_text_field.dart";
+import "package:home_manager/features/shared/section_header.dart";
 
 class SettingsMembersPage extends StatefulWidget {
   const SettingsMembersPage({
@@ -27,11 +29,12 @@ class _SettingsMembersPageState extends State<SettingsMembersPage> {
   List<HomeMember> _members = [];
   List<HomeInvite> _pending = [];
   String? _error;
+  bool _sending = false;
 
   @override
   void initState() {
     super.initState();
-    _loadPeople();
+    _load();
   }
 
   @override
@@ -40,16 +43,18 @@ class _SettingsMembersPageState extends State<SettingsMembersPage> {
     super.dispose();
   }
 
-  Future<void> _loadPeople() async {
+  Future<void> _load() async {
     try {
       final members = await widget.homesApi.listMembers(widget.home.id);
-      final pending = widget.home.isOwner
-          ? await widget.invites.listPending(widget.home.id)
-          : <HomeInvite>[];
+      final pending =
+          widget.home.isOwner
+              ? await widget.invites.listPending(widget.home.id)
+              : <HomeInvite>[];
       if (mounted) {
         setState(() {
           _members = members;
           _pending = pending;
+          _error = null;
         });
       }
     } catch (e) {
@@ -57,58 +62,186 @@ class _SettingsMembersPageState extends State<SettingsMembersPage> {
     }
   }
 
+  Future<void> _sendInvite() async {
+    final email = _inviteEmail.text.trim();
+    if (email.isEmpty) return;
+    setState(() {
+      _sending = true;
+      _error = null;
+    });
+    try {
+      await widget.invites.invite(homeId: widget.home.id, email: email);
+      _inviteEmail.clear();
+      await _load();
+    } catch (e) {
+      if (mounted) setState(() => _error = "$e");
+    } finally {
+      if (mounted) setState(() => _sending = false);
+    }
+  }
+
+  Future<void> _cancelInvite(HomeInvite invite) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text(S.cancelInvite),
+            content: Text("${S.cancelInviteConfirm} ${invite.email}?"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text(S.cancel),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: FilledButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                ),
+                child: const Text(S.delete),
+              ),
+            ],
+          ),
+    );
+    if (confirmed != true || !mounted) return;
+    try {
+      await widget.invites.cancel(invite.id);
+      await _load();
+    } catch (e) {
+      if (mounted) setState(() => _error = "$e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     final owner = widget.home.isOwner;
+
     return Scaffold(
       appBar: AppBar(title: const Text(S.settingsMembers)),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.md),
         children: [
-          Text(S.members, style: Theme.of(context).textTheme.titleMedium),
-          for (final member in _members)
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(member.displayName ?? member.email ?? member.userId),
-              subtitle: Text(member.role == "owner" ? S.owner : S.member),
-            ),
+          const SectionHeader(title: S.members),
+          for (final member in _members) _MemberTile(member: member),
           if (owner) ...[
-            const SizedBox(height: AppSpacing.md),
-            Text(S.invite, style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: AppSpacing.sm),
+            const SectionHeader(title: S.invite),
             LabeledTextField(
               label: S.inviteEmail,
               controller: _inviteEmail,
               keyboardType: TextInputType.emailAddress,
+              hint: "example@gmail.com",
             ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: TextButton(
-                onPressed: () async {
-                  final email = _inviteEmail.text.trim();
-                  if (email.isEmpty) return;
-                  try {
-                    await widget.invites.invite(
-                      homeId: widget.home.id,
-                      email: email,
-                    );
-                    _inviteEmail.clear();
-                    await _loadPeople();
-                  } catch (e) {
-                    setState(() => _error = "$e");
-                  }
-                },
-                child: const Text(S.sendInvite),
+            const SizedBox(height: AppSpacing.sm),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: _sending ? null : _sendInvite,
+                icon:
+                    _sending
+                        ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                        : const Icon(Icons.send_outlined, size: 18),
+                label: Text(_sending ? S.sending : S.sendInvite),
               ),
             ),
-            if (_pending.isNotEmpty)
-              Text(S.pendingInvites, style: Theme.of(context).textTheme.titleSmall),
-            for (final invite in _pending)
-              ListTile(title: Text(invite.email), dense: true),
+            if (_pending.isNotEmpty) ...[
+              const SectionHeader(title: S.pendingInvites),
+              for (final invite in _pending)
+                _PendingInviteTile(
+                  invite: invite,
+                  onCancel: () => _cancelInvite(invite),
+                ),
+            ],
           ],
           if (_error != null)
-            Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+            Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.sm),
+              child: Text(_error!, style: TextStyle(color: colors.error)),
+            ),
         ],
+      ),
+    );
+  }
+}
+
+class _MemberTile extends StatelessWidget {
+  const _MemberTile({required this.member});
+  final HomeMember member;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final label = member.displayName ?? member.email ?? member.userId;
+    final sub =
+        member.email != null && member.displayName != null
+            ? member.email!
+            : null;
+    final isOwner = member.role == "owner";
+
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: CircleAvatar(
+        backgroundColor: colors.accentMuted(),
+        child: Text(
+          label.isNotEmpty ? label[0].toUpperCase() : "?",
+          style: TextStyle(color: colors.accent, fontWeight: FontWeight.w600),
+        ),
+      ),
+      title: Text(label),
+      subtitle: sub != null ? Text(sub) : null,
+      trailing: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.sm,
+          vertical: AppSpacing.xs,
+        ),
+        decoration: BoxDecoration(
+          color: isOwner ? colors.accentMuted() : colors.bgElevated,
+          borderRadius: BorderRadius.circular(AppSpacing.sm),
+        ),
+        child: Text(
+          isOwner ? S.owner : S.member,
+          style: TextStyle(
+            color: isOwner ? colors.accent : colors.textSecondary,
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PendingInviteTile extends StatelessWidget {
+  const _PendingInviteTile({required this.invite, required this.onCancel});
+  final HomeInvite invite;
+  final VoidCallback onCancel;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: CircleAvatar(
+        backgroundColor: colors.warningMuted(),
+        child: Icon(Icons.mail_outline, color: colors.warning, size: 18),
+      ),
+      title: Text(invite.email),
+      subtitle: Text(
+        S.pendingInviteHint,
+        style: TextStyle(color: colors.textMuted, fontSize: 12),
+      ),
+      trailing: IconButton(
+        onPressed: onCancel,
+        icon: const Icon(Icons.close),
+        iconSize: 18,
+        color: colors.textSecondary,
+        tooltip: S.cancelInvite,
       ),
     );
   }
