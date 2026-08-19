@@ -19,6 +19,16 @@ class ElectricitySummaryCard extends StatelessWidget {
   final Home home;
   final List<ElectricityPeriod> periods;
 
+  static String _capitalizeFirst(String s) =>
+      s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
+
+  static String _formatKwh(double kwh) {
+    final rounded = kwh.round();
+    return kwh == rounded.toDouble()
+        ? rounded.toString()
+        : kwh.toStringAsFixed(1);
+  }
+
   @override
   Widget build(BuildContext context) {
     if (periods.isEmpty) {
@@ -29,7 +39,8 @@ class ElectricitySummaryCard extends StatelessWidget {
     final latest = periods.first;
     final recent = periods.take(6).toList();
     final avg =
-        recent.fold<double>(0, (sum, p) => sum + p.amountVnd) / recent.length;
+        (recent.fold<double>(0, (sum, p) => sum + p.amountVnd) / recent.length)
+            .roundToDouble();
 
     return AppCard(
       child: Column(
@@ -43,7 +54,9 @@ class ElectricitySummaryCard extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
-            DateFormat("MMMM yyyy", "vi").format(latest.periodMonth),
+            _capitalizeFirst(
+              DateFormat("MMMM yyyy", "vi").format(latest.periodMonth),
+            ),
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -52,13 +65,13 @@ class ElectricitySummaryCard extends StatelessWidget {
               latest.consumptionKwh != null) ...[
             const SizedBox(height: AppSpacing.sm),
             Text(
-              "${S.consumption}: ${latest.consumptionKwh!.toStringAsFixed(1)} kWh",
+              "${S.consumption}: ${_formatKwh(latest.consumptionKwh!)} kWh",
               style: TextStyle(color: colors.textSecondary),
             ),
           ],
           const SizedBox(height: AppSpacing.md),
           const Divider(height: 1),
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: AppSpacing.md),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

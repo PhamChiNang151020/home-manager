@@ -7,6 +7,7 @@ import "package:home_manager/core/models/electricity_period.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/shared/app_card.dart";
+
 class ElectricityTrendChart extends StatelessWidget {
   const ElectricityTrendChart({super.key, required this.periods});
 

@@ -10,6 +10,14 @@ import "package:home_manager/features/shared/money_text.dart";
 import "package:home_manager/features/shared/status_badge.dart";
 import "package:intl/intl.dart";
 
+String _fmtKwh(double? kwh) {
+  if (kwh == null) return '–';
+  final rounded = kwh.round();
+  return kwh == rounded.toDouble()
+      ? rounded.toString()
+      : kwh.toStringAsFixed(1);
+}
+
 class PeriodListTile extends StatelessWidget {
   const PeriodListTile({
     super.key,
@@ -50,9 +58,9 @@ class PeriodListTile extends StatelessWidget {
             if (home.trackingMode == TrackingMode.meter) ...[
               const SizedBox(height: AppSpacing.xs),
               Text(
-                "${period.previousKwh?.toStringAsFixed(0) ?? '–'} → "
-                "${period.newKwh?.toStringAsFixed(0) ?? '–'} kWh"
-                "${period.consumptionKwh != null ? ' · ${period.consumptionKwh!.toStringAsFixed(1)} kWh' : ''}",
+                "${_fmtKwh(period.previousKwh)} → "
+                "${_fmtKwh(period.newKwh)} kWh"
+                "${period.consumptionKwh != null ? ' · ${_fmtKwh(period.consumptionKwh!)} kWh' : ''}",
                 style: TextStyle(color: colors.textSecondary),
               ),
             ],
@@ -73,7 +81,7 @@ class PeriodListTile extends StatelessWidget {
                 if (home.trackingMode == TrackingMode.meter &&
                     period.consumptionKwh != null)
                   StatusBadge(
-                    label: "${period.consumptionKwh!.toStringAsFixed(0)} kWh",
+                    label: "${_fmtKwh(period.consumptionKwh!)} kWh",
                     variant: StatusBadgeVariant.accent,
                   ),
                 StatusBadge(
