@@ -928,15 +928,19 @@ class _InfoRow extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, size: 13, color: colors.textMuted),
+              Icon(icon, size: 14, color: colors.textSecondary),
               const SizedBox(width: 4),
               Text(
                 label,
-                style: TextStyle(color: colors.textMuted, fontSize: 11),
+                style: TextStyle(
+                  color: colors.textSecondary,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 4),
           onTap != null
               ? DecoratedBox(
                 decoration: BoxDecoration(
