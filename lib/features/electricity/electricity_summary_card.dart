@@ -21,16 +21,11 @@ class ElectricitySummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.appColors;
     if (periods.isEmpty) {
-      return AppCard(
-        child: Text(
-          S.noPeriods,
-          style: TextStyle(color: colors.textSecondary),
-        ),
-      );
+      return const SizedBox.shrink();
     }
 
+    final colors = context.appColors;
     final latest = periods.first;
     final recent = periods.take(6).toList();
     final avg = recent.fold<double>(0, (sum, p) => sum + p.amountVnd) /

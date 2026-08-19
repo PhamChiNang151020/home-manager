@@ -32,7 +32,7 @@ abstract final class S {
   static const deletePeriod = "Xóa kỳ điện";
   static const deletePeriodConfirm = "Xóa kỳ điện này? Không thể hoàn tác.";
   static const noHomes = "Chưa có nhà. Tạo nhà hoặc nhận lời mời.";
-  static const noPeriods = "Chưa có kỳ điện.";
+  static const noPeriods = "Chưa có kỳ điện nào được ghi nhận";
   static const invite = "Mời thành viên";
   static const inviteEmail = "Email Google";
   static const sendInvite = "Gửi lời mời";

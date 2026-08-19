@@ -42,7 +42,10 @@ abstract final class AppTheme {
       ),
       cardTheme: CardTheme(
         color: colors.bgSurface,
-        elevation: 0,
+        elevation: brightness == Brightness.dark ? 1 : 2,
+        shadowColor: brightness == Brightness.dark
+            ? Colors.black.withValues(alpha: 0.35)
+            : Colors.black.withValues(alpha: 0.08),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           side: BorderSide(color: colors.border),

@@ -10,6 +10,7 @@ import "package:home_manager/features/electricity/electricity_summary_card.dart"
 import "package:home_manager/features/electricity/electricity_trend_chart.dart";
 import "package:home_manager/features/electricity/period_list_tile.dart";
 import "package:home_manager/features/electricity/reminder_banner.dart";
+import "package:home_manager/features/shared/empty_state_view.dart";
 import "package:home_manager/features/shared/error_view.dart";
 import "package:home_manager/features/shared/loading_view.dart";
 import "package:home_manager/features/shared/section_header.dart";
@@ -123,10 +124,12 @@ class ElectricityPageState extends State<ElectricityPage> {
         ),
         children: [
           ReminderBanner(home: widget.home),
-          ElectricitySummaryCard(home: widget.home, periods: _items),
-          const SizedBox(height: AppSpacing.sm),
-          ElectricityTrendChart(periods: _items),
-          if (_items.isNotEmpty) ...[
+          if (_items.isEmpty) ...[
+            const EmptyStateView(message: S.noPeriods),
+          ] else ...[
+            ElectricitySummaryCard(home: widget.home, periods: _items),
+            const SizedBox(height: AppSpacing.sm),
+            ElectricityTrendChart(periods: _items),
             const SectionHeader(title: S.history),
             for (final item in _items)
               PeriodListTile(
@@ -134,11 +137,7 @@ class ElectricityPageState extends State<ElectricityPage> {
                 home: widget.home,
                 onTap: () => _openPeriodDialog(item),
               ),
-          ] else
-            const Padding(
-              padding: EdgeInsets.all(AppSpacing.lg),
-              child: Center(child: Text(S.noPeriods)),
-            ),
+          ],
         ],
       ),
     );
