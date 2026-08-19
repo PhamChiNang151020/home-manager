@@ -47,3 +47,9 @@ Locked decisions. Do not change without discussion.
 - GitHub: `https://github.com/PhamChiNang151020/home-manager.git` (private)
 - Default branch: `main`
 - Parent folder `../` (`client/`) holds multiple personal projects; this repo root is `home-manager/` only.
+
+## QA & testing
+
+- Workflow index: `.cursor/docs/qa/README.md`
+- Agent skill: `.cursor/skills/qa-testing/SKILL.md`
+- Every feature/bug: plan + checklist + automated test + `flutter test`

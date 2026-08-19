@@ -87,6 +87,7 @@ class ElectricityPageState extends State<ElectricityPage> {
       electricity: widget.electricity,
       photos: widget.photos,
       previousPeriod: previous,
+      existingPeriods: _items,
       onSaved: _load,
     );
   }
@@ -104,6 +105,7 @@ class ElectricityPageState extends State<ElectricityPage> {
       photos: widget.photos,
       existing: existing,
       previousPeriod: previous.isEmpty ? null : previous.first,
+      existingPeriods: _items,
       onSaved: _load,
     );
   }

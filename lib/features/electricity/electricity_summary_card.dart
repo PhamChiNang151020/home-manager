@@ -28,8 +28,8 @@ class ElectricitySummaryCard extends StatelessWidget {
     final colors = context.appColors;
     final latest = periods.first;
     final recent = periods.take(6).toList();
-    final avg = recent.fold<double>(0, (sum, p) => sum + p.amountVnd) /
-        recent.length;
+    final avg =
+        recent.fold<double>(0, (sum, p) => sum + p.amountVnd) / recent.length;
 
     return AppCard(
       child: Column(
@@ -37,9 +37,9 @@ class ElectricitySummaryCard extends StatelessWidget {
         children: [
           Text(
             S.lastPeriod,
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: colors.textSecondary,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.labelMedium?.copyWith(color: colors.textSecondary),
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(

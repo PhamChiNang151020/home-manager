@@ -42,15 +42,16 @@ class PeriodListTile extends StatelessWidget {
                   child: Text(
                     monthLabel,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
                 StatusBadge(
                   label: hasPhoto ? S.hasPhoto : S.noPhoto,
-                  variant: hasPhoto
-                      ? StatusBadgeVariant.success
-                      : StatusBadgeVariant.warning,
+                  variant:
+                      hasPhoto
+                          ? StatusBadgeVariant.success
+                          : StatusBadgeVariant.warning,
                 ),
               ],
             ),
@@ -69,10 +70,7 @@ class PeriodListTile extends StatelessWidget {
               const SizedBox(height: AppSpacing.xs),
               Text(
                 period.note!,
-                style: TextStyle(
-                  color: colors.textMuted,
-                  fontSize: 13,
-                ),
+                style: TextStyle(color: colors.textMuted, fontSize: 13),
               ),
             ],
           ],

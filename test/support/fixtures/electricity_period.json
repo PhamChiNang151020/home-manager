@@ -1,0 +1,11 @@
+{
+  "id": "p1",
+  "home_id": "h1",
+  "period_month": "2026-03-01",
+  "amount_vnd": 70000,
+  "previous_kwh": 100,
+  "new_kwh": 120,
+  "consumption_kwh": 20,
+  "photo_path": null,
+  "note": null
+}

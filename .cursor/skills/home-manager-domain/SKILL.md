@@ -42,3 +42,10 @@ Vietnamese UI. Electricity only.
 - Water, expenses, shopping
 - Web Push (documented in `.cursor/docs/web-push.md`)
 - Paid hosting
+
+## Testing / validation
+
+- Feature list + E2E cases: `.cursor/docs/qa/v1-feature-inventory.md`
+- Meter validation (missing kWh, new < prev): `lib/core/domain/electricity_validation.dart`
+- Duplicate period month: `lib/features/electricity/period_month_conflict.dart`
+- Agent workflow: `.cursor/skills/qa-testing/SKILL.md`

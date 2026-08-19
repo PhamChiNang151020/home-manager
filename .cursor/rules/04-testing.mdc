@@ -1,0 +1,35 @@
+---
+description: >
+  QA workflow for home_manager. Load when adding features, fixing bugs, writing
+  tests, or reviewing. Trigger on: test, QA, checklist, regression, unit test,
+  widget test, bug fix, new feature.
+alwaysApply: false
+---
+
+# Testing — home_manager
+
+Read [`.cursor/skills/qa-testing/SKILL.md`](../skills/qa-testing/SKILL.md) before implementing features or bug fixes.
+
+## Required for every feature / bug fix
+
+1. Plan (goal + files from CODEBASE_MAP)
+2. Checklist — copy [checklist-template.md](../docs/qa/checklist-template.md) or tick [v1-manual-e2e.md](../docs/qa/v1-manual-e2e.md) IDs
+3. Automated tests per [test-map.md](../docs/qa/test-map.md)
+4. `flutter analyze && flutter test` pass before PR
+
+## Test placement
+
+| Change type | Required test |
+|-------------|---------------|
+| Pure logic in `lib/core/domain/` | `test/unit/` |
+| UI validation / empty states | `test/widget/` |
+| Supabase service call | `test/integration/` or extract + unit test helper |
+| User-facing flow | Manual E2E checklist item |
+
+## Extract before testing widgets
+
+Form validation and month-edit logic belong in `lib/core/domain/` — not duplicated inside private `_save()` methods.
+
+## CI
+
+GitHub Actions runs `flutter test` on push to `main`. Do not merge failing tests.

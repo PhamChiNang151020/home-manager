@@ -1,5 +1,6 @@
 import "dart:typed_data";
 
+import "package:home_manager/core/domain/electricity_period_edit.dart";
 import "package:home_manager/core/logging/app_log.dart";
 import "package:home_manager/core/models/electricity_period.dart";
 import "package:intl/intl.dart";
@@ -11,7 +12,7 @@ class ElectricityService {
   final SupabaseClient _client;
 
   static String monthKey(DateTime month) =>
-      DateFormat("yyyy-MM-01").format(DateTime(month.year, month.month));
+      ElectricityPeriodEdit.monthKey(month);
 
   Future<List<ElectricityPeriod>> list(String homeId) async {
     AppLog.d("list periods for $homeId");
@@ -22,9 +23,8 @@ class ElectricityService {
         .order("period_month", ascending: false);
     return (rows as List)
         .map(
-          (row) => ElectricityPeriod.fromJson(
-            Map<String, dynamic>.from(row as Map),
-          ),
+          (row) =>
+              ElectricityPeriod.fromJson(Map<String, dynamic>.from(row as Map)),
         )
         .toList();
   }
@@ -40,7 +40,9 @@ class ElectricityService {
     if (list.isEmpty) {
       return null;
     }
-    return ElectricityPeriod.fromJson(Map<String, dynamic>.from(list.first as Map));
+    return ElectricityPeriod.fromJson(
+      Map<String, dynamic>.from(list.first as Map),
+    );
   }
 
   Future<ElectricityPeriod> upsert({
@@ -52,22 +54,35 @@ class ElectricityService {
     double? consumptionKwh,
     String? photoPath,
     String? note,
+    String? editingId,
+    DateTime? editingOriginalMonth,
   }) async {
-    final row = await _client
-        .from("electricity_periods")
-        .upsert({
-          "home_id": homeId,
-          "period_month": monthKey(periodMonth),
-          "amount_vnd": amountVnd,
-          "previous_kwh": previousKwh,
-          "new_kwh": newKwh,
-          "consumption_kwh": consumptionKwh,
-          "photo_path": photoPath,
-          "note": note,
-          "recorded_at": DateTime.now().toUtc().toIso8601String(),
-        }, onConflict: "home_id,period_month")
-        .select()
-        .single();
+    final row =
+        await _client
+            .from("electricity_periods")
+            .upsert({
+              "home_id": homeId,
+              "period_month": monthKey(periodMonth),
+              "amount_vnd": amountVnd,
+              "previous_kwh": previousKwh,
+              "new_kwh": newKwh,
+              "consumption_kwh": consumptionKwh,
+              "photo_path": photoPath,
+              "note": note,
+              "recorded_at": DateTime.now().toUtc().toIso8601String(),
+            }, onConflict: "home_id,period_month")
+            .select()
+            .single();
+
+    final monthChanged = ElectricityPeriodEdit.shouldDeleteOriginalPeriod(
+      editingId: editingId,
+      editingOriginalMonth: editingOriginalMonth,
+      periodMonth: periodMonth,
+    );
+    if (monthChanged) {
+      await delete(editingId!);
+    }
+
     return ElectricityPeriod.fromJson(row);
   }
 
@@ -94,7 +109,9 @@ class BillPhotoService {
     required Uint8List bytes,
   }) async {
     final path = pathFor(homeId: homeId, month: month);
-    await _client.storage.from(bucket).uploadBinary(
+    await _client.storage
+        .from(bucket)
+        .uploadBinary(
           path,
           bytes,
           fileOptions: const FileOptions(

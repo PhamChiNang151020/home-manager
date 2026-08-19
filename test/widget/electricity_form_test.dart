@@ -1,0 +1,136 @@
+import "package:flutter/material.dart";
+import "package:flutter_test/flutter_test.dart";
+import "package:home_manager/core/l10n/strings.dart";
+import "package:home_manager/core/models/electricity_period.dart";
+import "package:home_manager/core/models/home.dart";
+import "package:home_manager/core/models/tracking_mode.dart";
+import "package:home_manager/core/services/electricity_service.dart";
+import "package:home_manager/core/theme/app_accent.dart";
+import "package:home_manager/core/theme/app_theme.dart";
+import "package:home_manager/features/electricity/electricity_form.dart";
+import "package:mocktail/mocktail.dart";
+
+class MockElectricityService extends Mock implements ElectricityService {}
+
+class MockBillPhotoService extends Mock implements BillPhotoService {}
+
+const _meterHome = Home(
+  id: "h1",
+  name: "Nhà tôi",
+  trackingMode: TrackingMode.meter,
+  kwhRate: 3500,
+  createdBy: "u1",
+);
+
+const _invoiceHome = Home(
+  id: "h2",
+  name: "Nhà ba mẹ",
+  trackingMode: TrackingMode.invoice,
+  kwhRate: 3500,
+  createdBy: "u1",
+);
+
+void main() {
+  late MockElectricityService electricity;
+  late MockBillPhotoService photos;
+
+  setUpAll(() {
+    registerFallbackValue(DateTime(2026));
+    registerFallbackValue(_meterHome.id);
+  });
+
+  setUp(() {
+    electricity = MockElectricityService();
+    photos = MockBillPhotoService();
+  });
+
+  Future<void> pumpAddForm(
+    WidgetTester tester, {
+    required Home home,
+    List<ElectricityPeriod> existingPeriods = const [],
+  }) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.build(
+          brightness: Brightness.light,
+          accent: AppAccent.amber,
+        ),
+        home: Builder(
+          builder: (context) {
+            return Scaffold(
+              body: Center(
+                child: FilledButton(
+                  onPressed:
+                      () => showElectricityAddForm(
+                        context: context,
+                        home: home,
+                        electricity: electricity,
+                        photos: photos,
+                        existingPeriods: existingPeriods,
+                        onSaved: () {},
+                      ),
+                  child: const Text("Open"),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+    await tester.tap(find.text("Open"));
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets("meter form shows invalidReadings when new kWh less than previous", (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(800, 1200));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await pumpAddForm(tester, home: _meterHome);
+
+    final fields = find.byType(TextField);
+    await tester.enterText(fields.at(0), "120");
+    await tester.enterText(fields.at(1), "100");
+    await tester.ensureVisible(find.widgetWithText(FilledButton, S.save));
+    await tester.tap(find.widgetWithText(FilledButton, S.save));
+    await tester.pump();
+
+    expect(find.text(S.invalidReadings), findsOneWidget);
+    verifyZeroInteractions(electricity);
+  });
+
+  testWidgets("invoice form shows invalidAmount for zero amount", (tester) async {
+    await tester.binding.setSurfaceSize(const Size(800, 1200));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await pumpAddForm(tester, home: _invoiceHome);
+
+    await tester.enterText(find.byType(TextField).first, "0");
+    await tester.ensureVisible(find.widgetWithText(FilledButton, S.save));
+    await tester.tap(find.widgetWithText(FilledButton, S.save));
+    await tester.pump();
+
+    expect(find.text(S.invalidAmount), findsOneWidget);
+    verifyZeroInteractions(electricity);
+  });
+
+  testWidgets("meter form shows duplicate hint for existing month", (tester) async {
+    final existing = [
+      ElectricityPeriod(
+        id: "p1",
+        homeId: "h1",
+        periodMonth: DateTime(DateTime.now().year, DateTime.now().month),
+        amountVnd: 70000,
+      ),
+    ];
+
+    await pumpAddForm(
+      tester,
+      home: _meterHome,
+      existingPeriods: existing,
+    );
+
+    expect(find.text(S.duplicatePeriodHint), findsOneWidget);
+  });
+}

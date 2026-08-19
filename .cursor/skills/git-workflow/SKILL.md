@@ -32,7 +32,7 @@ description: >-
 
 1. Parallel: status, diff, tracking branch, `git log main..HEAD`, full diff vs `main`.
 2. Push with `-u` if needed (`gh` / network permissions as required).
-3. `gh pr create` with Summary + Test plan.
+3. `gh pr create` with Summary + Test plan (link checklist from `.cursor/docs/qa/checklists/` or E2E TC IDs; list new `test/` files; confirm `flutter test` pass).
 
 ## Project-specific
 

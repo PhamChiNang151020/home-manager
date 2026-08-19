@@ -33,6 +33,11 @@ abstract final class S {
   static const editPeriod = "Sửa kỳ điện";
   static const deletePeriod = "Xóa kỳ điện";
   static const deletePeriodConfirm = "Xóa kỳ điện này? Không thể hoàn tác.";
+  static const duplicatePeriodTitle = "Kỳ điện đã tồn tại";
+  static const duplicatePeriodConfirm =
+      "Tháng này đã có kỳ điện. Ghi đè dữ liệu cũ?";
+  static const duplicatePeriodHint = "Tháng này đã có kỳ điện";
+  static const overwrite = "Ghi đè";
   static const noHomes = "Chưa có nhà. Tạo nhà hoặc nhận lời mời.";
   static const noPeriods = "Chưa có kỳ điện nào được ghi nhận";
   static const invite = "Mời thành viên";

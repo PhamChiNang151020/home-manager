@@ -32,5 +32,6 @@ alwaysApply: false
 ## Quality
 
 - Run `dart format <changed paths>` on every file you edit before finishing.
-- Run `flutter analyze` before considering work done.
+- Run `flutter analyze` and `flutter test` before considering work done.
 - No `print` in production paths — use `debugPrint` if needed.
+- Pure business logic → `lib/core/domain/` with unit tests in `test/unit/`. See `.cursor/skills/qa-testing/SKILL.md`.

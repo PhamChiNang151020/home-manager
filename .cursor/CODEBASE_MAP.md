@@ -41,6 +41,8 @@ Consult this file before grepping the repo. Update when adding modules under `li
 | Copy (VI) | `lib/core/l10n/strings.dart` |
 | Logging (debug) | `lib/core/logging/app_log.dart` |
 | Theme (dark) | `lib/core/theme/app_theme.dart`, `app_colors.dart`, `app_spacing.dart`, `mobile_viewport.dart` |
+| Domain validation | `lib/core/domain/electricity_validation.dart` |
+| Period edit helpers | `lib/core/domain/electricity_period_edit.dart` |
 | Meter math / day clamp | `lib/core/domain/meter_math.dart` |
 | Models | `lib/core/models/home.dart`, `electricity_period.dart`, `tracking_mode.dart` |
 | Auth / homes / invites | `lib/core/services/auth_service.dart`, `home_service.dart`, `invite_service.dart` |
@@ -64,12 +66,36 @@ Consult this file before grepping the repo. Update when adding modules under `li
 | Pages notes | `.cursor/docs/github-pages.md` |
 | Web Push (later) | `.cursor/docs/web-push.md` |
 
-## Tests
+## QA & Tests
 
 | Item | Path |
 |------|------|
-| Meter math + missing config | `test/widget_test.dart` |
-| ICS export | `test/ics_export_service_test.dart` |
+| QA index | `.cursor/docs/qa/README.md` |
+| Feature inventory | `.cursor/docs/qa/v1-feature-inventory.md` |
+| Manual E2E | `.cursor/docs/qa/v1-manual-e2e.md` |
+| Checklist → test map | `.cursor/docs/qa/test-map.md` |
+| Per-feature template | `.cursor/docs/qa/checklist-template.md` |
+| QA agent skill | `.cursor/skills/qa-testing/SKILL.md` |
+| Testing rule | `.cursor/rules/04-testing.mdc` |
+
+### Automated tests (`test/`)
+
+| Layer | Path | Examples |
+|-------|------|----------|
+| Meter math | `test/unit/meter_math_test.dart` |
+| Day clamp / isToday | `test/unit/day_of_month_test.dart` |
+| VND format | `test/unit/vnd_format_test.dart` |
+| Electricity validation | `test/unit/electricity_validation_test.dart` |
+| Period edit / monthKey | `test/unit/electricity_period_edit_test.dart` |
+| Duplicate month | `test/unit/period_month_conflict_test.dart` |
+| Bill photo path | `test/unit/bill_photo_service_test.dart` |
+| ICS export | `test/unit/ics_export_service_test.dart` |
+| Missing config widget | `test/widget/missing_config_test.dart` |
+| Electricity form validation | `test/widget/electricity_form_test.dart` |
+| Reminder banner | `test/widget/reminder_banner_test.dart` |
+| Electricity service integration | `test/integration/electricity_service_test.dart` |
+| Mock helpers | `test/support/mock_supabase.dart` |
+| Fixtures | `test/support/fixtures/electricity_period.json` |
 
 ### Feature modules (`lib/features/`)
 

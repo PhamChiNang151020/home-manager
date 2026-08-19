@@ -1,6 +1,7 @@
 import "dart:typed_data";
 
 import "package:flutter/material.dart";
+import "package:home_manager/core/domain/electricity_validation.dart";
 import "package:home_manager/core/domain/meter_math.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/models/electricity_period.dart";
@@ -10,6 +11,7 @@ import "package:home_manager/core/format/vnd_format.dart";
 import "package:home_manager/core/services/electricity_service.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/features/electricity/period_month_conflict.dart";
 import "package:home_manager/features/shared/form_title.dart";
 import "package:home_manager/features/shared/labeled_money_field.dart";
 import "package:home_manager/features/shared/labeled_text_field.dart";
@@ -17,12 +19,24 @@ import "package:home_manager/features/shared/month_picker.dart";
 import "package:image_picker/image_picker.dart";
 import "package:intl/intl.dart";
 
+String _saveErrorMessage(ElectricitySaveError error) {
+  switch (error) {
+    case ElectricitySaveError.missingReadings:
+      return S.firstPeriodHint;
+    case ElectricitySaveError.invalidReadings:
+      return S.invalidReadings;
+    case ElectricitySaveError.invalidAmount:
+      return S.invalidAmount;
+  }
+}
+
 Future<void> showElectricityAddForm({
   required BuildContext context,
   required Home home,
   required ElectricityService electricity,
   required BillPhotoService photos,
   ElectricityPeriod? previousPeriod,
+  required List<ElectricityPeriod> existingPeriods,
   required VoidCallback onSaved,
 }) {
   return showModalBottomSheet<void>(
@@ -30,7 +44,9 @@ Future<void> showElectricityAddForm({
     isScrollControlled: true,
     backgroundColor: context.appColors.bgSurface,
     shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.cardRadius)),
+      borderRadius: BorderRadius.vertical(
+        top: Radius.circular(AppSpacing.cardRadius),
+      ),
     ),
     builder: (context) {
       return _ElectricityAddSheet(
@@ -38,6 +54,7 @@ Future<void> showElectricityAddForm({
         electricity: electricity,
         photos: photos,
         previousPeriod: previousPeriod,
+        existingPeriods: existingPeriods,
         onSaved: onSaved,
       );
     },
@@ -51,6 +68,7 @@ Future<void> showElectricityPeriodDialog({
   required BillPhotoService photos,
   required ElectricityPeriod existing,
   ElectricityPeriod? previousPeriod,
+  required List<ElectricityPeriod> existingPeriods,
   required VoidCallback onSaved,
 }) {
   return showDialog<void>(
@@ -59,13 +77,16 @@ Future<void> showElectricityPeriodDialog({
       return Dialog(
         insetPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppSpacing.maxContentWidth),
+          constraints: const BoxConstraints(
+            maxWidth: AppSpacing.maxContentWidth,
+          ),
           child: _ElectricityPeriodDialog(
             home: home,
             electricity: electricity,
             photos: photos,
             existing: existing,
             previousPeriod: previousPeriod,
+            existingPeriods: existingPeriods,
             onSaved: onSaved,
           ),
         ),
@@ -80,12 +101,14 @@ class _ElectricityAddSheet extends StatefulWidget {
     required this.electricity,
     required this.photos,
     required this.onSaved,
+    required this.existingPeriods,
     this.previousPeriod,
   });
 
   final Home home;
   final ElectricityService electricity;
   final BillPhotoService photos;
+  final List<ElectricityPeriod> existingPeriods;
   final ElectricityPeriod? previousPeriod;
   final VoidCallback onSaved;
 
@@ -101,8 +124,20 @@ class _ElectricityAddSheetState extends State<_ElectricityAddSheet> {
   late DateTime _month;
   Uint8List? _photoBytes;
   String? _error;
+  String? _duplicateHint;
 
   bool get _isMeter => widget.home.trackingMode == TrackingMode.meter;
+
+  void _updateDuplicateHint() {
+    final duplicate = findPeriodForMonth(widget.existingPeriods, _month);
+    _duplicateHint = duplicate == null ? null : S.duplicatePeriodHint;
+  }
+
+  Future<bool> _confirmDuplicateIfNeeded() async {
+    final duplicate = findPeriodForMonth(widget.existingPeriods, _month);
+    if (duplicate == null) return true;
+    return confirmDuplicatePeriodMonth(context, _month);
+  }
 
   @override
   void initState() {
@@ -114,6 +149,7 @@ class _ElectricityAddSheetState extends State<_ElectricityAddSheet> {
     _next = TextEditingController();
     _amount = TextEditingController();
     _note = TextEditingController();
+    _updateDuplicateHint();
   }
 
   @override
@@ -127,15 +163,12 @@ class _ElectricityAddSheetState extends State<_ElectricityAddSheet> {
 
   void _recompute() {
     if (!_isMeter) return;
-    final prev = double.tryParse(_previous.text.replaceAll(",", "."));
-    final neu = double.tryParse(_next.text.replaceAll(",", "."));
+    final prev = ElectricityValidation.parseKwh(_previous.text);
+    final neu = ElectricityValidation.parseKwh(_next.text);
     if (prev == null || neu == null) return;
     final used = MeterMath.consumption(previousKwh: prev, newKwh: neu);
     _amount.text = VndFormat.input(
-      MeterMath.amountVnd(
-        consumptionKwh: used,
-        kwhRate: widget.home.kwhRate,
-      ),
+      MeterMath.amountVnd(consumptionKwh: used, kwhRate: widget.home.kwhRate),
     );
   }
 
@@ -146,21 +179,24 @@ class _ElectricityAddSheetState extends State<_ElectricityAddSheet> {
       double? used;
       final money = VndFormat.parse(_amount.text);
       if (_isMeter) {
-        prev = double.tryParse(_previous.text.replaceAll(",", "."));
-        neu = double.tryParse(_next.text.replaceAll(",", "."));
-        if (prev == null || neu == null) {
-          setState(() => _error = S.firstPeriodHint);
+        prev = ElectricityValidation.parseKwh(_previous.text);
+        neu = ElectricityValidation.parseKwh(_next.text);
+        final error = ElectricityValidation.validateMeterReadings(prev, neu);
+        if (error != null) {
+          setState(() => _error = _saveErrorMessage(error));
           return;
         }
-        if (neu < prev) {
-          setState(() => _error = S.invalidReadings);
+        used = MeterMath.consumption(previousKwh: prev!, newKwh: neu!);
+      } else {
+        final error = ElectricityValidation.validateInvoiceAmount(money);
+        if (error != null) {
+          setState(() => _error = _saveErrorMessage(error));
           return;
         }
-        used = MeterMath.consumption(previousKwh: prev, newKwh: neu);
-      } else if (money == null || money <= 0) {
-        setState(() => _error = S.invalidAmount);
-        return;
       }
+      if (!await _confirmDuplicateIfNeeded()) return;
+
+      setState(() => _error = null);
       String? photoPath;
       if (_photoBytes != null) {
         photoPath = await widget.photos.upload(
@@ -172,12 +208,13 @@ class _ElectricityAddSheetState extends State<_ElectricityAddSheet> {
       await widget.electricity.upsert(
         homeId: widget.home.id,
         periodMonth: _month,
-        amountVnd: _isMeter
-            ? MeterMath.amountVnd(
-                consumptionKwh: used!,
-                kwhRate: widget.home.kwhRate,
-              )
-            : money!,
+        amountVnd:
+            _isMeter
+                ? MeterMath.amountVnd(
+                  consumptionKwh: used!,
+                  kwhRate: widget.home.kwhRate,
+                )
+                : money!,
         previousKwh: prev,
         newKwh: neu,
         consumptionKwh: used,
@@ -193,12 +230,12 @@ class _ElectricityAddSheetState extends State<_ElectricityAddSheet> {
   }
 
   Future<void> _pickMonth() async {
-    final picked = await showMonthPicker(
-      context: context,
-      initialDate: _month,
-    );
+    final picked = await showMonthPicker(context: context, initialDate: _month);
     if (picked != null) {
-      setState(() => _month = DateTime(picked.year, picked.month));
+      setState(() {
+        _month = DateTime(picked.year, picked.month);
+        _updateDuplicateHint();
+      });
     }
   }
 
@@ -234,6 +271,14 @@ class _ElectricityAddSheetState extends State<_ElectricityAddSheet> {
               value: DateFormat("MM/yyyy").format(_month),
               onTap: _pickMonth,
             ),
+            if (_duplicateHint != null)
+              Padding(
+                padding: const EdgeInsets.only(top: AppSpacing.sm),
+                child: Text(
+                  _duplicateHint!,
+                  style: TextStyle(color: colors.warning),
+                ),
+              ),
             if (_isMeter) ...[
               if (widget.previousPeriod == null)
                 Padding(
@@ -266,10 +311,7 @@ class _ElectricityAddSheetState extends State<_ElectricityAddSheet> {
               readOnly: _isMeter,
             ),
             const SizedBox(height: AppSpacing.formFieldGap),
-            LabeledTextField(
-              label: S.note,
-              controller: _note,
-            ),
+            LabeledTextField(label: S.note, controller: _note),
             const SizedBox(height: AppSpacing.md),
             OutlinedButton.icon(
               onPressed: () async {
@@ -289,16 +331,10 @@ class _ElectricityAddSheetState extends State<_ElectricityAddSheet> {
             if (_error != null)
               Padding(
                 padding: const EdgeInsets.only(top: AppSpacing.sm),
-                child: Text(
-                  _error!,
-                  style: TextStyle(color: colors.error),
-                ),
+                child: Text(_error!, style: TextStyle(color: colors.error)),
               ),
             const SizedBox(height: AppSpacing.md),
-            FilledButton(
-              onPressed: _save,
-              child: const Text(S.save),
-            ),
+            FilledButton(onPressed: _save, child: const Text(S.save)),
           ],
         ),
       ),
@@ -313,6 +349,7 @@ class _ElectricityPeriodDialog extends StatefulWidget {
     required this.photos,
     required this.existing,
     required this.onSaved,
+    required this.existingPeriods,
     this.previousPeriod,
   });
 
@@ -320,6 +357,7 @@ class _ElectricityPeriodDialog extends StatefulWidget {
   final ElectricityService electricity;
   final BillPhotoService photos;
   final ElectricityPeriod existing;
+  final List<ElectricityPeriod> existingPeriods;
   final ElectricityPeriod? previousPeriod;
   final VoidCallback onSaved;
 
@@ -336,10 +374,30 @@ class _ElectricityPeriodDialogState extends State<_ElectricityPeriodDialog> {
   late DateTime _month;
   Uint8List? _photoBytes;
   String? _error;
+  String? _duplicateHint;
   bool _editing = false;
   bool _saving = false;
 
   bool get _isMeter => widget.home.trackingMode == TrackingMode.meter;
+
+  void _updateDuplicateHint() {
+    final duplicate = findPeriodForMonth(
+      widget.existingPeriods,
+      _month,
+      excludeId: widget.existing.id,
+    );
+    _duplicateHint = duplicate == null ? null : S.duplicatePeriodHint;
+  }
+
+  Future<bool> _confirmDuplicateIfNeeded() async {
+    final duplicate = findPeriodForMonth(
+      widget.existingPeriods,
+      _month,
+      excludeId: widget.existing.id,
+    );
+    if (duplicate == null) return true;
+    return confirmDuplicatePeriodMonth(context, _month);
+  }
 
   @override
   void initState() {
@@ -350,10 +408,9 @@ class _ElectricityPeriodDialogState extends State<_ElectricityPeriodDialog> {
       text: existing.previousKwh?.toString() ?? "",
     );
     _next = TextEditingController(text: existing.newKwh?.toString() ?? "");
-    _amount = TextEditingController(
-      text: VndFormat.input(existing.amountVnd),
-    );
+    _amount = TextEditingController(text: VndFormat.input(existing.amountVnd));
     _note = TextEditingController(text: existing.note ?? "");
+    _updateDuplicateHint();
   }
 
   @override
@@ -367,15 +424,12 @@ class _ElectricityPeriodDialogState extends State<_ElectricityPeriodDialog> {
 
   void _recompute() {
     if (!_isMeter || !_editing) return;
-    final prev = double.tryParse(_previous.text.replaceAll(",", "."));
-    final neu = double.tryParse(_next.text.replaceAll(",", "."));
+    final prev = ElectricityValidation.parseKwh(_previous.text);
+    final neu = ElectricityValidation.parseKwh(_next.text);
     if (prev == null || neu == null) return;
     final used = MeterMath.consumption(previousKwh: prev, newKwh: neu);
     _amount.text = VndFormat.input(
-      MeterMath.amountVnd(
-        consumptionKwh: used,
-        kwhRate: widget.home.kwhRate,
-      ),
+      MeterMath.amountVnd(consumptionKwh: used, kwhRate: widget.home.kwhRate),
     );
   }
 
@@ -390,21 +444,23 @@ class _ElectricityPeriodDialogState extends State<_ElectricityPeriodDialog> {
       double? used;
       final money = VndFormat.parse(_amount.text);
       if (_isMeter) {
-        prev = double.tryParse(_previous.text.replaceAll(",", "."));
-        neu = double.tryParse(_next.text.replaceAll(",", "."));
-        if (prev == null || neu == null) {
-          setState(() => _error = S.firstPeriodHint);
+        prev = ElectricityValidation.parseKwh(_previous.text);
+        neu = ElectricityValidation.parseKwh(_next.text);
+        final error = ElectricityValidation.validateMeterReadings(prev, neu);
+        if (error != null) {
+          setState(() => _error = _saveErrorMessage(error));
           return;
         }
-        if (neu < prev) {
-          setState(() => _error = S.invalidReadings);
+        used = MeterMath.consumption(previousKwh: prev!, newKwh: neu!);
+      } else {
+        final error = ElectricityValidation.validateInvoiceAmount(money);
+        if (error != null) {
+          setState(() => _error = _saveErrorMessage(error));
           return;
         }
-        used = MeterMath.consumption(previousKwh: prev, newKwh: neu);
-      } else if (money == null || money <= 0) {
-        setState(() => _error = S.invalidAmount);
-        return;
       }
+      if (!await _confirmDuplicateIfNeeded()) return;
+
       String? photoPath = widget.existing.photoPath;
       if (_photoBytes != null) {
         photoPath = await widget.photos.upload(
@@ -416,17 +472,20 @@ class _ElectricityPeriodDialogState extends State<_ElectricityPeriodDialog> {
       await widget.electricity.upsert(
         homeId: widget.home.id,
         periodMonth: _month,
-        amountVnd: _isMeter
-            ? MeterMath.amountVnd(
-                consumptionKwh: used!,
-                kwhRate: widget.home.kwhRate,
-              )
-            : money!,
+        amountVnd:
+            _isMeter
+                ? MeterMath.amountVnd(
+                  consumptionKwh: used!,
+                  kwhRate: widget.home.kwhRate,
+                )
+                : money!,
         previousKwh: prev,
         newKwh: neu,
         consumptionKwh: used,
         photoPath: photoPath,
         note: _note.text.trim().isEmpty ? null : _note.text.trim(),
+        editingId: widget.existing.id,
+        editingOriginalMonth: widget.existing.periodMonth,
       );
       if (!mounted) return;
       Navigator.pop(context);
@@ -440,35 +499,36 @@ class _ElectricityPeriodDialogState extends State<_ElectricityPeriodDialog> {
 
   Future<void> _pickMonth() async {
     if (!_editing) return;
-    final picked = await showMonthPicker(
-      context: context,
-      initialDate: _month,
-    );
+    final picked = await showMonthPicker(context: context, initialDate: _month);
     if (picked != null) {
-      setState(() => _month = DateTime(picked.year, picked.month));
+      setState(() {
+        _month = DateTime(picked.year, picked.month);
+        _updateDuplicateHint();
+      });
     }
   }
 
   Future<void> _confirmDelete() async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text(S.deletePeriod),
-        content: const Text(S.deletePeriodConfirm),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text(S.cancel),
+      builder:
+          (context) => AlertDialog(
+            title: const Text(S.deletePeriod),
+            content: const Text(S.deletePeriodConfirm),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text(S.cancel),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: FilledButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                ),
+                child: const Text(S.delete),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
-            child: const Text(S.delete),
-          ),
-        ],
-      ),
     );
     if (confirmed != true || !mounted) return;
 
@@ -490,7 +550,8 @@ class _ElectricityPeriodDialogState extends State<_ElectricityPeriodDialog> {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
-    final hasPhoto = widget.existing.photoPath != null &&
+    final hasPhoto =
+        widget.existing.photoPath != null &&
         widget.existing.photoPath!.isNotEmpty;
 
     return Padding(
@@ -507,6 +568,14 @@ class _ElectricityPeriodDialogState extends State<_ElectricityPeriodDialog> {
               enabled: _editing,
               onTap: _pickMonth,
             ),
+            if (_duplicateHint != null)
+              Padding(
+                padding: const EdgeInsets.only(top: AppSpacing.sm),
+                child: Text(
+                  _duplicateHint!,
+                  style: TextStyle(color: colors.warning),
+                ),
+              ),
             if (_isMeter) ...[
               const SizedBox(height: AppSpacing.formFieldGap),
               LabeledTextField(
@@ -557,38 +626,31 @@ class _ElectricityPeriodDialogState extends State<_ElectricityPeriodDialog> {
                   }
                 },
                 icon: const Icon(Icons.photo_camera_outlined),
-                label: Text(
-                  _photoBytes != null ? "${S.photo} ✓" : S.pickPhoto,
-                ),
+                label: Text(_photoBytes != null ? "${S.photo} ✓" : S.pickPhoto),
               ),
             ] else if (hasPhoto) ...[
               const SizedBox(height: AppSpacing.sm),
-              Text(
-                S.hasPhoto,
-                style: TextStyle(color: colors.textSecondary),
-              ),
+              Text(S.hasPhoto, style: TextStyle(color: colors.textSecondary)),
             ],
             if (_error != null)
               Padding(
                 padding: const EdgeInsets.only(top: AppSpacing.sm),
-                child: Text(
-                  _error!,
-                  style: TextStyle(color: colors.error),
-                ),
+                child: Text(_error!, style: TextStyle(color: colors.error)),
               ),
             const SizedBox(height: AppSpacing.lg),
             Row(
               children: [
                 Expanded(
-                  child: _editing
-                      ? FilledButton(
-                          onPressed: _saving ? null : _save,
-                          child: const Text(S.save),
-                        )
-                      : OutlinedButton(
-                          onPressed: () => setState(() => _editing = true),
-                          child: const Text(S.edit),
-                        ),
+                  child:
+                      _editing
+                          ? FilledButton(
+                            onPressed: _saving ? null : _save,
+                            child: const Text(S.save),
+                          )
+                          : OutlinedButton(
+                            onPressed: () => setState(() => _editing = true),
+                            child: const Text(S.edit),
+                          ),
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
