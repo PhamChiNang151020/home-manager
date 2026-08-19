@@ -15,18 +15,18 @@ alwaysApply: false
 
 ## Architecture
 
-- **Services:** pure Dart, testable; Hive/IndexedDB isolated in storage/backup services.
+- **Services:** talk to Supabase; testable; no `BuildContext`.
 - **UI:** Material 3; mobile-first; Vietnamese user-facing copy.
-- **State:** start simple; extract a provider layer when screens share app data. Widgets must not open Hive boxes directly.
+- **State:** `SessionController` (ChangeNotifier) for auth/home selection. Widgets call services via the session, not `Supabase.instance` in build methods.
 
 ## Comments
 
-- Explain non-obvious web/PWA or IndexedDB behavior only.
+- Explain non-obvious RLS, OAuth redirect, or meter math only.
 - No commented-out dead code in commits.
 
 ## Web
 
-- Prefer packages that support Flutter Web (`image_picker`, Hive).
+- Prefer packages that support Flutter Web (`image_picker`, `supabase_flutter`).
 - Do not use `dart:io` on web code paths.
 
 ## Quality

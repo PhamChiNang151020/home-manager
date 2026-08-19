@@ -14,14 +14,28 @@ Locked decisions. Do not change without discussion.
 
 - No App Store.
 - No Xcode install / Developer Mode.
-- Deploy static `flutter build web` to free hosting (Firebase Hosting or GitHub Pages).
+- Deploy static `flutter build web --base-href /home-manager/` to **GitHub Pages**.
+- Private repo + Pages may need GitHub Pro; fallback: Cloudflare Pages or Firebase Hosting (source stays on GitHub).
 
-## Data
+## Auth and data
 
-- **Phase 1:** local-only (Hive → IndexedDB in the browser). Offline after first load.
-- **Backup:** export/import JSON (and photos) — required because Safari may clear site data.
-- **Phase 2 (optional):** Firebase/Supabase free tier for sync. Do not add until asked.
-- App is personal; do not log PII or bill photos to third-party analytics.
+- **Source of truth:** Supabase (Postgres + RLS + Storage). Online-first for family sync.
+- **Auth:** Google via Supabase OAuth.
+- **Owner invites** members **per home** by Google email.
+- Anon key + project URL are public (RLS protects rows). Never commit the **service role** key.
+- Do not log PII or bill photos to analytics.
+
+## Homes (v1)
+
+- Two homes: **Nhà tôi** (`meter`) and **Nhà ba mẹ** (`invoice`).
+- `meter`: new kWh − previous period kWh, then × `kwh_rate` (default 3500 đ/kWh, editable per home).
+- `invoice`: amount + month + photo (MoMo / bank screenshot). No meter math.
+- Each home: `photo_due_day`, `payday_day`, `remind_day` (day of month 1–31).
+
+## v1 product scope
+
+- Electricity only. Water, expenses, shopping are later; keep `homes` reusable.
+- Reminders: in-app banner first, then `.ics` export, then Web Push (separate, after PWA install).
 
 ## Flutter SDK
 

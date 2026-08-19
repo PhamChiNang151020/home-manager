@@ -1,8 +1,8 @@
 ---
 description: >
-  home_manager — Flutter Web PWA for personal home management. Load when
-  working on this repo. Trigger on: home-manager, PWA, Hive, utilities, expenses,
-  shopping, bill photo, Flutter Web.
+  home_manager — Flutter Web PWA for family electricity tracking. Load when
+  working on this repo. Trigger on: home-manager, PWA, Supabase, Google auth,
+  meter, invoice, bill photo, Flutter Web.
 alwaysApply: false
 ---
 
@@ -12,7 +12,7 @@ Read `.cursor/notes.md` before changing platform, storage, or distribution.
 
 ## Overview
 
-Personal Flutter **Web** app: electricity/water bills, expenses, shopping list, bill photos. Install on iPhone via Safari Add to Home Screen. No App Store, no Developer Mode.
+Flutter **Web** PWA: family electricity for two homes (meter vs invoice), Google login, Supabase sync. iPhone via Safari Add to Home Screen. No App Store, no Developer Mode.
 
 ## Repo
 
@@ -20,29 +20,30 @@ Personal Flutter **Web** app: electricity/water bills, expenses, shopping list, 
 - Org: `com.pcn`
 - Remote: `https://github.com/PhamChiNang151020/home-manager.git` (private)
 - Branch: `main`
-- Path: `/Users/be011/Desktop/PCN/scr/client/home-manager` (sibling of `flutter_sdk_switcher`)
+- Path: `/Users/be011/Desktop/PCN/scr/client/home-manager`
 
-## Structure (target)
+## Structure
 
-- `lib/core/` — models + services (storage, backup); no UI imports
+- `lib/core/` — models + services; no UI imports
 - `lib/features/` — screens and widgets
-- `lib/app.dart` — app shell when split from `main.dart`
+- `lib/app.dart` — MaterialApp + auth gate
+- `supabase/migrations/` — schema, RLS, RPCs
 - `web/` — PWA manifest and icons
 
 ## Rules
 
-1. Web-only in v1 — do not add iOS/Android platforms without approval.
-2. Local-first storage (Hive). No cloud unless the user asks.
-3. Persistence stays in services, not widgets.
-4. Keep diffs small; match `flutter_lints` / `analysis_options.yaml`.
-5. Do not commit secrets, `.env` keys, or personal bill data/photos.
+1. Web-only in v1 — do not add iOS/Android without approval.
+2. Supabase is the source of truth. Widgets do not call Supabase.
+3. V1 is electricity only (no water/expenses/shopping unless asked).
+4. Match `flutter_lints`. Keep diffs small.
+5. Do not commit service role keys, `.env` secrets, or bill photos.
 
 ## Build
 
 ```bash
 flutter pub get
-flutter run -d chrome
-flutter build web
+flutter run -d chrome --dart-define=SUPABASE_URL=... --dart-define=SUPABASE_ANON_KEY=...
+flutter build web --base-href /home-manager/
 ```
 
-Develop with Flutter **3.29.2** (Dart 3.7.2 per `pubspec.yaml`).
+Develop with Flutter **3.29.2** (Dart 3.7.2).

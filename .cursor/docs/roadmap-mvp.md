@@ -1,30 +1,28 @@
 # MVP roadmap
 
-## Must ship (Flutter Web PWA)
+## V1 must ship (electricity only)
 
-1. App shell (tabs or bottom nav): Home, Utilities, Expenses, Shopping
-2. Local Hive storage + export/import backup
-3. Điện / nước: readings, amount, date
-4. Chi tiêu: list + simple totals (chart optional)
-5. Danh sách mua: add / check / delete
-6. Chụp hoặc chọn ảnh hoá đơn (Safari camera / gallery), store compressed
-7. `flutter build web` + deploy to free hosting
-8. Usable from iPhone Home Screen without Developer Mode
+1. Google sign-in (Supabase)
+2. Homes: create, switch, owner invite by email
+3. `meter` periods (Nhà tôi) + `invoice` periods (Nhà ba mẹ)
+4. Bill photo attached to the period
+5. In-app reminder banner + `.ics` export
+6. GitHub Pages (or Cloudflare/Firebase fallback)
+7. iPhone: Safari Add to Home Screen — no Developer Mode
 
 ## Out of scope (v1)
 
-- Native iOS/Android
-- App Store / TestFlight
-- Push notifications
-- Multi-device sync (Phase 2)
+- Native iOS/Android, App Store, TestFlight
+- Water, daily expenses, shopping list
+- Web Push (immediately after V1 core — see `web-push.md`)
 - Paid APIs
 
-## Post-MVP
+## Post-V1
 
-- Firebase/Supabase sync (free tier)
-- Charts for monthly spend
-- Recurring utility reminders (if web allows)
+- Web Push for photo / payday / remind days
+- Nước, chi tiêu, danh sách mua
+- Charts
 
-## UI reference
+## UI
 
-Personal Vietnamese household app. Keep copy in Vietnamese in the UI; code/comments/commits in English unless the user asks otherwise.
+Vietnamese copy in the UI. Code and commits in English.

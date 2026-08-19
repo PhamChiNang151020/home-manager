@@ -2,37 +2,58 @@
 
 ## Problem
 
-Track household costs (electricity, water, spending, shopping list, bill photos) on a personal iPhone **without** App Store or Developer Mode. Data stays on-device first.
+Track electricity for two family homes on iPhone **without** App Store or Developer Mode, with Google login and sync.
 
 ## Layers
 
-1. **UI (Flutter Web)** — Material 3 screens; mobile-first; PWA standalone display.
-2. **Domain** — bills, expenses, shopping items; no UI imports in models/services.
-3. **Storage** — Hive on web (IndexedDB). Optional later: cloud sync.
+1. **UI (Flutter Web)** — Material 3, Vietnamese, PWA standalone.
+2. **Domain / services** — homes, invites, electricity periods, photos, ICS. No Supabase in widgets.
+3. **Supabase** — Auth (Google), Postgres + RLS, Storage for bill JPEGs.
 
-## Data shapes (v1)
+## Homes
 
-```text
-UtilityBill  { id, type: dien|nuoc, oldReading, newReading, amount, date, photoId?, note }
-Expense      { id, category, amount, date, note }
-ShoppingItem { id, name, quantity?, isDone, createdAt }
+| Mode | House | Input | Amount |
+|------|--------|--------|--------|
+| `meter` | Nhà tôi | New kWh (first period also previous kWh) | `(new − previous) × kwh_rate` |
+| `invoice` | Nhà ba mẹ | Month + VND + photo | Entered from MoMo / bank bill |
+
+## Data (see `supabase/migrations/`)
+
+- `profiles` — `id` = `auth.users.id`
+- `homes` — name, `tracking_mode`, `kwh_rate`, calendar days, `created_by`
+- `home_members` — `owner` \| `member`
+- `home_invites` — pending email until Google email matches
+- `electricity_periods` — unique `(home_id, period_month)`
+
+Storage: bucket `bill-photos`, path `homes/{home_id}/{yyyy-mm}.jpg`.
+
+## Auth / invite
+
+1. Sign in with Google.
+2. Trigger upserts `profiles`.
+3. RPC `accept_pending_invites` attaches memberships for matching email.
+4. Owner calls `invite_to_home(home_id, email)`.
+5. RLS: only members read/write that home’s rows and photos.
+
+## Reminders
+
+1. Banner on electricity tab when today matches photo / payday / remind day (clamp 31 → last day of month).
+2. Settings: download monthly `.ics` (RRULE) for those days.
+3. Web Push: later — iOS needs Home Screen PWA + VAPID + scheduled Edge Function. See `.cursor/docs/web-push.md`.
+
+## Deploy
+
+```bash
+flutter build web --base-href /home-manager/ \
+  --dart-define=SUPABASE_URL=... \
+  --dart-define=SUPABASE_ANON_KEY=...
 ```
 
-Bill photos: compress JPEG locally, store as Hive binary / blob. Do not upload unless Phase 2 is approved.
-
-## Persistence
-
-- Single `StorageService` owns Hive boxes.
-- Widgets never open boxes directly.
-- Export dumps JSON (+ photos zip later). Import replaces or merges with an explicit UX choice.
-
-## PWA
-
-- `web/manifest.json` `display: standalone`.
-- After hosting deploy, iPhone: Safari → Share → Add to Home Screen.
-- Warn in-app that clearing Safari website data can wipe local storage.
+OAuth redirect URLs: `http://localhost:*` and the Pages origin.
 
 ## Error cases
 
-- Quota exceeded (too many photos) — prompt compress / export / delete old bills.
-- Corrupt Hive box — recover via last export if present; otherwise empty-state + message.
+- Not a member → empty home list; owner creates a home.
+- First `meter` period missing previous kWh → require both readings.
+- New kWh < previous → validation error.
+- Storage denied → show RLS/login error, keep period without photo if upload fails after insert (prefer upload then upsert).

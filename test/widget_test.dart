@@ -1,30 +1,22 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import 'package:home_manager/main.dart';
+import "package:flutter_test/flutter_test.dart";
+import "package:home_manager/app.dart";
+import "package:home_manager/core/domain/meter_math.dart";
+import "package:home_manager/core/l10n/strings.dart";
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  test("meter math uses delta times rate", () {
+    final used = MeterMath.consumption(previousKwh: 100, newKwh: 120);
+    expect(used, 20);
+    expect(MeterMath.amountVnd(consumptionKwh: used, kwhRate: 3500), 70000);
+  });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  test("day of month clamps 31 in February", () {
+    expect(DayOfMonth.clampToMonth(31, DateTime(2026, 2, 1)), 28);
+    expect(DayOfMonth.isToday(31, DateTime(2026, 1, 31)), isTrue);
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+  testWidgets("missing config screen", (tester) async {
+    await tester.pumpWidget(const MissingConfigApp());
+    expect(find.text(S.missingConfig), findsOneWidget);
   });
 }
