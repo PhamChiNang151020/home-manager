@@ -13,7 +13,7 @@ import "package:home_manager/features/shared/status_badge.dart";
 import "package:intl/intl.dart";
 
 String _fmtKwh(double? kwh) {
-  if (kwh == null) return '–';
+  if (kwh == null) return "–";
   final rounded = kwh.round();
   return kwh == rounded.toDouble()
       ? rounded.toString()
@@ -27,12 +27,29 @@ class PeriodListTile extends StatelessWidget {
     required this.home,
     required this.photos,
     required this.onTap,
+    required this.onEdit,
+    required this.onDelete,
+    required this.onTogglePaid,
+    this.previousPeriod,
   });
 
   final ElectricityPeriod period;
+  final ElectricityPeriod? previousPeriod;
   final Home home;
   final BillPhotoService photos;
   final VoidCallback onTap;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+  final VoidCallback onTogglePaid;
+
+  // ── trend helpers ──────────────────────────────────────────────────────────
+  _TrendData? _trend() {
+    final prev = previousPeriod;
+    if (prev == null || prev.amountVnd == 0) return null;
+    final delta = period.amountVnd - prev.amountVnd;
+    final pct = (delta / prev.amountVnd * 100).roundToDouble();
+    return _TrendData(pct: pct, up: delta > 0);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +60,7 @@ class PeriodListTile extends StatelessWidget {
     final recordedLabel = DateFormat(
       "dd/MM/yyyy HH:mm",
     ).format(period.recordedAt.toLocal());
+    final trend = _trend();
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
@@ -51,20 +69,44 @@ class PeriodListTile extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              monthLabel,
-              style: Theme.of(
-                context,
-              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
+            // ── header row: month + kebab ─────────────────────────────────
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Text(
+                    monthLabel,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                _KebabMenu(
+                  isPaid: period.isPaid,
+                  onEdit: onEdit,
+                  onDelete: onDelete,
+                  onTogglePaid: onTogglePaid,
+                ),
+              ],
             ),
-            const SizedBox(height: AppSpacing.sm),
-            MoneyText(amount: period.amountVnd, large: true),
+            const SizedBox(height: AppSpacing.xs),
+            // ── amount + trend indicator ───────────────────────────────────
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                MoneyText(amount: period.amountVnd, large: true),
+                if (trend != null) ...[
+                  const SizedBox(width: AppSpacing.sm),
+                  _TrendChip(trend: trend, colors: colors),
+                ],
+              ],
+            ),
             if (home.trackingMode == TrackingMode.meter) ...[
               const SizedBox(height: AppSpacing.xs),
               Text(
                 "${_fmtKwh(period.previousKwh)} → "
                 "${_fmtKwh(period.newKwh)} kWh"
-                "${period.consumptionKwh != null ? ' · ${_fmtKwh(period.consumptionKwh!)} kWh' : ''}",
+                "${period.consumptionKwh != null ? " · ${_fmtKwh(period.consumptionKwh!)} kWh" : ""}",
                 style: TextStyle(color: colors.textSecondary),
               ),
             ],
@@ -78,16 +120,27 @@ class PeriodListTile extends StatelessWidget {
               ),
             ],
             const SizedBox(height: AppSpacing.sm),
+            // ── chip row ──────────────────────────────────────────────────
             Wrap(
               spacing: AppSpacing.xs,
               runSpacing: AppSpacing.xs,
               children: [
+                // paid status
+                StatusBadge(
+                  label: period.isPaid ? S.paid : S.unpaid,
+                  variant:
+                      period.isPaid
+                          ? StatusBadgeVariant.success
+                          : StatusBadgeVariant.neutral,
+                ),
+                // kWh chip
                 if (home.trackingMode == TrackingMode.meter &&
                     period.consumptionKwh != null)
                   StatusBadge(
                     label: "${_fmtKwh(period.consumptionKwh!)} kWh",
                     variant: StatusBadgeVariant.accent,
                   ),
+                // photo chip (tappable)
                 GestureDetector(
                   onTap:
                       hasPhoto
@@ -122,3 +175,142 @@ class PeriodListTile extends StatelessWidget {
     );
   }
 }
+
+// ── Trend chip widget ──────────────────────────────────────────────────────
+
+class _TrendData {
+  const _TrendData({required this.pct, required this.up});
+  final double pct;
+  final bool up;
+}
+
+class _TrendChip extends StatelessWidget {
+  const _TrendChip({required this.trend, required this.colors});
+  final _TrendData trend;
+  final AppColorScheme colors;
+
+  @override
+  Widget build(BuildContext context) {
+    final isZero = trend.pct == 0;
+    final color =
+        isZero
+            ? colors.textMuted
+            : trend.up
+            ? colors.error
+            : colors.success;
+    final icon =
+        isZero
+            ? Icons.remove
+            : trend.up
+            ? Icons.arrow_upward_rounded
+            : Icons.arrow_downward_rounded;
+    final label =
+        isZero
+            ? "0%"
+            : "${trend.up ? "+" : ""}${trend.pct.abs().toStringAsFixed(0)}%";
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: 2,
+      ),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(AppSpacing.sm),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: color),
+          const SizedBox(width: 2),
+          Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Kebab menu ─────────────────────────────────────────────────────────────
+
+class _KebabMenu extends StatelessWidget {
+  const _KebabMenu({
+    required this.isPaid,
+    required this.onEdit,
+    required this.onDelete,
+    required this.onTogglePaid,
+  });
+
+  final bool isPaid;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+  final VoidCallback onTogglePaid;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return PopupMenuButton<_MenuAction>(
+      icon: Icon(Icons.more_vert, size: 20, color: colors.textMuted),
+      iconSize: 20,
+      padding: EdgeInsets.zero,
+      onSelected: (action) {
+        switch (action) {
+          case _MenuAction.edit:
+            onEdit();
+          case _MenuAction.delete:
+            onDelete();
+          case _MenuAction.togglePaid:
+            onTogglePaid();
+        }
+      },
+      itemBuilder:
+          (context) => [
+            PopupMenuItem(
+              value: _MenuAction.edit,
+              child: ListTile(
+                dense: true,
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.edit_outlined, size: 18),
+                title: const Text(S.edit),
+              ),
+            ),
+            PopupMenuItem(
+              value: _MenuAction.togglePaid,
+              child: ListTile(
+                dense: true,
+                contentPadding: EdgeInsets.zero,
+                leading: Icon(
+                  isPaid
+                      ? Icons.unpublished_outlined
+                      : Icons.check_circle_outline,
+                  size: 18,
+                ),
+                title: Text(isPaid ? S.markUnpaid : S.markPaid),
+              ),
+            ),
+            const PopupMenuDivider(),
+            PopupMenuItem(
+              value: _MenuAction.delete,
+              child: ListTile(
+                dense: true,
+                contentPadding: EdgeInsets.zero,
+                leading: Icon(
+                  Icons.delete_outline,
+                  size: 18,
+                  color: colors.error,
+                ),
+                title: Text(S.delete, style: TextStyle(color: colors.error)),
+              ),
+            ),
+          ],
+    );
+  }
+}
+
+enum _MenuAction { edit, delete, togglePaid }

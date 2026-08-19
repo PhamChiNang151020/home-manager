@@ -98,4 +98,8 @@ abstract final class S {
   static const cancelInviteConfirm = "Huỷ lời mời đã gửi đến";
   static const pendingInviteHint = "Đang chờ chấp nhận";
   static const sending = "Đang gửi…";
+  static const paid = "Đã thanh toán";
+  static const unpaid = "Chưa chốt số";
+  static const markPaid = "Đánh dấu đã thanh toán";
+  static const markUnpaid = "Bỏ đánh dấu";
 }

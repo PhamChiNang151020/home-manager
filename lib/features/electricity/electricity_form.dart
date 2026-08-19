@@ -11,6 +11,7 @@ import "package:home_manager/core/format/vnd_format.dart";
 import "package:home_manager/core/services/electricity_service.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/features/electricity/bill_photo_viewer.dart";
 import "package:home_manager/features/electricity/period_month_conflict.dart";
 import "package:home_manager/features/shared/datetime_picker.dart";
 import "package:home_manager/features/shared/form_title.dart";
@@ -673,27 +674,53 @@ class _ElectricityPeriodDialogState extends State<_ElectricityPeriodDialog> {
               enabled: _editing,
               readOnly: !_editing,
             ),
-            if (_editing) ...[
-              const SizedBox(height: AppSpacing.md),
-              OutlinedButton.icon(
-                onPressed: () async {
-                  final file = await ImagePicker().pickImage(
-                    source: ImageSource.gallery,
-                    imageQuality: 70,
-                    maxWidth: 1600,
-                  );
-                  if (file != null) {
-                    final bytes = await file.readAsBytes();
-                    setState(() => _photoBytes = bytes);
-                  }
-                },
-                icon: const Icon(Icons.photo_camera_outlined),
-                label: Text(_photoBytes != null ? "${S.photo} ✓" : S.pickPhoto),
-              ),
-            ] else if (hasPhoto) ...[
-              const SizedBox(height: AppSpacing.sm),
-              Text(S.hasPhoto, style: TextStyle(color: colors.textSecondary)),
-            ],
+            const SizedBox(height: AppSpacing.md),
+            Row(
+              children: [
+                if (_editing)
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () async {
+                        final file = await ImagePicker().pickImage(
+                          source: ImageSource.gallery,
+                          imageQuality: 70,
+                          maxWidth: 1600,
+                        );
+                        if (file != null) {
+                          final bytes = await file.readAsBytes();
+                          setState(() => _photoBytes = bytes);
+                        }
+                      },
+                      icon: const Icon(Icons.photo_camera_outlined),
+                      label: Text(
+                        _photoBytes != null ? "${S.photo} ✓" : S.pickPhoto,
+                      ),
+                    ),
+                  ),
+                if (_editing && (hasPhoto || _photoBytes != null))
+                  const SizedBox(width: AppSpacing.sm),
+                if (hasPhoto || _photoBytes != null)
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        if (_photoBytes != null) {
+                          // preview local bytes not yet implemented — show hint
+                          return;
+                        }
+                        showBillPhotoViewer(
+                          context: context,
+                          photoPath: widget.existing.photoPath!,
+                          photos: widget.photos,
+                        );
+                      },
+                      icon: const Icon(Icons.image_outlined),
+                      label: Text(
+                        _photoBytes != null ? S.pickPhoto : S.hasPhoto,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
             if (_error != null)
               Padding(
                 padding: const EdgeInsets.only(top: AppSpacing.sm),

@@ -45,6 +45,14 @@ class ElectricityService {
     );
   }
 
+  Future<void> setPaid(String id, {required bool isPaid}) async {
+    AppLog.d("setPaid $id -> $isPaid");
+    await _client
+        .from("electricity_periods")
+        .update({"is_paid": isPaid})
+        .eq("id", id);
+  }
+
   Future<ElectricityPeriod> upsert({
     required String homeId,
     required DateTime periodMonth,
@@ -54,6 +62,7 @@ class ElectricityService {
     double? consumptionKwh,
     String? photoPath,
     String? note,
+    bool isPaid = false,
     String? editingId,
     DateTime? editingOriginalMonth,
     DateTime? recordedAt,
@@ -70,6 +79,7 @@ class ElectricityService {
               "consumption_kwh": consumptionKwh,
               "photo_path": photoPath,
               "note": note,
+              "is_paid": isPaid,
               "recorded_at":
                   (recordedAt ?? DateTime.now()).toUtc().toIso8601String(),
             }, onConflict: "home_id,period_month")

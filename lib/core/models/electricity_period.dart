@@ -5,6 +5,7 @@ class ElectricityPeriod {
     required this.periodMonth,
     required this.amountVnd,
     required this.recordedAt,
+    this.isPaid = false,
     this.previousKwh,
     this.newKwh,
     this.consumptionKwh,
@@ -17,11 +18,28 @@ class ElectricityPeriod {
   final DateTime periodMonth;
   final double amountVnd;
   final DateTime recordedAt;
+  final bool isPaid;
   final double? previousKwh;
   final double? newKwh;
   final double? consumptionKwh;
   final String? photoPath;
   final String? note;
+
+  ElectricityPeriod copyWith({bool? isPaid}) {
+    return ElectricityPeriod(
+      id: id,
+      homeId: homeId,
+      periodMonth: periodMonth,
+      amountVnd: amountVnd,
+      recordedAt: recordedAt,
+      isPaid: isPaid ?? this.isPaid,
+      previousKwh: previousKwh,
+      newKwh: newKwh,
+      consumptionKwh: consumptionKwh,
+      photoPath: photoPath,
+      note: note,
+    );
+  }
 
   factory ElectricityPeriod.fromJson(Map<String, dynamic> json) {
     return ElectricityPeriod(
@@ -33,6 +51,7 @@ class ElectricityPeriod {
         json["recorded_at"] as String? ??
             DateTime.now().toUtc().toIso8601String(),
       ),
+      isPaid: json["is_paid"] as bool? ?? false,
       previousKwh: (json["previous_kwh"] as num?)?.toDouble(),
       newKwh: (json["new_kwh"] as num?)?.toDouble(),
       consumptionKwh: (json["consumption_kwh"] as num?)?.toDouble(),
