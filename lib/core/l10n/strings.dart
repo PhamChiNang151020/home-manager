@@ -24,6 +24,8 @@ abstract final class S {
   static const consumption = "Tiêu thụ";
   static const amount = "Số tiền (đ)";
   static const month = "Tháng";
+  static const selectMonth = "Chọn tháng";
+  static const ok = "OK";
   static const note = "Ghi chú";
   static const photo = "Ảnh hoá đơn";
   static const pickPhoto = "Chụp hoặc chọn ảnh";

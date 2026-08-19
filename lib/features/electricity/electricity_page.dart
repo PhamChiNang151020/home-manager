@@ -59,6 +59,7 @@ class ElectricityPageState extends State<ElectricityPage> {
     try {
       final items = await widget.electricity.list(widget.home.id);
       if (mounted) {
+        items.sort((a, b) => b.periodMonth.compareTo(a.periodMonth));
         setState(() {
           _items = items;
           _loading = false;
@@ -91,9 +92,11 @@ class ElectricityPageState extends State<ElectricityPage> {
   }
 
   Future<void> _openPeriodDialog(ElectricityPeriod existing) async {
-    final previous = _items
-        .where((item) => item.periodMonth.isBefore(existing.periodMonth))
-        .toList();
+    final previous =
+        _items
+            .where((item) => item.periodMonth.isBefore(existing.periodMonth))
+            .toList()
+          ..sort((a, b) => b.periodMonth.compareTo(a.periodMonth));
     await showElectricityPeriodDialog(
       context: context,
       home: widget.home,

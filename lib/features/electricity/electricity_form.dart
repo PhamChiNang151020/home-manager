@@ -13,6 +13,7 @@ import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/shared/form_title.dart";
 import "package:home_manager/features/shared/labeled_money_field.dart";
 import "package:home_manager/features/shared/labeled_text_field.dart";
+import "package:home_manager/features/shared/month_picker.dart";
 import "package:image_picker/image_picker.dart";
 import "package:intl/intl.dart";
 
@@ -192,11 +193,9 @@ class _ElectricityAddSheetState extends State<_ElectricityAddSheet> {
   }
 
   Future<void> _pickMonth() async {
-    final picked = await showDatePicker(
+    final picked = await showMonthPicker(
       context: context,
       initialDate: _month,
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2100),
     );
     if (picked != null) {
       setState(() => _month = DateTime(picked.year, picked.month));
@@ -441,11 +440,9 @@ class _ElectricityPeriodDialogState extends State<_ElectricityPeriodDialog> {
 
   Future<void> _pickMonth() async {
     if (!_editing) return;
-    final picked = await showDatePicker(
+    final picked = await showMonthPicker(
       context: context,
       initialDate: _month,
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2100),
     );
     if (picked != null) {
       setState(() => _month = DateTime(picked.year, picked.month));

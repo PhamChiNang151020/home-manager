@@ -1,5 +1,6 @@
 import "package:fl_chart/fl_chart.dart";
 import "package:flutter/material.dart";
+import "package:home_manager/core/format/vnd_format.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/models/electricity_period.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
@@ -30,9 +31,9 @@ class ElectricityTrendChart extends StatelessWidget {
         children: [
           Text(
             S.trendSixMonths,
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  color: colors.textSecondary,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleSmall?.copyWith(color: colors.textSecondary),
           ),
           const SizedBox(height: AppSpacing.md),
           SizedBox(
@@ -43,12 +44,25 @@ class ElectricityTrendChart extends StatelessWidget {
                 gridData: FlGridData(
                   show: true,
                   drawVerticalLine: false,
-                  getDrawingHorizontalLine: (_) => FlLine(
-                    color: colors.border,
-                    strokeWidth: 1,
-                  ),
+                  getDrawingHorizontalLine:
+                      (_) => FlLine(color: colors.border, strokeWidth: 1),
                 ),
                 borderData: FlBorderData(show: false),
+                barTouchData: BarTouchData(
+                  touchTooltipData: BarTouchTooltipData(
+                    getTooltipColor: (_) => colors.bgElevated,
+                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                      return BarTooltipItem(
+                        VndFormat.format(rod.toY),
+                        TextStyle(
+                          color: colors.textPrimary,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                        ),
+                      );
+                    },
+                  ),
+                ),
                 titlesData: FlTitlesData(
                   topTitles: const AxisTitles(
                     sideTitles: SideTitles(showTitles: false),
@@ -56,8 +70,23 @@ class ElectricityTrendChart extends StatelessWidget {
                   rightTitles: const AxisTitles(
                     sideTitles: SideTitles(showTitles: false),
                   ),
-                  leftTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 44,
+                      getTitlesWidget: (value, meta) {
+                        if (value <= 0 || value > maxAmount * 1.1) {
+                          return const SizedBox.shrink();
+                        }
+                        return Text(
+                          VndFormat.compact(value),
+                          style: TextStyle(
+                            color: colors.textMuted,
+                            fontSize: 10,
+                          ),
+                        );
+                      },
+                    ),
                   ),
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(

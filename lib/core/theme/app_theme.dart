@@ -8,12 +8,12 @@ abstract final class AppTheme {
     required Brightness brightness,
     required AppAccent accent,
   }) {
-    final colors = brightness == Brightness.dark
-        ? AppColorScheme.dark(accent.color)
-        : AppColorScheme.light(accent.color);
-    final onPrimary = brightness == Brightness.dark
-        ? colors.bgBase
-        : Colors.white;
+    final colors =
+        brightness == Brightness.dark
+            ? AppColorScheme.dark(accent.color)
+            : AppColorScheme.light(accent.color);
+    final onPrimary =
+        brightness == Brightness.dark ? colors.bgBase : Colors.white;
 
     final scheme = ColorScheme(
       brightness: brightness,
@@ -43,9 +43,10 @@ abstract final class AppTheme {
       cardTheme: CardTheme(
         color: colors.bgSurface,
         elevation: brightness == Brightness.dark ? 1 : 2,
-        shadowColor: brightness == Brightness.dark
-            ? Colors.black.withValues(alpha: 0.35)
-            : Colors.black.withValues(alpha: 0.08),
+        shadowColor:
+            brightness == Brightness.dark
+                ? Colors.black.withValues(alpha: 0.35)
+                : Colors.black.withValues(alpha: 0.08),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           side: BorderSide(color: colors.border),
@@ -126,8 +127,6 @@ abstract final class AppTheme {
   }
 
   @Deprecated("Use AppTheme.build with ThemeController")
-  static ThemeData dark() => build(
-        brightness: Brightness.dark,
-        accent: AppAccent.amber,
-      );
+  static ThemeData dark() =>
+      build(brightness: Brightness.dark, accent: AppAccent.amber);
 }

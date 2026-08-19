@@ -7,11 +7,13 @@ import "package:home_manager/core/services/home_service.dart";
 import "package:home_manager/core/state/session_controller.dart";
 import "package:home_manager/core/state/theme_controller.dart";
 import "package:intl/date_symbol_data_local.dart";
+import "package:intl/intl.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting("vi");
+  Intl.defaultLocale = "vi";
   AppLog.i("Starting home_manager");
   final theme = await ThemeController.load();
   if (!AppConfig.isConfigured) {

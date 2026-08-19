@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:home_manager/core/theme/app_accent.dart";
 
 @immutable
 class AppColorScheme extends ThemeExtension<AppColorScheme> {
@@ -99,22 +100,24 @@ class AppColorScheme extends ThemeExtension<AppColorScheme> {
   AppColorScheme lerp(AppColorScheme? other, double t) {
     if (other == null) return this;
     return AppColorScheme(
-      bgBase: Color.lerp(bgBase, other.bgBase, t)!,
-      bgSurface: Color.lerp(bgSurface, other.bgSurface, t)!,
-      bgElevated: Color.lerp(bgElevated, other.bgElevated, t)!,
-      border: Color.lerp(border, other.border, t)!,
-      textPrimary: Color.lerp(textPrimary, other.textPrimary, t)!,
-      textSecondary: Color.lerp(textSecondary, other.textSecondary, t)!,
-      textMuted: Color.lerp(textMuted, other.textMuted, t)!,
-      accent: Color.lerp(accent, other.accent, t)!,
-      success: Color.lerp(success, other.success, t)!,
-      warning: Color.lerp(warning, other.warning, t)!,
-      error: Color.lerp(error, other.error, t)!,
+      bgBase: Color.lerp(bgBase, other.bgBase, t) ?? bgBase,
+      bgSurface: Color.lerp(bgSurface, other.bgSurface, t) ?? bgSurface,
+      bgElevated: Color.lerp(bgElevated, other.bgElevated, t) ?? bgElevated,
+      border: Color.lerp(border, other.border, t) ?? border,
+      textPrimary: Color.lerp(textPrimary, other.textPrimary, t) ?? textPrimary,
+      textSecondary:
+          Color.lerp(textSecondary, other.textSecondary, t) ?? textSecondary,
+      textMuted: Color.lerp(textMuted, other.textMuted, t) ?? textMuted,
+      accent: Color.lerp(accent, other.accent, t) ?? accent,
+      success: Color.lerp(success, other.success, t) ?? success,
+      warning: Color.lerp(warning, other.warning, t) ?? warning,
+      error: Color.lerp(error, other.error, t) ?? error,
     );
   }
 }
 
 extension AppColorSchemeContext on BuildContext {
   AppColorScheme get appColors =>
-      Theme.of(this).extension<AppColorScheme>()!;
+      Theme.of(this).extension<AppColorScheme>() ??
+      AppColorScheme.dark(AppAccent.amber.color);
 }

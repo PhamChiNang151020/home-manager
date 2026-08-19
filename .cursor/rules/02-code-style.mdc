@@ -31,5 +31,6 @@ alwaysApply: false
 
 ## Quality
 
+- Run `dart format <changed paths>` on every file you edit before finishing.
 - Run `flutter analyze` before considering work done.
 - No `print` in production paths — use `debugPrint` if needed.
