@@ -43,6 +43,10 @@ class ElectricitySummaryCard extends StatelessWidget {
             .roundToDouble();
 
     return AppCard(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -52,26 +56,26 @@ class ElectricitySummaryCard extends StatelessWidget {
               context,
             ).textTheme.labelMedium?.copyWith(color: colors.textSecondary),
           ),
-          const SizedBox(height: AppSpacing.xs),
+          const SizedBox(height: 2),
           Text(
             _capitalizeFirst(
               DateFormat("MMMM yyyy", "vi").format(latest.periodMonth),
             ),
             style: Theme.of(context).textTheme.titleMedium,
           ),
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: AppSpacing.xs),
           MoneyText(amount: latest.amountVnd, large: true),
           if (home.trackingMode == TrackingMode.meter &&
               latest.consumptionKwh != null) ...[
-            const SizedBox(height: AppSpacing.sm),
+            const SizedBox(height: AppSpacing.xs),
             Text(
               "${S.consumption}: ${_formatKwh(latest.consumptionKwh!)} kWh",
               style: TextStyle(color: colors.textSecondary),
             ),
           ],
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacing.sm),
           const Divider(height: 1),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacing.sm),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

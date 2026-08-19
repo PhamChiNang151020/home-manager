@@ -31,6 +31,12 @@ class ElectricityTrendChart extends StatelessWidget {
     final midY = (chartMax / 2).roundToDouble();
 
     return AppCard(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.md,
+        AppSpacing.sm,
+        AppSpacing.md,
+        AppSpacing.sm,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -40,9 +46,9 @@ class ElectricityTrendChart extends StatelessWidget {
               context,
             ).textTheme.titleSmall?.copyWith(color: colors.textSecondary),
           ),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacing.sm),
           SizedBox(
-            height: 160,
+            height: 130,
             child: BarChart(
               BarChartData(
                 minY: 0,

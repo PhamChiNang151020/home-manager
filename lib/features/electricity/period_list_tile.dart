@@ -63,9 +63,13 @@ class PeriodListTile extends StatelessWidget {
     final isMeter = home.trackingMode == TrackingMode.meter;
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+      padding: const EdgeInsets.only(bottom: AppSpacing.xs),
       child: AppCard(
         onTap: onTap,
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.sm,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -88,7 +92,7 @@ class PeriodListTile extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: AppSpacing.xs),
+            const SizedBox(height: 2),
             // ── Row 2: tiền + trend (trái) | trạng thái paid (phải) ──────
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -113,7 +117,7 @@ class PeriodListTile extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: AppSpacing.sm),
+            const SizedBox(height: AppSpacing.xs),
             // ── Row 3: kWh (trái) | ảnh (phải) ─────────────────────────
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
