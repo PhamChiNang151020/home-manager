@@ -70,19 +70,19 @@ class PeriodListTile extends StatelessWidget {
               spacing: AppSpacing.xs,
               runSpacing: AppSpacing.xs,
               children: [
-                StatusBadge(
-                  label: hasPhoto ? S.hasPhoto : S.noPhoto,
-                  variant:
-                      hasPhoto
-                          ? StatusBadgeVariant.success
-                          : StatusBadgeVariant.warning,
-                ),
                 if (home.trackingMode == TrackingMode.meter &&
                     period.consumptionKwh != null)
                   StatusBadge(
                     label: "${period.consumptionKwh!.toStringAsFixed(0)} kWh",
                     variant: StatusBadgeVariant.accent,
                   ),
+                StatusBadge(
+                  label: hasPhoto ? S.hasPhoto : S.noPhoto,
+                  variant:
+                      hasPhoto
+                          ? StatusBadgeVariant.success
+                          : StatusBadgeVariant.neutral,
+                ),
                 if (hasNote)
                   const StatusBadge(
                     label: S.hasNote,

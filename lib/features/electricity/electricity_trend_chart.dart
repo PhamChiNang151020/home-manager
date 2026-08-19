@@ -1,13 +1,12 @@
 import "package:fl_chart/fl_chart.dart";
 import "package:flutter/material.dart";
 import "package:home_manager/core/format/vnd_format.dart";
+import "package:intl/intl.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/models/electricity_period.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/shared/app_card.dart";
-import "package:intl/intl.dart";
-
 class ElectricityTrendChart extends StatelessWidget {
   const ElectricityTrendChart({super.key, required this.periods});
 
@@ -24,6 +23,11 @@ class ElectricityTrendChart extends StatelessWidget {
     final maxAmount = recent
         .map((p) => p.amountVnd)
         .reduce((a, b) => a > b ? a : b);
+    final chartMax = maxAmount * 1.2;
+    // index of the most recent bar (last in the reversed list)
+    final latestIndex = recent.length - 1;
+    // Y axis ticks: 0, midpoint, max
+    final midY = (chartMax / 2).roundToDouble();
 
     return AppCard(
       child: Column(
@@ -40,10 +44,14 @@ class ElectricityTrendChart extends StatelessWidget {
             height: 160,
             child: BarChart(
               BarChartData(
-                maxY: maxAmount * 1.15,
+                minY: 0,
+                maxY: chartMax,
                 gridData: FlGridData(
                   show: true,
                   drawVerticalLine: false,
+                  checkToShowHorizontalLine:
+                      (value) =>
+                          value == 0 || value == midY || value == chartMax,
                   getDrawingHorizontalLine:
                       (_) => FlLine(color: colors.border, strokeWidth: 1),
                 ),
@@ -75,11 +83,11 @@ class ElectricityTrendChart extends StatelessWidget {
                       showTitles: true,
                       reservedSize: 44,
                       getTitlesWidget: (value, meta) {
-                        if (value <= 0 || value > maxAmount * 1.1) {
+                        if (value != 0 && value != midY && value != chartMax) {
                           return const SizedBox.shrink();
                         }
                         return Text(
-                          VndFormat.compact(value),
+                          value == 0 ? "0" : VndFormat.compact(value),
                           style: TextStyle(
                             color: colors.textMuted,
                             fontSize: 10,
@@ -96,13 +104,19 @@ class ElectricityTrendChart extends StatelessWidget {
                         if (index < 0 || index >= recent.length) {
                           return const SizedBox.shrink();
                         }
+                        final isLatest = index == latestIndex;
                         return Padding(
                           padding: const EdgeInsets.only(top: 6),
                           child: Text(
                             DateFormat("MM").format(recent[index].periodMonth),
                             style: TextStyle(
-                              color: colors.textMuted,
+                              color:
+                                  isLatest ? colors.accent : colors.textMuted,
                               fontSize: 11,
+                              fontWeight:
+                                  isLatest
+                                      ? FontWeight.w700
+                                      : FontWeight.normal,
                             ),
                           ),
                         );
@@ -117,7 +131,10 @@ class ElectricityTrendChart extends StatelessWidget {
                       barRods: [
                         BarChartRodData(
                           toY: recent[i].amountVnd,
-                          color: colors.accent,
+                          color:
+                              i == latestIndex
+                                  ? colors.accent
+                                  : colors.accent.withValues(alpha: 0.45),
                           width: 20,
                           borderRadius: const BorderRadius.vertical(
                             top: Radius.circular(4),

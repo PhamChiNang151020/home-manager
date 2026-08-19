@@ -596,7 +596,26 @@ class _ElectricityPeriodDialogState extends State<_ElectricityPeriodDialog> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
-            FormTitle(title: S.editPeriod),
+            Stack(
+              children: [
+                Align(
+                  alignment: Alignment.center,
+                  child: FormTitle(title: S.editPeriod),
+                ),
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close),
+                    iconSize: 20,
+                    visualDensity: VisualDensity.compact,
+                    color: colors.textSecondary,
+                    tooltip: S.cancel,
+                  ),
+                ),
+              ],
+            ),
             LabeledPickerField(
               label: S.month,
               value: DateFormat("MM/yyyy").format(_month),
@@ -690,7 +709,7 @@ class _ElectricityPeriodDialogState extends State<_ElectricityPeriodDialog> {
                             onPressed: _saving ? null : _save,
                             child: const Text(S.save),
                           )
-                          : OutlinedButton(
+                          : FilledButton(
                             onPressed: () => setState(() => _editing = true),
                             child: const Text(S.edit),
                           ),
