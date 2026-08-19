@@ -1,79 +1,96 @@
 import "package:flutter/material.dart";
-import "package:home_manager/core/theme/app_colors.dart";
+import "package:home_manager/core/theme/app_accent.dart";
+import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 
 abstract final class AppTheme {
-  static ThemeData dark() {
-    const scheme = ColorScheme.dark(
-      surface: AppColors.bgBase,
-      onSurface: AppColors.textPrimary,
-      primary: AppColors.accent,
-      onPrimary: AppColors.bgBase,
-      secondary: AppColors.bgElevated,
-      onSecondary: AppColors.textPrimary,
-      error: AppColors.error,
-      onError: AppColors.bgBase,
-      outline: AppColors.border,
+  static ThemeData build({
+    required Brightness brightness,
+    required AppAccent accent,
+  }) {
+    final colors = brightness == Brightness.dark
+        ? AppColorScheme.dark(accent.color)
+        : AppColorScheme.light(accent.color);
+    final onPrimary = brightness == Brightness.dark
+        ? colors.bgBase
+        : Colors.white;
+
+    final scheme = ColorScheme(
+      brightness: brightness,
+      surface: colors.bgBase,
+      onSurface: colors.textPrimary,
+      primary: colors.accent,
+      onPrimary: onPrimary,
+      secondary: colors.bgElevated,
+      onSecondary: colors.textPrimary,
+      error: colors.error,
+      onError: onPrimary,
+      outline: colors.border,
     );
 
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.dark,
+      brightness: brightness,
       colorScheme: scheme,
-      scaffoldBackgroundColor: AppColors.bgBase,
-      appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.bgBase,
-        foregroundColor: AppColors.textPrimary,
+      scaffoldBackgroundColor: colors.bgBase,
+      extensions: [colors],
+      appBarTheme: AppBarTheme(
+        backgroundColor: colors.bgBase,
+        foregroundColor: colors.textPrimary,
         elevation: 0,
         centerTitle: false,
       ),
       cardTheme: CardTheme(
-        color: AppColors.bgSurface,
+        color: colors.bgSurface,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-          side: const BorderSide(color: AppColors.border),
+          side: BorderSide(color: colors.border),
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: AppColors.bgSurface,
-        indicatorColor: AppColors.accentMuted(),
+        backgroundColor: colors.bgSurface,
+        indicatorColor: colors.accentMuted(),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
           return TextStyle(
-            color: selected ? AppColors.accent : AppColors.textSecondary,
+            color: selected ? colors.accent : colors.textSecondary,
             fontSize: 12,
           );
         }),
         iconTheme: WidgetStateProperty.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
           return IconThemeData(
-            color: selected ? AppColors.accent : AppColors.textSecondary,
+            color: selected ? colors.accent : colors.textSecondary,
           );
         }),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.bgSurface,
+        fillColor: colors.bgSurface,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.sm + 4,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-          borderSide: const BorderSide(color: AppColors.border),
+          borderSide: BorderSide(color: colors.border),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-          borderSide: const BorderSide(color: AppColors.border),
+          borderSide: BorderSide(color: colors.border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-          borderSide: const BorderSide(color: AppColors.accent, width: 1.5),
+          borderSide: BorderSide(color: colors.accent, width: 1.5),
         ),
-        labelStyle: const TextStyle(color: AppColors.textSecondary),
-        hintStyle: const TextStyle(color: AppColors.textMuted),
+        hintStyle: TextStyle(color: colors.textMuted),
+        helperStyle: TextStyle(color: colors.textSecondary),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: AppColors.accent,
-          foregroundColor: AppColors.bgBase,
+          backgroundColor: colors.accent,
+          foregroundColor: onPrimary,
           minimumSize: const Size.fromHeight(AppSpacing.touchMin),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
@@ -82,8 +99,8 @@ abstract final class AppTheme {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.textPrimary,
-          side: const BorderSide(color: AppColors.border),
+          foregroundColor: colors.textPrimary,
+          side: BorderSide(color: colors.border),
           minimumSize: const Size.fromHeight(AppSpacing.touchMin),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
@@ -92,16 +109,22 @@ abstract final class AppTheme {
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: AppColors.accent,
+          foregroundColor: colors.accent,
           minimumSize: const Size.fromHeight(AppSpacing.touchMin),
         ),
       ),
-      dividerTheme: const DividerThemeData(color: AppColors.border, thickness: 1),
-      listTileTheme: const ListTileThemeData(
-        iconColor: AppColors.textSecondary,
-        textColor: AppColors.textPrimary,
+      dividerTheme: DividerThemeData(color: colors.border, thickness: 1),
+      listTileTheme: ListTileThemeData(
+        iconColor: colors.textSecondary,
+        textColor: colors.textPrimary,
         minVerticalPadding: AppSpacing.sm,
       ),
     );
   }
+
+  @Deprecated("Use AppTheme.build with ThemeController")
+  static ThemeData dark() => build(
+        brightness: Brightness.dark,
+        accent: AppAccent.amber,
+      );
 }

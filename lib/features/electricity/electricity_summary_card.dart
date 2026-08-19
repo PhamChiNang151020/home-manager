@@ -3,7 +3,7 @@ import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/models/electricity_period.dart";
 import "package:home_manager/core/models/home.dart";
 import "package:home_manager/core/models/tracking_mode.dart";
-import "package:home_manager/core/theme/app_colors.dart";
+import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/shared/app_card.dart";
 import "package:home_manager/features/shared/money_text.dart";
@@ -21,11 +21,12 @@ class ElectricitySummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     if (periods.isEmpty) {
       return AppCard(
         child: Text(
           S.noPeriods,
-          style: const TextStyle(color: AppColors.textSecondary),
+          style: TextStyle(color: colors.textSecondary),
         ),
       );
     }
@@ -42,7 +43,7 @@ class ElectricitySummaryCard extends StatelessWidget {
           Text(
             S.lastPeriod,
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: colors.textSecondary,
                 ),
           ),
           const SizedBox(height: AppSpacing.xs),
@@ -57,7 +58,7 @@ class ElectricitySummaryCard extends StatelessWidget {
             const SizedBox(height: AppSpacing.sm),
             Text(
               "${S.consumption}: ${latest.consumptionKwh!.toStringAsFixed(1)} kWh",
-              style: const TextStyle(color: AppColors.textSecondary),
+              style: TextStyle(color: colors.textSecondary),
             ),
           ],
           const SizedBox(height: AppSpacing.md),
@@ -68,7 +69,7 @@ class ElectricitySummaryCard extends StatelessWidget {
             children: [
               Text(
                 S.avgSixMonths,
-                style: const TextStyle(color: AppColors.textSecondary),
+                style: TextStyle(color: colors.textSecondary),
               ),
               MoneyText(amount: avg),
             ],

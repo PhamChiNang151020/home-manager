@@ -2,7 +2,7 @@ import "package:flutter/material.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/models/home.dart";
 import "package:home_manager/core/models/tracking_mode.dart";
-import "package:home_manager/core/theme/app_colors.dart";
+import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/shared/status_badge.dart";
 
@@ -15,11 +15,12 @@ Future<void> showHomePickerSheet({
 }) {
   return showModalBottomSheet<void>(
     context: context,
-    backgroundColor: AppColors.bgSurface,
+    backgroundColor: context.appColors.bgSurface,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.cardRadius)),
     ),
     builder: (context) {
+      final colors = context.appColors;
       return SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(
@@ -45,8 +46,8 @@ Future<void> showHomePickerSheet({
                         ? Icons.radio_button_checked
                         : Icons.radio_button_off,
                     color: home.id == selected?.id
-                        ? AppColors.accent
-                        : AppColors.textMuted,
+                        ? colors.accent
+                        : colors.textMuted,
                   ),
                   title: Text(home.name),
                   subtitle: Text(
@@ -62,7 +63,7 @@ Future<void> showHomePickerSheet({
               const Divider(),
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.add_home_outlined, color: AppColors.accent),
+                leading: Icon(Icons.add_home_outlined, color: colors.accent),
                 title: const Text(S.addHome),
                 onTap: () {
                   Navigator.pop(context);

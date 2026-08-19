@@ -1,6 +1,6 @@
 import "package:flutter/material.dart";
 import "package:home_manager/core/l10n/strings.dart";
-import "package:home_manager/core/theme/app_colors.dart";
+import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/shared/app_card.dart";
 
@@ -12,13 +12,14 @@ class SignInPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [AppColors.bgBase, AppColors.bgSurface],
+            colors: [colors.bgBase, colors.bgSurface],
           ),
         ),
         child: SafeArea(
@@ -36,7 +37,7 @@ class SignInPage extends StatelessWidget {
                       Icon(
                         Icons.bolt,
                         size: 48,
-                        color: AppColors.accent.withValues(alpha: 0.9),
+                        color: colors.accent.withValues(alpha: 0.9),
                       ),
                       const SizedBox(height: AppSpacing.md),
                       Text(
@@ -45,17 +46,17 @@ class SignInPage extends StatelessWidget {
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: AppSpacing.sm),
-                      const Text(
+                      Text(
                         S.signInHint,
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: AppColors.textSecondary),
+                        style: TextStyle(color: colors.textSecondary),
                       ),
                       if (error != null) ...[
                         const SizedBox(height: AppSpacing.md),
                         Text(
                           error!,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(color: AppColors.error),
+                          style: TextStyle(color: colors.error),
                         ),
                       ],
                       const SizedBox(height: AppSpacing.lg),

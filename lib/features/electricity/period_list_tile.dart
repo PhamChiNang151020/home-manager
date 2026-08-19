@@ -3,7 +3,7 @@ import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/models/electricity_period.dart";
 import "package:home_manager/core/models/home.dart";
 import "package:home_manager/core/models/tracking_mode.dart";
-import "package:home_manager/core/theme/app_colors.dart";
+import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/shared/app_card.dart";
 import "package:home_manager/features/shared/money_text.dart";
@@ -24,6 +24,7 @@ class PeriodListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     final monthLabel = DateFormat("MM/yyyy").format(period.periodMonth);
     final hasPhoto = period.photoPath != null && period.photoPath!.isNotEmpty;
 
@@ -61,15 +62,15 @@ class PeriodListTile extends StatelessWidget {
                 "${period.previousKwh?.toStringAsFixed(0) ?? '–'} → "
                 "${period.newKwh?.toStringAsFixed(0) ?? '–'} kWh"
                 "${period.consumptionKwh != null ? ' · ${period.consumptionKwh!.toStringAsFixed(1)} kWh' : ''}",
-                style: const TextStyle(color: AppColors.textSecondary),
+                style: TextStyle(color: colors.textSecondary),
               ),
             ],
             if (period.note != null && period.note!.isNotEmpty) ...[
               const SizedBox(height: AppSpacing.xs),
               Text(
                 period.note!,
-                style: const TextStyle(
-                  color: AppColors.textMuted,
+                style: TextStyle(
+                  color: colors.textMuted,
                   fontSize: 13,
                 ),
               ),

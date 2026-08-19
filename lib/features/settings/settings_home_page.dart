@@ -1,9 +1,12 @@
 import "package:flutter/material.dart";
+import "package:home_manager/core/format/vnd_format.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/models/home.dart";
 import "package:home_manager/core/models/tracking_mode.dart";
 import "package:home_manager/core/services/home_service.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/features/shared/labeled_money_field.dart";
+import "package:home_manager/features/shared/labeled_text_field.dart";
 
 class SettingsHomePage extends StatefulWidget {
   const SettingsHomePage({
@@ -31,7 +34,7 @@ class _SettingsHomePageState extends State<SettingsHomePage> {
   void initState() {
     super.initState();
     _name = TextEditingController(text: widget.home.name);
-    _rate = TextEditingController(text: widget.home.kwhRate.toStringAsFixed(0));
+    _rate = TextEditingController(text: VndFormat.input(widget.home.kwhRate));
   }
 
   @override
@@ -52,7 +55,7 @@ class _SettingsHomePageState extends State<SettingsHomePage> {
         homeId: widget.home.id,
         name: _name.text.trim(),
         kwhRate: widget.home.trackingMode == TrackingMode.meter
-            ? double.tryParse(_rate.text.replaceAll(",", "."))
+            ? VndFormat.parse(_rate.text)
             : null,
       );
       widget.onChanged();
@@ -72,18 +75,18 @@ class _SettingsHomePageState extends State<SettingsHomePage> {
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.md),
         children: [
-          TextField(
+          LabeledTextField(
+            label: S.homeName,
             controller: _name,
             enabled: owner,
-            decoration: const InputDecoration(labelText: S.homeName),
           ),
           if (widget.home.trackingMode == TrackingMode.meter) ...[
-            const SizedBox(height: AppSpacing.md),
-            TextField(
+            const SizedBox(height: AppSpacing.formFieldGap),
+            LabeledMoneyField(
+              label: S.kwhRate,
               controller: _rate,
               enabled: owner,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: S.kwhRate),
+              suffix: "đ/kWh",
             ),
           ],
           if (_error != null) ...[

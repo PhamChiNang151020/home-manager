@@ -1,5 +1,5 @@
 import "package:flutter/material.dart";
-import "package:home_manager/core/theme/app_colors.dart";
+import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 
 class StatusBadge extends StatelessWidget {
@@ -14,11 +14,15 @@ class StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     final (bg, fg) = switch (variant) {
-      StatusBadgeVariant.success => (AppColors.success.withValues(alpha: 0.15), AppColors.success),
-      StatusBadgeVariant.warning => (AppColors.warningMuted(), AppColors.warning),
-      StatusBadgeVariant.accent => (AppColors.accentMuted(), AppColors.accent),
-      StatusBadgeVariant.neutral => (AppColors.bgElevated, AppColors.textSecondary),
+      StatusBadgeVariant.success =>
+        (colors.success.withValues(alpha: 0.15), colors.success),
+      StatusBadgeVariant.warning =>
+        (colors.warningMuted(), colors.warning),
+      StatusBadgeVariant.accent => (colors.accentMuted(), colors.accent),
+      StatusBadgeVariant.neutral =>
+        (colors.bgElevated, colors.textSecondary),
     };
     return Container(
       padding: const EdgeInsets.symmetric(

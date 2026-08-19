@@ -1,5 +1,5 @@
 import "package:flutter/material.dart";
-import "package:home_manager/core/theme/app_colors.dart";
+import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 
 class StickyPrimaryBar extends StatelessWidget {
@@ -16,6 +16,7 @@ class StickyPrimaryBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Container(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.md,
@@ -23,9 +24,9 @@ class StickyPrimaryBar extends StatelessWidget {
         AppSpacing.md,
         AppSpacing.sm,
       ),
-      decoration: const BoxDecoration(
-        color: AppColors.bgSurface,
-        border: Border(top: BorderSide(color: AppColors.border)),
+      decoration: BoxDecoration(
+        color: colors.bgSurface,
+        border: Border(top: BorderSide(color: colors.border)),
       ),
       child: SafeArea(
         top: false,

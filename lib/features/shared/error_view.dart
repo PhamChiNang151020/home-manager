@@ -1,6 +1,6 @@
 import "package:flutter/material.dart";
 import "package:home_manager/core/l10n/strings.dart";
-import "package:home_manager/core/theme/app_colors.dart";
+import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 
 class ErrorView extends StatelessWidget {
@@ -11,17 +11,18 @@ class ErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.md),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.error_outline, color: AppColors.error, size: 40),
+          Icon(Icons.error_outline, color: colors.error, size: 40),
           const SizedBox(height: AppSpacing.sm),
           Text(
             message,
             textAlign: TextAlign.center,
-            style: const TextStyle(color: AppColors.error),
+            style: TextStyle(color: colors.error),
           ),
           if (onRetry != null) ...[
             const SizedBox(height: AppSpacing.md),

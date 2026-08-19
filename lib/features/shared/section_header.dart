@@ -1,5 +1,5 @@
 import "package:flutter/material.dart";
-import "package:home_manager/core/theme/app_colors.dart";
+import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 
 class SectionHeader extends StatelessWidget {
@@ -21,7 +21,7 @@ class SectionHeader extends StatelessWidget {
             child: Text(
               title,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: context.appColors.textSecondary,
                     letterSpacing: 0.5,
                   ),
             ),

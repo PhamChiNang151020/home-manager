@@ -4,6 +4,7 @@ import "package:home_manager/core/models/home.dart";
 import "package:home_manager/core/services/home_service.dart";
 import "package:home_manager/core/services/invite_service.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/features/shared/labeled_text_field.dart";
 
 class SettingsMembersPage extends StatefulWidget {
   const SettingsMembersPage({
@@ -74,10 +75,11 @@ class _SettingsMembersPageState extends State<SettingsMembersPage> {
           if (owner) ...[
             const SizedBox(height: AppSpacing.md),
             Text(S.invite, style: Theme.of(context).textTheme.titleMedium),
-            TextField(
+            const SizedBox(height: AppSpacing.sm),
+            LabeledTextField(
+              label: S.inviteEmail,
               controller: _inviteEmail,
               keyboardType: TextInputType.emailAddress,
-              decoration: const InputDecoration(labelText: S.inviteEmail),
             ),
             Align(
               alignment: Alignment.centerLeft,

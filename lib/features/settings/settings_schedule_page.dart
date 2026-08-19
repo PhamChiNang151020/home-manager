@@ -5,6 +5,7 @@ import "package:home_manager/core/services/home_service.dart";
 import "package:home_manager/core/services/ics_export_service.dart";
 import "package:home_manager/core/services/web_file_saver.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/features/shared/labeled_text_field.dart";
 
 class SettingsSchedulePage extends StatefulWidget {
   const SettingsSchedulePage({
@@ -83,28 +84,26 @@ class _SettingsSchedulePageState extends State<SettingsSchedulePage> {
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.md),
         children: [
-          TextField(
+          LabeledTextField(
+            label: S.photoDueDay,
             controller: _photoDay,
             enabled: owner,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: S.photoDueDay,
-              helperText: S.dayOfMonth,
-            ),
+            helperText: S.dayOfMonth,
           ),
-          const SizedBox(height: AppSpacing.md),
-          TextField(
+          const SizedBox(height: AppSpacing.formFieldGap),
+          LabeledTextField(
+            label: S.payday,
             controller: _payday,
             enabled: owner,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(labelText: S.payday),
           ),
-          const SizedBox(height: AppSpacing.md),
-          TextField(
+          const SizedBox(height: AppSpacing.formFieldGap),
+          LabeledTextField(
+            label: S.remindDay,
             controller: _remind,
             enabled: owner,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(labelText: S.remindDay),
           ),
           if (_error != null) ...[
             const SizedBox(height: AppSpacing.sm),

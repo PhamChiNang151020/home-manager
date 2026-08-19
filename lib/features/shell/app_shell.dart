@@ -4,7 +4,8 @@ import "package:home_manager/core/services/electricity_service.dart";
 import "package:home_manager/core/services/home_service.dart";
 import "package:home_manager/core/services/invite_service.dart";
 import "package:home_manager/core/state/session_controller.dart";
-import "package:home_manager/core/theme/app_colors.dart";
+import "package:home_manager/core/state/theme_controller.dart";
+import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/core/theme/mobile_viewport.dart";
 import "package:home_manager/features/electricity/electricity_page.dart";
@@ -15,9 +16,10 @@ import "package:home_manager/features/shell/home_picker_sheet.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
 
 class AppShell extends StatefulWidget {
-  const AppShell({super.key, required this.session});
+  const AppShell({super.key, required this.session, required this.theme});
 
   final SessionController session;
+  final ThemeController theme;
 
   @override
   State<AppShell> createState() => _AppShellState();
@@ -76,7 +78,7 @@ class _AppShellState extends State<AppShell> {
       ),
       body: MobileViewport(
         child: session.loading
-            ? const Center(child: CircularProgressIndicator(color: AppColors.accent))
+            ? Center(child: CircularProgressIndicator(color: context.appColors.accent))
             : home == null
                 ? Center(
                     child: Column(
@@ -107,6 +109,7 @@ class _AppShellState extends State<AppShell> {
                         home: home,
                         homesApi: homesApi,
                         invites: invites,
+                        theme: widget.theme,
                         onChanged: session.refreshHomes,
                         onSignOut: session.signOut,
                       ),

@@ -5,6 +5,7 @@ import "package:home_manager/core/logging/app_log.dart";
 import "package:home_manager/core/services/auth_service.dart";
 import "package:home_manager/core/services/home_service.dart";
 import "package:home_manager/core/state/session_controller.dart";
+import "package:home_manager/core/state/theme_controller.dart";
 import "package:intl/date_symbol_data_local.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
 
@@ -12,9 +13,10 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting("vi");
   AppLog.i("Starting home_manager");
+  final theme = await ThemeController.load();
   if (!AppConfig.isConfigured) {
     AppLog.w("Supabase not configured");
-    runApp(const MissingConfigApp());
+    runApp(MissingConfigApp(theme: theme));
     return;
   }
   await Supabase.initialize(
@@ -27,5 +29,5 @@ Future<void> main() async {
     homesApi: HomeService(client),
   );
   await session.start();
-  runApp(HomeManagerApp(session: session));
+  runApp(HomeManagerApp(session: session, theme: theme));
 }

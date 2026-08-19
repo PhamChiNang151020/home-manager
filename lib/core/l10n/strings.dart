@@ -15,6 +15,8 @@ abstract final class S {
   static const modeMeter = "Công tơ (nhập số điện)";
   static const modeInvoice = "Hoá đơn (MoMo / ngân hàng)";
   static const save = "Lưu";
+  static const edit = "Sửa";
+  static const delete = "Xóa";
   static const cancel = "Huỷ";
   static const kwhRate = "Đơn giá (đ/kWh)";
   static const previousKwh = "Số cũ (kWh)";
@@ -27,6 +29,8 @@ abstract final class S {
   static const pickPhoto = "Chụp hoặc chọn ảnh";
   static const addPeriod = "Thêm kỳ điện";
   static const editPeriod = "Sửa kỳ điện";
+  static const deletePeriod = "Xóa kỳ điện";
+  static const deletePeriodConfirm = "Xóa kỳ điện này? Không thể hoàn tác.";
   static const noHomes = "Chưa có nhà. Tạo nhà hoặc nhận lời mời.";
   static const noPeriods = "Chưa có kỳ điện.";
   static const invite = "Mời thành viên";
@@ -61,9 +65,16 @@ abstract final class S {
   static const settingsSchedule = "Lịch nhắc";
   static const settingsMembers = "Thành viên";
   static const settingsAccount = "Tài khoản";
+  static const settingsAppearance = "Giao diện";
   static const settingsHomeDesc = "Tên nhà, đơn giá điện";
   static const settingsScheduleDesc = "Ngày chụp, lương, nhắc · xuất .ics";
   static const settingsMembersDesc = "Thành viên và lời mời";
   static const settingsAccountDesc = "Đăng xuất";
+  static const settingsAppearanceDesc = "Sáng / tối, màu nhấn";
+  static const themeModeLabel = "Chế độ";
+  static const themeModeSystem = "Hệ thống";
+  static const themeModeLight = "Sáng";
+  static const themeModeDark = "Tối";
+  static const themeAccent = "Màu nhấn";
   static const history = "Lịch sử";
 }

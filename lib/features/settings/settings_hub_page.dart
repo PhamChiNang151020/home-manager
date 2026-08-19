@@ -3,9 +3,11 @@ import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/models/home.dart";
 import "package:home_manager/core/services/home_service.dart";
 import "package:home_manager/core/services/invite_service.dart";
-import "package:home_manager/core/theme/app_colors.dart";
+import "package:home_manager/core/state/theme_controller.dart";
+import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/settings/settings_account_page.dart";
+import "package:home_manager/features/settings/settings_appearance_page.dart";
 import "package:home_manager/features/settings/settings_home_page.dart";
 import "package:home_manager/features/settings/settings_members_page.dart";
 import "package:home_manager/features/settings/settings_schedule_page.dart";
@@ -16,6 +18,7 @@ class SettingsHubPage extends StatelessWidget {
     required this.home,
     required this.homesApi,
     required this.invites,
+    required this.theme,
     required this.onChanged,
     required this.onSignOut,
   });
@@ -23,6 +26,7 @@ class SettingsHubPage extends StatelessWidget {
   final Home home;
   final HomeService homesApi;
   final InviteService invites;
+  final ThemeController theme;
   final VoidCallback onChanged;
   final VoidCallback onSignOut;
 
@@ -85,6 +89,17 @@ class SettingsHubPage extends StatelessWidget {
           ),
         ),
         _SettingsTile(
+          icon: Icons.palette_outlined,
+          title: S.settingsAppearance,
+          subtitle: S.settingsAppearanceDesc,
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute<void>(
+              builder: (_) => SettingsAppearancePage(theme: theme),
+            ),
+          ),
+        ),
+        _SettingsTile(
           icon: Icons.person_outline,
           title: S.settingsAccount,
           subtitle: S.settingsAccountDesc,
@@ -115,13 +130,14 @@ class _SettingsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Card(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: ListTile(
-        leading: Icon(icon, color: AppColors.accent),
+        leading: Icon(icon, color: colors.accent),
         title: Text(title),
         subtitle: Text(subtitle),
-        trailing: const Icon(Icons.chevron_right, color: AppColors.textMuted),
+        trailing: Icon(Icons.chevron_right, color: colors.textMuted),
         onTap: onTap,
       ),
     );

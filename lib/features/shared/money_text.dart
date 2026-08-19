@@ -1,6 +1,6 @@
 import "package:flutter/material.dart";
-import "package:home_manager/core/theme/app_colors.dart";
-import "package:intl/intl.dart";
+import "package:home_manager/core/format/vnd_format.dart";
+import "package:home_manager/core/theme/app_color_scheme.dart";
 
 class MoneyText extends StatelessWidget {
   const MoneyText({
@@ -14,22 +14,21 @@ class MoneyText extends StatelessWidget {
   final TextStyle? style;
   final bool large;
 
-  static final _vnd = NumberFormat.decimalPattern("vi_VN");
-
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     final theme = Theme.of(context);
     final defaultStyle = large
         ? theme.textTheme.headlineMedium?.copyWith(
-            color: AppColors.accent,
+            color: colors.accent,
             fontWeight: FontWeight.w700,
           )
         : theme.textTheme.titleMedium?.copyWith(
-            color: AppColors.textPrimary,
+            color: colors.textPrimary,
             fontWeight: FontWeight.w600,
           );
     return Text(
-      "${_vnd.format(amount)} đ",
+      VndFormat.format(amount),
       style: style ?? defaultStyle,
     );
   }

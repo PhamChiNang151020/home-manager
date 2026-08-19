@@ -70,6 +70,11 @@ class ElectricityService {
         .single();
     return ElectricityPeriod.fromJson(row);
   }
+
+  Future<void> delete(String id) async {
+    AppLog.d("delete period $id");
+    await _client.from("electricity_periods").delete().eq("id", id);
+  }
 }
 
 class BillPhotoService {
@@ -105,5 +110,10 @@ class BillPhotoService {
       return null;
     }
     return _client.storage.from(bucket).createSignedUrl(path, 3600);
+  }
+
+  Future<void> remove(String path) async {
+    if (path.isEmpty) return;
+    await _client.storage.from(bucket).remove([path]);
   }
 }

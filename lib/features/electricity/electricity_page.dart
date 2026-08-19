@@ -75,14 +75,25 @@ class ElectricityPageState extends State<ElectricityPage> {
     }
   }
 
-  void openAddForm() => _openForm();
+  void openAddForm() => _openAddForm();
 
-  Future<void> _openForm([ElectricityPeriod? existing]) async {
-    final previous = _items.where((item) {
-      if (existing == null) return true;
-      return item.periodMonth.isBefore(existing.periodMonth);
-    }).toList();
-    await showElectricityForm(
+  Future<void> _openAddForm() async {
+    final previous = _items.isEmpty ? null : _items.first;
+    await showElectricityAddForm(
+      context: context,
+      home: widget.home,
+      electricity: widget.electricity,
+      photos: widget.photos,
+      previousPeriod: previous,
+      onSaved: _load,
+    );
+  }
+
+  Future<void> _openPeriodDialog(ElectricityPeriod existing) async {
+    final previous = _items
+        .where((item) => item.periodMonth.isBefore(existing.periodMonth))
+        .toList();
+    await showElectricityPeriodDialog(
       context: context,
       home: widget.home,
       electricity: widget.electricity,
@@ -121,7 +132,7 @@ class ElectricityPageState extends State<ElectricityPage> {
               PeriodListTile(
                 period: item,
                 home: widget.home,
-                onTap: () => _openForm(item),
+                onTap: () => _openPeriodDialog(item),
               ),
           ] else
             const Padding(

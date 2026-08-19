@@ -2,7 +2,7 @@ import "package:fl_chart/fl_chart.dart";
 import "package:flutter/material.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/models/electricity_period.dart";
-import "package:home_manager/core/theme/app_colors.dart";
+import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/shared/app_card.dart";
 import "package:intl/intl.dart";
@@ -14,6 +14,7 @@ class ElectricityTrendChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     final recent = periods.take(6).toList().reversed.toList();
     if (recent.length < 2) {
       return const SizedBox.shrink();
@@ -30,7 +31,7 @@ class ElectricityTrendChart extends StatelessWidget {
           Text(
             S.trendSixMonths,
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: colors.textSecondary,
                 ),
           ),
           const SizedBox(height: AppSpacing.md),
@@ -42,8 +43,8 @@ class ElectricityTrendChart extends StatelessWidget {
                 gridData: FlGridData(
                   show: true,
                   drawVerticalLine: false,
-                  getDrawingHorizontalLine: (_) => const FlLine(
-                    color: AppColors.border,
+                  getDrawingHorizontalLine: (_) => FlLine(
+                    color: colors.border,
                     strokeWidth: 1,
                   ),
                 ),
@@ -70,8 +71,8 @@ class ElectricityTrendChart extends StatelessWidget {
                           padding: const EdgeInsets.only(top: 6),
                           child: Text(
                             DateFormat("MM").format(recent[index].periodMonth),
-                            style: const TextStyle(
-                              color: AppColors.textMuted,
+                            style: TextStyle(
+                              color: colors.textMuted,
                               fontSize: 11,
                             ),
                           ),
@@ -87,7 +88,7 @@ class ElectricityTrendChart extends StatelessWidget {
                       barRods: [
                         BarChartRodData(
                           toY: recent[i].amountVnd,
-                          color: AppColors.accent,
+                          color: colors.accent,
                           width: 20,
                           borderRadius: const BorderRadius.vertical(
                             top: Radius.circular(4),
