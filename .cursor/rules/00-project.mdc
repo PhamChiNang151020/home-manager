@@ -1,0 +1,48 @@
+---
+description: >
+  home_manager — Flutter Web PWA for personal home management. Load when
+  working on this repo. Trigger on: home-manager, PWA, Hive, utilities, expenses,
+  shopping, bill photo, Flutter Web.
+alwaysApply: false
+---
+
+# home_manager — project context
+
+Read `.cursor/notes.md` before changing platform, storage, or distribution.
+
+## Overview
+
+Personal Flutter **Web** app: electricity/water bills, expenses, shopping list, bill photos. Install on iPhone via Safari Add to Home Screen. No App Store, no Developer Mode.
+
+## Repo
+
+- Package: `home_manager`
+- Org: `com.pcn`
+- Remote: `https://github.com/PhamChiNang151020/home-manager.git` (private)
+- Branch: `main`
+- Path: `/Users/be011/Desktop/PCN/scr/client/home-manager` (sibling of `flutter_sdk_switcher`)
+
+## Structure (target)
+
+- `lib/core/` — models + services (storage, backup); no UI imports
+- `lib/features/` — screens and widgets
+- `lib/app.dart` — app shell when split from `main.dart`
+- `web/` — PWA manifest and icons
+
+## Rules
+
+1. Web-only in v1 — do not add iOS/Android platforms without approval.
+2. Local-first storage (Hive). No cloud unless the user asks.
+3. Persistence stays in services, not widgets.
+4. Keep diffs small; match `flutter_lints` / `analysis_options.yaml`.
+5. Do not commit secrets, `.env` keys, or personal bill data/photos.
+
+## Build
+
+```bash
+flutter pub get
+flutter run -d chrome
+flutter build web
+```
+
+Develop with Flutter **3.29.2** (Dart 3.7.2 per `pubspec.yaml`).

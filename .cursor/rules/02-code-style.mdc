@@ -1,0 +1,35 @@
+---
+description: >
+  Dart/Flutter style for home_manager. Trigger on: new file, widget, service,
+  refactor, lint, naming.
+alwaysApply: false
+---
+
+# Code style — home_manager
+
+## Dart
+
+- Double quotes for strings (Flutter default).
+- `snake_case.dart` files; `PascalCase` types; `camelCase` members.
+- Prefer `const` constructors where possible.
+
+## Architecture
+
+- **Services:** pure Dart, testable; Hive/IndexedDB isolated in storage/backup services.
+- **UI:** Material 3; mobile-first; Vietnamese user-facing copy.
+- **State:** start simple; extract a provider layer when screens share app data. Widgets must not open Hive boxes directly.
+
+## Comments
+
+- Explain non-obvious web/PWA or IndexedDB behavior only.
+- No commented-out dead code in commits.
+
+## Web
+
+- Prefer packages that support Flutter Web (`image_picker`, Hive).
+- Do not use `dart:io` on web code paths.
+
+## Quality
+
+- Run `flutter analyze` before considering work done.
+- No `print` in production paths — use `debugPrint` if needed.

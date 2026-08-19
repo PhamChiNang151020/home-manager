@@ -1,0 +1,19 @@
+---
+description: >
+  Consult CODEBASE_MAP before searching the repo. Trigger on: where is, find file,
+  which file, structure, new screen, new service.
+alwaysApply: false
+---
+
+# CODEBASE_MAP usage
+
+Before grepping the project, read `.cursor/CODEBASE_MAP.md`.
+
+1. Map → pick file or planned module
+2. Open file → implement
+3. Grep only if the map is stale or insufficient
+
+After adding features or folders under `lib/`:
+
+1. Add a curated row under **Feature screens** / **Core** when the module is user-facing or non-obvious.
+2. Update the **Current tree** section to match disk.

@@ -1,12 +1,10 @@
 # Miscellaneous
+# Note: .cursor/ (rules, docs, skills) is tracked — do not ignore.
 *.class
 *.log
 *.pyc
 *.swp
 .DS_Store
-
-# Sibling local project — not part of home-manager
-flutter_sdk_switcher/
 .atom/
 .build/
 .buildlog/

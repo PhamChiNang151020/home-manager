@@ -1,0 +1,37 @@
+---
+description: >
+  Git and GitHub workflow for this repo. Trigger on: commit, push, pull request,
+  gh pr, branch, merge, git status.
+alwaysApply: false
+---
+
+# Git workflow — home_manager
+
+Also apply project skill `.cursor/skills/git-workflow/SKILL.md` when the user asks for git operations.
+
+When drafting commit messages, use `.cursor/skills/format-commit-message/SKILL.md` (bracket tags: `[FIX]`, `[FEATURE]`, …).
+
+## Remote
+
+- `origin` → `https://github.com/PhamChiNang151020/home-manager.git`
+- Default branch: `main`
+
+## Commits
+
+- Commit **only when the user asks**.
+- Format subjects with **`.cursor/skills/format-commit-message/SKILL.md`** (`[TYPE]: …` in English).
+- Do not commit secrets, bill photos, or exported household JSON dumps.
+
+## Pull requests
+
+- Use `gh` for PRs when requested.
+- Include Summary + Test plan in PR body.
+
+## Tracked Cursor config
+
+- `.cursor/` is **intentionally tracked** (rules, docs, skills) — do not add `.cursor` to `.gitignore`.
+
+## Safety
+
+- No force-push to `main`, no destructive git without explicit user approval.
+- No `git add .` when staging for user-requested commits — stage named paths only.
