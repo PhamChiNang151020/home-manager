@@ -1,3 +1,4 @@
+import "package:home_manager/core/logging/app_log.dart";
 import "package:home_manager/core/models/home.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
 
@@ -7,6 +8,7 @@ class InviteService {
   final SupabaseClient _client;
 
   Future<void> invite({required String homeId, required String email}) {
+    AppLog.i("Inviting $email to home $homeId");
     return _client.rpc(
       "invite_to_home",
       params: {"p_home_id": homeId, "p_email": email},

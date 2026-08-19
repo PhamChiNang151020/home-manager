@@ -1,4 +1,5 @@
 import "package:flutter/foundation.dart";
+import "package:home_manager/core/logging/app_log.dart";
 import "package:home_manager/core/models/home.dart";
 import "package:home_manager/core/services/auth_service.dart";
 import "package:home_manager/core/services/home_service.dart";
@@ -20,8 +21,10 @@ class SessionController extends ChangeNotifier {
   String? error;
 
   Future<void> start() async {
+    AppLog.i("SessionController starting");
     auth.onAuthStateChange.listen((state) async {
       user = state.session?.user;
+      AppLog.d("Auth state: ${user?.id ?? "signed out"}");
       if (user != null) {
         await refreshHomes();
       } else {
@@ -55,7 +58,8 @@ class SessionController extends ChangeNotifier {
       } else if (homes.isNotEmpty) {
         selected = homes.first;
       }
-    } catch (e) {
+    } catch (e, st) {
+      AppLog.e("refreshHomes failed", error: e, stackTrace: st);
       error = "$e";
     } finally {
       loading = false;

@@ -2,6 +2,9 @@ import "package:flutter/material.dart";
 import "package:home_manager/core/domain/meter_math.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/models/home.dart";
+import "package:home_manager/core/theme/app_colors.dart";
+import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/features/shared/app_card.dart";
 
 class ReminderBanner extends StatelessWidget {
   const ReminderBanner({super.key, required this.home});
@@ -18,14 +21,27 @@ class ReminderBanner extends StatelessWidget {
     if (messages.isEmpty) {
       return const SizedBox.shrink();
     }
-    return Card(
-      color: Theme.of(context).colorScheme.secondaryContainer,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+      child: AppCard(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            for (final line in messages) Text(line),
+            const Icon(Icons.notifications_active_outlined, color: AppColors.warning),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (final line in messages)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 2),
+                      child: Text(line),
+                    ),
+                ],
+              ),
+            ),
           ],
         ),
       ),

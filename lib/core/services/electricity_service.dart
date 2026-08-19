@@ -1,5 +1,6 @@
 import "dart:typed_data";
 
+import "package:home_manager/core/logging/app_log.dart";
 import "package:home_manager/core/models/electricity_period.dart";
 import "package:intl/intl.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
@@ -13,6 +14,7 @@ class ElectricityService {
       DateFormat("yyyy-MM-01").format(DateTime(month.year, month.month));
 
   Future<List<ElectricityPeriod>> list(String homeId) async {
+    AppLog.d("list periods for $homeId");
     final rows = await _client
         .from("electricity_periods")
         .select()

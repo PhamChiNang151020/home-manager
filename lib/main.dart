@@ -1,14 +1,19 @@
 import "package:flutter/material.dart";
 import "package:home_manager/app.dart";
 import "package:home_manager/core/config/app_config.dart";
+import "package:home_manager/core/logging/app_log.dart";
 import "package:home_manager/core/services/auth_service.dart";
 import "package:home_manager/core/services/home_service.dart";
 import "package:home_manager/core/state/session_controller.dart";
+import "package:intl/date_symbol_data_local.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting("vi");
+  AppLog.i("Starting home_manager");
   if (!AppConfig.isConfigured) {
+    AppLog.w("Supabase not configured");
     runApp(const MissingConfigApp());
     return;
   }

@@ -9,14 +9,22 @@ Flutter Web PWA for family electricity (two homes, Google login, Supabase). Viet
 
 ## Run locally
 
+**Cursor / VS Code (recommended):**
+
+1. `cp .vscode/supabase.local.json.example .vscode/supabase.local.json`
+2. Paste **Project URL** and **anon key** from Supabase (see [supabase/README.md](supabase/README.md))
+3. Run and Debug → **home-manager (Chrome)** (port 8080)
+
+**Terminal:**
+
 ```bash
 flutter pub get
-flutter run -d chrome \
+flutter run -d chrome --web-port=8080 \
   --dart-define=SUPABASE_URL=https://YOUR_PROJECT.supabase.co \
   --dart-define=SUPABASE_ANON_KEY=YOUR_ANON_KEY
 ```
 
-Copy [env.example](env.example) for the names of those values. Do not commit real keys in `.env`.
+Do not commit `.vscode/supabase.local.json` or `.env` with real keys.
 
 ## iPhone
 

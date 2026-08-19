@@ -1,4 +1,5 @@
 import "package:home_manager/core/config/app_config.dart";
+import "package:home_manager/core/logging/app_log.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
 
 class AuthService {
@@ -11,11 +12,15 @@ class AuthService {
   Stream<AuthState> get onAuthStateChange => _client.auth.onAuthStateChange;
 
   Future<void> signInWithGoogle() {
+    AppLog.i("Starting Google OAuth sign-in");
     return _client.auth.signInWithOAuth(
       OAuthProvider.google,
       redirectTo: AppConfig.oauthRedirect,
     );
   }
 
-  Future<void> signOut() => _client.auth.signOut();
+  Future<void> signOut() {
+    AppLog.i("Signing out");
+    return _client.auth.signOut();
+  }
 }

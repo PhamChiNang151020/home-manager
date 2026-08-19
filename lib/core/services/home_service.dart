@@ -1,3 +1,4 @@
+import "package:home_manager/core/logging/app_log.dart";
 import "package:home_manager/core/models/home.dart";
 import "package:home_manager/core/models/tracking_mode.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
@@ -18,8 +19,10 @@ class HomeService {
   Future<List<Home>> listHomes() async {
     final uid = _client.auth.currentUser?.id;
     if (uid == null) {
+      AppLog.d("listHomes: no user");
       return [];
     }
+    AppLog.d("listHomes for $uid");
     final memberships = await _client
         .from("home_members")
         .select("home_id, role, homes(*)")

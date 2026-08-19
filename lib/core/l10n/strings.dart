@@ -48,4 +48,22 @@ abstract final class S {
   static const invalidReadings = "Số mới phải lớn hơn hoặc bằng số cũ.";
   static const invalidAmount = "Nhập số tiền hợp lệ.";
   static const roleOwnerOnly = "Chỉ chủ nhà mới sửa cài đặt và mời người.";
+  static const switchHome = "Chọn nhà";
+  static const modeMeterShort = "Công tơ";
+  static const modeInvoiceShort = "Hoá đơn";
+  static const lastPeriod = "Kỳ gần nhất";
+  static const avgSixMonths = "TB 6 tháng";
+  static const trendSixMonths = "6 tháng gần đây";
+  static const hasPhoto = "Có ảnh";
+  static const noPhoto = "Chưa ảnh";
+  static const retry = "Thử lại";
+  static const settingsHome = "Nhà";
+  static const settingsSchedule = "Lịch nhắc";
+  static const settingsMembers = "Thành viên";
+  static const settingsAccount = "Tài khoản";
+  static const settingsHomeDesc = "Tên nhà, đơn giá điện";
+  static const settingsScheduleDesc = "Ngày chụp, lương, nhắc · xuất .ics";
+  static const settingsMembersDesc = "Thành viên và lời mời";
+  static const settingsAccountDesc = "Đăng xuất";
+  static const history = "Lịch sử";
 }
