@@ -42,7 +42,6 @@ class PeriodListTile extends StatelessWidget {
   final VoidCallback onDelete;
   final VoidCallback onTogglePaid;
 
-  // ── trend helpers ──────────────────────────────────────────────────────────
   _TrendData? _trend() {
     final prev = previousPeriod;
     if (prev == null || prev.amountVnd == 0) return null;
@@ -61,6 +60,7 @@ class PeriodListTile extends StatelessWidget {
       "dd/MM/yyyy HH:mm",
     ).format(period.recordedAt.toLocal());
     final trend = _trend();
+    final isMeter = home.trackingMode == TrackingMode.meter;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
@@ -69,14 +69,13 @@ class PeriodListTile extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── header row: month + kebab ─────────────────────────────────
+            // ── Row 1: tháng (trái) + kebab (phải) ──────────────────────
             Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
                   child: Text(
                     monthLabel,
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -90,42 +89,21 @@ class PeriodListTile extends StatelessWidget {
               ],
             ),
             const SizedBox(height: AppSpacing.xs),
-            // ── amount + trend indicator ───────────────────────────────────
+            // ── Row 2: tiền + trend (trái) | trạng thái paid (phải) ──────
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                MoneyText(amount: period.amountVnd, large: true),
-                if (trend != null) ...[
-                  const SizedBox(width: AppSpacing.sm),
-                  _TrendChip(trend: trend, colors: colors),
-                ],
-              ],
-            ),
-            if (home.trackingMode == TrackingMode.meter) ...[
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                "${_fmtKwh(period.previousKwh)} → "
-                "${_fmtKwh(period.newKwh)} kWh"
-                "${period.consumptionKwh != null ? " · ${_fmtKwh(period.consumptionKwh!)} kWh" : ""}",
-                style: TextStyle(color: colors.textSecondary),
-              ),
-            ],
-            if (hasNote) ...[
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                period.note!,
-                style: TextStyle(color: colors.textMuted, fontSize: 13),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-            const SizedBox(height: AppSpacing.sm),
-            // ── chip row ──────────────────────────────────────────────────
-            Wrap(
-              spacing: AppSpacing.xs,
-              runSpacing: AppSpacing.xs,
-              children: [
-                // paid status
+                Expanded(
+                  child: Row(
+                    children: [
+                      MoneyText(amount: period.amountVnd, large: true),
+                      if (trend != null) ...[
+                        const SizedBox(width: AppSpacing.sm),
+                        _TrendChip(trend: trend, colors: colors),
+                      ],
+                    ],
+                  ),
+                ),
                 StatusBadge(
                   label: period.isPaid ? S.paid : S.unpaid,
                   variant:
@@ -133,39 +111,75 @@ class PeriodListTile extends StatelessWidget {
                           ? StatusBadgeVariant.success
                           : StatusBadgeVariant.neutral,
                 ),
-                // kWh chip
-                if (home.trackingMode == TrackingMode.meter &&
-                    period.consumptionKwh != null)
-                  StatusBadge(
-                    label: "${_fmtKwh(period.consumptionKwh!)} kWh",
-                    variant: StatusBadgeVariant.accent,
-                  ),
-                // photo chip (tappable)
-                GestureDetector(
-                  onTap:
-                      hasPhoto
-                          ? () => showBillPhotoViewer(
-                            context: context,
-                            photoPath: period.photoPath!,
-                            photos: photos,
-                          )
-                          : null,
-                  child: StatusBadge(
-                    label: hasPhoto ? S.hasPhoto : S.noPhoto,
-                    variant:
-                        hasPhoto
-                            ? StatusBadgeVariant.success
-                            : StatusBadgeVariant.neutral,
+              ],
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            // ── Row 3: kWh (trái) | ảnh (phải) ─────────────────────────
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // cột trái: kWh + ghi chú
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (isMeter)
+                        Text(
+                          "${_fmtKwh(period.previousKwh)} → "
+                          "${_fmtKwh(period.newKwh)} kWh",
+                          style: TextStyle(color: colors.textSecondary),
+                        ),
+                      if (isMeter && period.consumptionKwh != null) ...[
+                        const SizedBox(height: 2),
+                        StatusBadge(
+                          label: "${_fmtKwh(period.consumptionKwh!)} kWh",
+                          variant: StatusBadgeVariant.accent,
+                        ),
+                      ],
+                      if (hasNote) ...[
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          period.note!,
+                          style: TextStyle(
+                            color: colors.textMuted,
+                            fontSize: 13,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ],
                   ),
                 ),
-                if (hasNote)
-                  const StatusBadge(
-                    label: S.hasNote,
-                    variant: StatusBadgeVariant.neutral,
-                  ),
-                StatusBadge(
-                  label: recordedLabel,
-                  variant: StatusBadgeVariant.neutral,
+                const SizedBox(width: AppSpacing.sm),
+                // cột phải: ảnh + ngày ghi
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    GestureDetector(
+                      onTap:
+                          hasPhoto
+                              ? () => showBillPhotoViewer(
+                                context: context,
+                                photoPath: period.photoPath!,
+                                photos: photos,
+                              )
+                              : null,
+                      child: StatusBadge(
+                        label: hasPhoto ? S.hasPhoto : S.noPhoto,
+                        variant:
+                            hasPhoto
+                                ? StatusBadgeVariant.success
+                                : StatusBadgeVariant.neutral,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      recordedLabel,
+                      style: TextStyle(color: colors.textMuted, fontSize: 11),
+                      textAlign: TextAlign.right,
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -176,7 +190,7 @@ class PeriodListTile extends StatelessWidget {
   }
 }
 
-// ── Trend chip widget ──────────────────────────────────────────────────────
+// ── Trend chip ──────────────────────────────────────────────────────────────
 
 class _TrendData {
   const _TrendData({required this.pct, required this.up});
@@ -237,7 +251,7 @@ class _TrendChip extends StatelessWidget {
   }
 }
 
-// ── Kebab menu ─────────────────────────────────────────────────────────────
+// ── Kebab menu ──────────────────────────────────────────────────────────────
 
 class _KebabMenu extends StatelessWidget {
   const _KebabMenu({

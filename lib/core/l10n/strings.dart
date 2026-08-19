@@ -102,4 +102,5 @@ abstract final class S {
   static const unpaid = "Chưa chốt số";
   static const markPaid = "Đánh dấu đã thanh toán";
   static const markUnpaid = "Bỏ đánh dấu";
+  static const detailPeriod = "Chi tiết kỳ điện";
 }
