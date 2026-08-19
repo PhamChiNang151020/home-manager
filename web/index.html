@@ -18,11 +18,13 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="description" content="Personal home management app">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Nhà cửa">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
@@ -34,5 +36,19 @@
 </head>
 <body>
   <script src="flutter_bootstrap.js" async></script>
+  <script>
+    // Auto-reload for iOS Simulator Safari when served via local IP (dev only)
+    if (/^192\.168\.|^10\.|^172\.(1[6-9]|2\d|3[01])\./.test(location.hostname)) {
+      let lastEtag = null;
+      setInterval(async () => {
+        try {
+          const res = await fetch('/flutter_bootstrap.js', { cache: 'no-store' });
+          const etag = res.headers.get('etag') || res.headers.get('last-modified');
+          if (lastEtag && etag !== lastEtag) location.reload();
+          lastEtag = etag;
+        } catch (_) {}
+      }, 2000);
+    }
+  </script>
 </body>
 </html>
