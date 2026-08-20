@@ -37,46 +37,43 @@
   <title>Tổ Ấm</title>
   <link rel="manifest" href="manifest.json">
   <script>
-    // iOS standalone PWA: sync viewport vars before first paint so touch bounds
-    // match painted layout. WebKit cold-start can report innerHeight ~59px
-    // shorter than screen.height while still painting edge-to-edge.
+    // iOS home-screen apps (PWA / Web Clip): size the page to innerHeight so
+    // painted layout matches WebKit touch bounds. Do not also inset in Flutter.
     (function () {
-      function isStandalone() {
+      function isHomeScreenApp() {
         if (navigator.standalone) return true;
-        return window.matchMedia &&
-          (window.matchMedia("(display-mode: standalone)").matches ||
-            window.matchMedia("(display-mode: fullscreen)").matches ||
-            window.matchMedia("(display-mode: minimal-ui)").matches);
+        if (!window.matchMedia) return false;
+        return (
+          window.matchMedia("(display-mode: standalone)").matches ||
+          window.matchMedia("(display-mode: fullscreen)").matches
+        );
       }
 
-      function syncStandaloneViewport() {
-        var innerHeight = window.innerHeight || 0;
-        var screenMax = Math.max(screen.width || 0, screen.height || 0);
-        var gap =
-          screenMax > innerHeight && innerHeight > 0
-            ? screenMax - innerHeight
-            : 0;
-
-        document.documentElement.style.setProperty(
-          "--standalone-bottom-gap",
-          gap + "px",
-        );
-
-        if (!isStandalone() && gap <= 0) return;
-
-        document.documentElement.style.setProperty(
-          "--app-height",
-          innerHeight + "px",
-        );
-        document.documentElement.style.height = innerHeight + "px";
-        document.body.style.height = innerHeight + "px";
+      function clearHomeScreenViewport() {
+        document.documentElement.style.height = "";
+        document.body.style.height = "";
+        document.documentElement.style.removeProperty("--app-height");
+        document.documentElement.removeAttribute("data-ios-home-screen");
       }
 
-      syncStandaloneViewport();
-      window.addEventListener("resize", syncStandaloneViewport);
-      window.addEventListener("orientationchange", syncStandaloneViewport);
+      function syncHomeScreenViewport() {
+        if (!isHomeScreenApp()) {
+          clearHomeScreenViewport();
+          return;
+        }
+        var h = window.innerHeight;
+        if (!h) return;
+        document.documentElement.style.setProperty("--app-height", h + "px");
+        document.documentElement.style.height = h + "px";
+        document.body.style.height = h + "px";
+        document.documentElement.setAttribute("data-ios-home-screen", "true");
+      }
+
+      syncHomeScreenViewport();
+      window.addEventListener("resize", syncHomeScreenViewport);
+      window.addEventListener("orientationchange", syncHomeScreenViewport);
       if (window.visualViewport) {
-        window.visualViewport.addEventListener("resize", syncStandaloneViewport);
+        window.visualViewport.addEventListener("resize", syncHomeScreenViewport);
       }
     })();
   </script>
@@ -89,18 +86,11 @@
       overflow: hidden;
       overscroll-behavior: none;
     }
-    @supports (height: 100dvh) {
-      html, body {
-        height: 100dvh;
-      }
-    }
-    @media (display-mode: standalone) {
-      html, body {
-        height: var(--app-height, 100%);
-        min-height: var(--app-height, 100%);
-        max-height: var(--app-height, 100%);
-        overflow: hidden;
-      }
+    html[data-ios-home-screen="true"],
+    html[data-ios-home-screen="true"] body {
+      height: var(--app-height, 100%);
+      min-height: var(--app-height, 100%);
+      max-height: var(--app-height, 100%);
     }
     #splash {
       position: fixed;
