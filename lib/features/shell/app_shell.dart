@@ -1,6 +1,8 @@
+import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/services/app_services.dart";
+import "package:home_manager/core/services/pwa_runtime.dart";
 import "package:home_manager/core/state/session_controller.dart";
 import "package:home_manager/core/state/theme_controller.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
@@ -162,6 +164,7 @@ class _AppShellState extends State<AppShell> {
                 ? null
                 : SafeArea(
                   top: false,
+                  bottom: !(kIsWeb && pwaIosHomeScreenShell()),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
