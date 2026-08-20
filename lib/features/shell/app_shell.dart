@@ -1,27 +1,33 @@
 import "package:flutter/material.dart";
 import "package:home_manager/core/l10n/strings.dart";
-import "package:home_manager/core/services/electricity_service.dart";
-import "package:home_manager/core/services/home_service.dart";
-import "package:home_manager/core/services/invite_service.dart";
+import "package:home_manager/core/services/app_services.dart";
 import "package:home_manager/core/state/session_controller.dart";
 import "package:home_manager/core/state/theme_controller.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
+import "package:home_manager/core/theme/app_icons.dart";
 import "package:home_manager/core/theme/app_motion.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/core/theme/mobile_viewport.dart";
-import "package:home_manager/features/electricity/electricity_page.dart";
+import "package:home_manager/features/expenses/expenses_page.dart";
 import "package:home_manager/features/homes/create_home_dialog.dart";
+import "package:home_manager/features/overview/overview_page.dart";
 import "package:home_manager/features/settings/settings_hub_page.dart";
+import "package:home_manager/features/shared/app_asset_icon.dart";
 import "package:home_manager/features/shared/app_loading.dart";
 import "package:home_manager/features/shared/sticky_primary_bar.dart";
 import "package:home_manager/features/shell/home_picker_sheet.dart";
-import "package:supabase_flutter/supabase_flutter.dart";
 
 class AppShell extends StatefulWidget {
-  const AppShell({super.key, required this.session, required this.theme});
+  const AppShell({
+    super.key,
+    required this.session,
+    required this.theme,
+    required this.services,
+  });
 
   final SessionController session;
   final ThemeController theme;
+  final AppServices services;
 
   @override
   State<AppShell> createState() => _AppShellState();
@@ -29,17 +35,13 @@ class AppShell extends StatefulWidget {
 
 class _AppShellState extends State<AppShell> {
   int _tab = 0;
-  final _electricityKey = GlobalKey<ElectricityPageState>();
+  final _expensesKey = GlobalKey<ExpensesPageState>();
 
   @override
   Widget build(BuildContext context) {
     final session = widget.session;
     final home = session.selected;
-    final client = Supabase.instance.client;
-    final homesApi = HomeService(client);
-    final electricity = ElectricityService(client);
-    final photos = BillPhotoService(client);
-    final invites = InviteService(client);
+    final services = widget.services;
     final colors = context.appColors;
 
     return ColoredBox(
@@ -63,7 +65,7 @@ class _AppShellState extends State<AppShell> {
                           onAddHome:
                               () => showCreateHomeDialog(
                                 context: context,
-                                homesApi: homesApi,
+                                homesApi: services.homes,
                                 onCreated: session.refreshHomes,
                               ),
                         ),
@@ -106,7 +108,7 @@ class _AppShellState extends State<AppShell> {
                             onPressed:
                                 () => showCreateHomeDialog(
                                   context: context,
-                                  homesApi: homesApi,
+                                  homesApi: services.homes,
                                   onCreated: session.refreshHomes,
                                 ),
                             child: const Text(S.addHome),
@@ -130,23 +132,30 @@ class _AppShellState extends State<AppShell> {
                           ),
                         );
                       },
-                      child:
-                          _tab == 0
-                              ? ElectricityPage(
-                                key: _electricityKey,
-                                home: home,
-                                electricity: electricity,
-                                photos: photos,
-                              )
-                              : SettingsHubPage(
-                                key: ValueKey("settings-${home.id}"),
-                                home: home,
-                                homesApi: homesApi,
-                                invites: invites,
-                                theme: widget.theme,
-                                onChanged: session.refreshHomes,
-                                onSignOut: session.signOut,
-                              ),
+                      child: switch (_tab) {
+                        0 => OverviewPage(
+                          key: ValueKey("overview-${home.id}"),
+                          home: home,
+                          services: services,
+                        ),
+                        1 => ExpensesPage(
+                          key: _expensesKey,
+                          home: home,
+                          expenses: services.expenses,
+                          homesApi: services.homes,
+                          photos: services.photos,
+                          currentUserId: session.user?.id ?? "",
+                        ),
+                        _ => SettingsHubPage(
+                          key: ValueKey("settings-${home.id}"),
+                          home: home,
+                          homesApi: services.homes,
+                          invites: services.invites,
+                          theme: widget.theme,
+                          onChanged: session.refreshHomes,
+                          onSignOut: session.signOut,
+                        ),
+                      },
                     ),
           ),
         ),
@@ -156,11 +165,11 @@ class _AppShellState extends State<AppShell> {
                 : Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (_tab == 0)
+                    if (_tab == 1)
                       StickyPrimaryBar(
-                        label: S.addPeriod,
+                        label: S.addExpense,
                         onPressed:
-                            () => _electricityKey.currentState?.openAddForm(),
+                            () => _expensesKey.currentState?.openAddForm(),
                       ),
                     NavigationBar(
                       selectedIndex: _tab,
@@ -168,11 +177,27 @@ class _AppShellState extends State<AppShell> {
                           (index) => setState(() => _tab = index),
                       destinations: const [
                         NavigationDestination(
-                          icon: Icon(Icons.bolt),
-                          label: S.electricity,
+                          icon: AppAssetIcon(AppIcons.dashboard, size: 24),
+                          selectedIcon: AppAssetIcon(
+                            AppIcons.dashboard,
+                            size: 26,
+                          ),
+                          label: S.overview,
                         ),
                         NavigationDestination(
-                          icon: Icon(Icons.settings),
+                          icon: AppAssetIcon(AppIcons.expenses, size: 24),
+                          selectedIcon: AppAssetIcon(
+                            AppIcons.expenses,
+                            size: 26,
+                          ),
+                          label: S.expenses,
+                        ),
+                        NavigationDestination(
+                          icon: AppAssetIcon(AppIcons.settings, size: 24),
+                          selectedIcon: AppAssetIcon(
+                            AppIcons.settings,
+                            size: 26,
+                          ),
                           label: S.settings,
                         ),
                       ],

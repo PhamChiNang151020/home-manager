@@ -7,7 +7,7 @@ Track electricity for two family homes on iPhone **without** App Store or Develo
 ## Layers
 
 1. **UI (Flutter Web)** — Material 3, Vietnamese, PWA standalone.
-2. **Domain / services** — homes, invites, electricity periods, photos, ICS. No Supabase in widgets.
+2. **Domain / services** — homes, invites, electricity/water periods, expenses, income, photos, ICS. No Supabase in widgets.
 3. **Supabase** — Auth (Google), Postgres + RLS, Storage for bill JPEGs.
 
 ## Homes
@@ -20,12 +20,15 @@ Track electricity for two family homes on iPhone **without** App Store or Develo
 ## Data (see `supabase/migrations/`)
 
 - `profiles` — `id` = `auth.users.id`
-- `homes` — name, `tracking_mode`, `kwh_rate`, calendar days, `created_by`
+- `homes` — name, `tracking_mode`, `kwh_rate`, `m3_rate`, calendar days, `created_by`
 - `home_members` — `owner` \| `member`
 - `home_invites` — pending email until Google email matches
-- `electricity_periods` — unique `(home_id, period_month)`
+- `electricity_periods` / `water_periods` — unique `(home_id, period_month)`
+- `expense_categories` — 5 defaults seeded per home
+- `expenses` — amount, category, paid_by, date, optional receipt
+- `incomes` — unique `(home_id, user_id, income_month)`
 
-Storage: bucket `bill-photos`, path `homes/{home_id}/{yyyy-mm}.jpg`.
+Storage: bucket `bill-photos`. Electricity `homes/{id}/{yyyy-mm}.jpg`; water `homes/{id}/water/{yyyy-mm}.jpg`; expense receipts `homes/{id}/expenses/{id}.jpg`.
 
 ## Auth / invite
 
@@ -37,7 +40,7 @@ Storage: bucket `bill-photos`, path `homes/{home_id}/{yyyy-mm}.jpg`.
 
 ## Reminders
 
-1. Banner on electricity tab when today matches photo / payday / remind day (clamp 31 → last day of month).
+1. Banner on Tổng quan (and utility pages) when today matches photo / payday / remind day (clamp 31 → last day of month). Copy covers điện + nước. Same calendar days — no separate water remind day.
 2. Settings: download monthly `.ics` (RRULE) for those days.
 3. Web Push: later — iOS needs Home Screen PWA + VAPID + scheduled Edge Function. See `.cursor/docs/web-push.md`.
 

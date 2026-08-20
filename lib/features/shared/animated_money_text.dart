@@ -35,10 +35,7 @@ class AnimatedMoneyText extends StatelessWidget {
       duration: AppMotion.slow,
       curve: AppCurves.enter,
       builder: (context, value, _) {
-        return Text(
-          VndFormat.format(value),
-          style: style ?? defaultStyle,
-        );
+        return Text(VndFormat.format(value), style: style ?? defaultStyle);
       },
     );
   }

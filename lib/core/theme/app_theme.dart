@@ -3,6 +3,10 @@ import "package:home_manager/core/theme/app_accent.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 
+abstract final class AppFonts {
+  static const nunito = "Nunito";
+}
+
 abstract final class AppTheme {
   static ThemeData build({
     required Brightness brightness,
@@ -28,10 +32,20 @@ abstract final class AppTheme {
       outline: colors.border,
     );
 
+    final material = ThemeData(brightness: brightness, useMaterial3: true);
+    final textTheme = material.textTheme.apply(
+      fontFamily: AppFonts.nunito,
+      bodyColor: colors.textPrimary,
+      displayColor: colors.textPrimary,
+    );
+
     return ThemeData(
       useMaterial3: true,
       brightness: brightness,
       colorScheme: scheme,
+      fontFamily: AppFonts.nunito,
+      textTheme: textTheme,
+      primaryTextTheme: textTheme,
       scaffoldBackgroundColor: colors.bgBase,
       extensions: [colors],
       appBarTheme: AppBarTheme(
@@ -39,6 +53,7 @@ abstract final class AppTheme {
         foregroundColor: colors.textPrimary,
         elevation: 0,
         centerTitle: false,
+        titleTextStyle: textTheme.titleLarge,
       ),
       cardTheme: CardTheme(
         color: colors.bgSurface,
@@ -57,9 +72,10 @@ abstract final class AppTheme {
         indicatorColor: colors.accentMuted(),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
-          return TextStyle(
+          return textTheme.labelMedium?.copyWith(
             color: selected ? colors.accent : colors.textSecondary,
             fontSize: 12,
+            fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
           );
         }),
         iconTheme: WidgetStateProperty.resolveWith((states) {
@@ -88,13 +104,16 @@ abstract final class AppTheme {
           borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
           borderSide: BorderSide(color: colors.accent, width: 1.5),
         ),
-        hintStyle: TextStyle(color: colors.textMuted),
-        helperStyle: TextStyle(color: colors.textSecondary),
+        hintStyle: textTheme.bodyMedium?.copyWith(color: colors.textMuted),
+        helperStyle: textTheme.bodySmall?.copyWith(color: colors.textSecondary),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           backgroundColor: colors.accent,
           foregroundColor: onPrimary,
+          textStyle: textTheme.labelLarge?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
           minimumSize: const Size.fromHeight(AppSpacing.touchMin),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
@@ -104,6 +123,9 @@ abstract final class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: colors.textPrimary,
+          textStyle: textTheme.labelLarge?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
           side: BorderSide(color: colors.border),
           minimumSize: const Size.fromHeight(AppSpacing.touchMin),
           shape: RoundedRectangleBorder(
@@ -114,6 +136,9 @@ abstract final class AppTheme {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: colors.accent,
+          textStyle: textTheme.labelLarge?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
           minimumSize: const Size.fromHeight(AppSpacing.touchMin),
         ),
       ),
@@ -128,6 +153,10 @@ abstract final class AppTheme {
       listTileTheme: ListTileThemeData(
         iconColor: colors.textSecondary,
         textColor: colors.textPrimary,
+        titleTextStyle: textTheme.titleMedium,
+        subtitleTextStyle: textTheme.bodyMedium?.copyWith(
+          color: colors.textSecondary,
+        ),
         minVerticalPadding: AppSpacing.sm,
       ),
     );

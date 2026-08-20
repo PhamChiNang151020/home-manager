@@ -1,4 +1,4 @@
-# CODEBASE_MAP — home_manager (Flutter Web)
+# CODEBASE_MAP — home_manager (Flutter Web) v2
 
 Consult this file before grepping the repo. Update when adding modules under `lib/`.
 
@@ -6,12 +6,13 @@ Consult this file before grepping the repo. Update when adding modules under `li
 
 | Item | Path |
 |------|------|
-| Process entry | `lib/main.dart` (Supabase init + session) |
+| Process entry | `lib/main.dart` (Supabase init + `AppServices` + session) |
 | Root widget | `lib/app.dart` → `HomeManagerApp` / `MissingConfigApp` |
 | Auth gate | `lib/app.dart` + `lib/features/auth/sign_in_page.dart` |
-| Main shell | `lib/features/shell/app_shell.dart` (Điện / Cài đặt) |
+| Main shell | `lib/features/shell/app_shell.dart` (Tổng quan / Chi tiêu / Cài đặt) |
 | Home picker sheet | `lib/features/shell/home_picker_sheet.dart` |
-| Session | `lib/core/state/session_controller.dart` |
+| Session | `lib/core/state/session_controller.dart` (persists `selected_home_id`) |
+| Services locator | `lib/core/services/app_services.dart` |
 
 ## Feature screens
 
@@ -19,99 +20,66 @@ Consult this file before grepping the repo. Update when adding modules under `li
 |------|------|
 | Sign in | `lib/features/auth/sign_in_page.dart` |
 | Create home | `lib/features/homes/create_home_dialog.dart` |
-| Electricity dashboard | `lib/features/electricity/electricity_page.dart` |
-| Summary + chart + cards | `electricity_summary_card.dart`, `electricity_trend_chart.dart`, `period_list_tile.dart` |
-| Period form (sheet) | `lib/features/electricity/electricity_form.dart` |
-| Reminder banner | `lib/features/electricity/reminder_banner.dart` |
-| Settings hub + sub-pages | `settings_hub_page.dart`, `settings_home_page.dart`, `settings_schedule_page.dart`, `settings_members_page.dart`, `settings_account_page.dart` |
+| Overview hub | `lib/features/overview/overview_page.dart`, `overview_summary_card.dart` |
+| Electricity | `lib/features/electricity/` (page, form, summary, chart, cards, reminder) |
+| Water | `lib/features/water/` (mirror of electricity) |
+| Expenses | `lib/features/expenses/` (list, form, category chart) |
+| Income | `lib/features/income/income_page.dart` |
+| Settings | `settings_hub_page.dart`, `settings_home_page.dart`, `settings_schedule_page.dart`, `settings_members_page.dart`, `settings_account_page.dart`, `settings_appearance_page.dart` |
 
 ## Shared UI
 
 | Item | Path |
 |------|------|
 | Card, money, badges | `lib/features/shared/app_card.dart`, `money_text.dart`, `status_badge.dart` |
-| Loading / error | `loading_view.dart`, `error_view.dart` |
-| Sticky CTA bar | `sticky_primary_bar.dart` |
+| Loading / error / empty | `loading_view.dart`, `error_view.dart`, `empty_state_view.dart` |
+| Sticky CTA / feature scaffold | `sticky_primary_bar.dart`, `feature_page_scaffold.dart` |
+| Fields | `labeled_text_field.dart` (`LabeledDropdownField`), `labeled_money_field.dart`, `month_picker.dart` |
+| Brand logo | `lib/features/shared/app_brand_logo.dart` (`assets/brand/logo.png`) |
+| Feature / category icons | `lib/core/theme/app_icons.dart` + `app_asset_icon.dart` (`assets/*.png`) |
+| Accent previews | `assets/brand/appearance_preview/icon-accent-*.png` |
+| PWA icons | `web/icons/` + `web/favicon.png`, `web/manifest.json` |
 
 ## Core
 
 | Item | Path |
 |------|------|
-| Config | `lib/core/config/app_config.dart` |
 | Copy (VI) | `lib/core/l10n/strings.dart` |
-| Logging (debug) | `lib/core/logging/app_log.dart` |
-| Theme (dark) | `lib/core/theme/app_theme.dart`, `app_colors.dart`, `app_spacing.dart`, `mobile_viewport.dart` |
-| Domain validation | `lib/core/domain/electricity_validation.dart` |
-| Period edit helpers | `lib/core/domain/electricity_period_edit.dart` |
-| Meter math / day clamp | `lib/core/domain/meter_math.dart` |
-| Models | `lib/core/models/home.dart`, `electricity_period.dart`, `tracking_mode.dart` |
-| Auth / homes / invites | `lib/core/services/auth_service.dart`, `home_service.dart`, `invite_service.dart` |
-| Periods + photos | `lib/core/services/electricity_service.dart` |
-| ICS + download | `lib/core/services/ics_export_service.dart`, `web_file_saver.dart` |
+| Theme | `lib/core/theme/app_theme.dart` (Nunito), `app_color_scheme.dart` (incl. category colors), `app_spacing.dart` |
+| Fonts | `assets/fonts/Nunito/static/` (Regular 400 · Medium 500 · SemiBold 600 · Bold 700) |
+| Domain | `electricity_validation.dart`, `water_validation.dart`, `meter_math.dart`, `month_balance.dart`, `expense_totals.dart`, `selected_home.dart`, `period_history_filter.dart` |
+| Models | `home.dart`, `electricity_period.dart`, `water_period.dart`, `expense.dart`, `income.dart`, `tracking_mode.dart` |
+| Services | `home_service.dart`, `invite_service.dart`, `electricity_service.dart` (`BillPhotoService`), `water_service.dart`, `expense_service.dart`, `income_service.dart` |
 
 ## Supabase
 
 | Item | Path |
 |------|------|
-| Migration | `supabase/migrations/20260819000000_init.sql` |
-| Setup | `supabase/README.md` |
-
-## Web / PWA / CI
-
-| Item | Path |
-|------|------|
-| HTML | `web/index.html` |
-| Manifest | `web/manifest.json` |
-| UI direction | `.cursor/docs/ui-direction.md` |
-| Pages notes | `.cursor/docs/github-pages.md` |
-| Web Push (later) | `.cursor/docs/web-push.md` |
+| Init + RLS | `supabase/migrations/20260819000000_init.sql` |
+| `is_paid` | `20260819000001_add_is_paid.sql` |
+| Invite/storage DELETE | `20260820090000_fix_invites_and_storage_rls.sql` |
+| Water | `20260820100000_water_periods.sql` |
+| Expenses | `20260820110000_expenses.sql` |
+| Income | `20260820120000_incomes.sql` |
 
 ## QA & Tests
 
 | Item | Path |
 |------|------|
 | QA index | `.cursor/docs/qa/README.md` |
-| Feature inventory | `.cursor/docs/qa/v1-feature-inventory.md` |
+| Feature inventory | `.cursor/docs/qa/v1-feature-inventory.md`, `v2-feature-inventory.md` |
 | Manual E2E | `.cursor/docs/qa/v1-manual-e2e.md` |
-| Checklist → test map | `.cursor/docs/qa/test-map.md` |
-| Per-feature template | `.cursor/docs/qa/checklist-template.md` |
-| QA agent skill | `.cursor/skills/qa-testing/SKILL.md` |
-| Testing rule | `.cursor/rules/04-testing.mdc` |
-
-### Automated tests (`test/`)
-
-| Layer | Path | Examples |
-|-------|------|----------|
-| Meter math | `test/unit/meter_math_test.dart` |
-| Day clamp / isToday | `test/unit/day_of_month_test.dart` |
-| VND format | `test/unit/vnd_format_test.dart` |
-| Electricity validation | `test/unit/electricity_validation_test.dart` |
-| Period edit / monthKey | `test/unit/electricity_period_edit_test.dart` |
-| Duplicate month | `test/unit/period_month_conflict_test.dart` |
-| Bill photo path | `test/unit/bill_photo_service_test.dart` |
-| ICS export | `test/unit/ics_export_service_test.dart` |
-| Missing config widget | `test/widget/missing_config_test.dart` |
-| Electricity form validation | `test/widget/electricity_form_test.dart` |
-| Reminder banner | `test/widget/reminder_banner_test.dart` |
-| Electricity service integration | `test/integration/electricity_service_test.dart` |
-| Mock helpers | `test/support/mock_supabase.dart` |
-| Fixtures | `test/support/fixtures/electricity_period.json` |
+| Test map | `.cursor/docs/qa/test-map.md` |
 
 ### Feature modules (`lib/features/`)
 
-- `lib/features/auth/` — sign_in_page.dart
-- `lib/features/electricity/` — page, form, summary, chart, period cards, reminder
-- `lib/features/homes/` — create_home_dialog.dart
-- `lib/features/settings/` — hub + home / schedule / members / account pages
-- `lib/features/shared/` — reusable UI widgets
-- `lib/features/shell/` — app_shell.dart, home_picker_sheet.dart
-
-### Core services (`lib/core/services/`)
-
-- `lib/core/services/auth_service.dart`
-- `lib/core/services/bill photo` — in electricity_service.dart (`BillPhotoService`)
-- `lib/core/services/electricity_service.dart`
-- `lib/core/services/home_service.dart`
-- `lib/core/services/ics_export_service.dart`
-- `lib/core/services/invite_service.dart`
-- `lib/core/services/web_file_saver.dart` (+ `_web.dart` / `_stub.dart`)
+- `lib/features/auth/`
+- `lib/features/overview/`
+- `lib/features/electricity/`
+- `lib/features/water/`
+- `lib/features/expenses/`
+- `lib/features/income/`
+- `lib/features/homes/`
+- `lib/features/settings/`
+- `lib/features/shared/`
+- `lib/features/shell/`

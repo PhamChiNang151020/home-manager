@@ -1,7 +1,7 @@
 ---
 name: qa-testing
 description: >-
-  QA and testing workflow for home_manager v1. Use when adding features, fixing
+  QA and testing workflow for home_manager v2. Use when adding features, fixing
   bugs, writing tests, reviewing code, or when the user asks for checklist,
   regression, unit test, widget test, or manual E2E verification.
 ---
@@ -19,7 +19,7 @@ Read [`.cursor/docs/qa/README.md`](../../docs/qa/README.md) first, then follow t
 
 ## Mandatory 6-step workflow
 
-1. **Identify module** — read [v1-feature-inventory.md](../../docs/qa/v1-feature-inventory.md); note affected rows.
+1. **Identify module** — read [v1-feature-inventory.md](../../docs/qa/v1-feature-inventory.md) and [v2-feature-inventory.md](../../docs/qa/v2-feature-inventory.md); note affected rows.
 2. **Checklist** — copy [checklist-template.md](../../docs/qa/checklist-template.md) to `checklists/<feature>.md` for new work; tick items as you go.
 3. **Plan** — goal, scope, files from [CODEBASE_MAP.md](../../CODEBASE_MAP.md).
 4. **Implement** — extract pure logic to `lib/core/domain/` when unit tests are needed (validation, date/month helpers).

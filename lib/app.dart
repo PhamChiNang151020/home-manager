@@ -1,6 +1,7 @@
 import "package:flutter/material.dart";
 import "package:home_manager/core/l10n/app_locale.dart";
 import "package:home_manager/core/l10n/strings.dart";
+import "package:home_manager/core/services/app_services.dart";
 import "package:home_manager/core/services/web_theme_color.dart";
 import "package:home_manager/core/state/session_controller.dart";
 import "package:home_manager/core/state/theme_controller.dart";
@@ -11,10 +12,16 @@ import "package:home_manager/features/shared/app_loading.dart";
 import "package:home_manager/features/shell/app_shell.dart";
 
 class HomeManagerApp extends StatelessWidget {
-  const HomeManagerApp({super.key, required this.session, required this.theme});
+  const HomeManagerApp({
+    super.key,
+    required this.session,
+    required this.theme,
+    required this.services,
+  });
 
   final SessionController session;
   final ThemeController theme;
+  final AppServices services;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +44,7 @@ class HomeManagerApp extends StatelessWidget {
           ),
           themeMode: theme.mode,
           builder: _syncWebThemeColor,
-          home: _AppHome(session: session, theme: theme),
+          home: _AppHome(session: session, theme: theme, services: services),
         );
       },
     );
@@ -85,10 +92,15 @@ Widget _syncWebThemeColor(BuildContext context, Widget? child) {
 }
 
 class _AppHome extends StatelessWidget {
-  const _AppHome({required this.session, required this.theme});
+  const _AppHome({
+    required this.session,
+    required this.theme,
+    required this.services,
+  });
 
   final SessionController session;
   final ThemeController theme;
+  final AppServices services;
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +113,7 @@ class _AppHome extends StatelessWidget {
         if (session.user == null) {
           return SignInPage(onGoogle: session.signIn, error: session.error);
         }
-        return AppShell(session: session, theme: theme);
+        return AppShell(session: session, theme: theme, services: services);
       },
     );
   }

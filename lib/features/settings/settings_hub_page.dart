@@ -7,6 +7,7 @@ import "package:home_manager/core/services/home_service.dart";
 import "package:home_manager/core/services/invite_service.dart";
 import "package:home_manager/core/state/theme_controller.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
+import "package:home_manager/core/theme/app_icons.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/settings/settings_account_page.dart";
 import "package:home_manager/features/settings/settings_appearance_page.dart";
@@ -14,6 +15,7 @@ import "package:home_manager/features/settings/settings_home_page.dart";
 import "package:home_manager/features/settings/settings_members_page.dart";
 import "package:home_manager/features/settings/settings_schedule_page.dart";
 import "package:home_manager/features/shared/animated_entrance.dart";
+import "package:home_manager/features/shared/app_asset_icon.dart";
 import "package:home_manager/features/shared/app_card.dart";
 
 class SettingsHubPage extends StatelessWidget {
@@ -50,7 +52,7 @@ class SettingsHubPage extends StatelessWidget {
         AnimatedEntrance(
           index: 0,
           child: _SettingsTile(
-            icon: Icons.home_outlined,
+            leading: Icon(Icons.home_outlined, color: context.appColors.accent),
             title: S.settingsHome,
             subtitle: S.settingsHomeDesc,
             onTap:
@@ -69,7 +71,7 @@ class SettingsHubPage extends StatelessWidget {
         AnimatedEntrance(
           index: 1,
           child: _SettingsTile(
-            icon: Icons.calendar_month_outlined,
+            leading: const AppAssetIcon(AppIcons.reminder, size: 28),
             title: S.settingsSchedule,
             subtitle: S.settingsScheduleDesc,
             onTap:
@@ -88,7 +90,10 @@ class SettingsHubPage extends StatelessWidget {
         AnimatedEntrance(
           index: 2,
           child: _SettingsTile(
-            icon: Icons.people_outline,
+            leading: Icon(
+              Icons.people_outline,
+              color: context.appColors.accent,
+            ),
             title: S.settingsMembers,
             subtitle: S.settingsMembersDesc,
             onTap:
@@ -107,7 +112,10 @@ class SettingsHubPage extends StatelessWidget {
         AnimatedEntrance(
           index: 3,
           child: _SettingsTile(
-            icon: Icons.palette_outlined,
+            leading: Icon(
+              Icons.palette_outlined,
+              color: context.appColors.accent,
+            ),
             title: S.settingsAppearance,
             subtitle: S.settingsAppearanceDesc,
             onTap:
@@ -122,7 +130,10 @@ class SettingsHubPage extends StatelessWidget {
         AnimatedEntrance(
           index: 4,
           child: _SettingsTile(
-            icon: Icons.person_outline,
+            leading: Icon(
+              Icons.person_outline,
+              color: context.appColors.accent,
+            ),
             title: S.settingsAccount,
             subtitle: S.settingsAccountDesc,
             onTap:
@@ -155,13 +166,13 @@ class SettingsHubPage extends StatelessWidget {
 
 class _SettingsTile extends StatelessWidget {
   const _SettingsTile({
-    required this.icon,
+    required this.leading,
     required this.title,
     required this.subtitle,
     required this.onTap,
   });
 
-  final IconData icon;
+  final Widget leading;
   final String title;
   final String subtitle;
   final VoidCallback onTap;
@@ -175,7 +186,7 @@ class _SettingsTile extends StatelessWidget {
         onTap: onTap,
         padding: EdgeInsets.zero,
         child: ListTile(
-          leading: Icon(icon, color: colors.accent),
+          leading: leading,
           title: Text(title),
           subtitle: Text(subtitle),
           trailing: Icon(Icons.chevron_right, color: colors.textMuted),

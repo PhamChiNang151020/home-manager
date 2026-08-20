@@ -165,6 +165,50 @@ Format: **Precondition → Steps → Expected → Browser**
 
 ---
 
+## Water
+
+### TC-WATER-01: Thêm kỳ nước meter
+- Precondition: Nhà meter, đã mở Tổng quan → Nước
+- Steps: Thêm kỳ, nhập số cũ + số mới m³
+- Expected: Amount = (new − prev) × m3_rate
+- Browser: Chrome
+
+### TC-WATER-02: Ảnh nước không ghi đè ảnh điện
+- Precondition: Cùng tháng đã có ảnh điện
+- Steps: Upload ảnh kỳ nước
+- Expected: Path `homes/{id}/water/{yyyy-mm}.jpg`, ảnh điện vẫn còn
+- Browser: Chrome
+
+## Expenses
+
+### TC-EXP-01: Thêm chi tiêu
+- Precondition: Đã có nhà, tab Chi tiêu
+- Steps: Thêm chi — số tiền, danh mục, người trả
+- Expected: Xuất hiện trong list tháng hiện tại + pie chart
+- Browser: Chrome
+
+### TC-EXP-02: Filter theo danh mục
+- Precondition: Có ≥ 2 category có chi
+- Steps: Chọn 1 danh mục
+- Expected: List chỉ hiện category đó
+- Browser: Chrome
+
+## Income / Overview
+
+### TC-INC-01: Nhập lương thành viên
+- Precondition: Nhà có ≥ 1 thành viên
+- Steps: Tổng quan → Thu nhập → nhập lương → Lưu
+- Expected: Tổng thu cập nhật; chênh lệch = thu − điện − nước − chi
+- Browser: Chrome
+
+### TC-OVW-01: Dashboard tháng
+- Precondition: Có dữ liệu điện/nước/chi/thu trong tháng
+- Steps: Mở tab Tổng quan, chọn tháng
+- Expected: Card tổng thu / tổng chi / chênh lệch + breakdown category
+- Browser: Chrome
+
+---
+
 ## Regression (bug fix)
 
 Khi fix bug, thêm dòng:

@@ -91,52 +91,52 @@ class _SettingsSchedulePageState extends State<SettingsSchedulePage> {
       body: MobileViewport(
         child: ListView(
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-        children: [
-          LabeledTextField(
-            label: S.photoDueDay,
-            controller: _photoDay,
-            enabled: owner,
-            keyboardType: TextInputType.number,
-            helperText: S.dayOfMonth,
-          ),
-          const SizedBox(height: AppSpacing.formFieldGap),
-          LabeledTextField(
-            label: S.payday,
-            controller: _payday,
-            enabled: owner,
-            keyboardType: TextInputType.number,
-          ),
-          const SizedBox(height: AppSpacing.formFieldGap),
-          LabeledTextField(
-            label: S.remindDay,
-            controller: _remind,
-            enabled: owner,
-            keyboardType: TextInputType.number,
-          ),
-          if (_error != null) ...[
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              _error!,
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
+          children: [
+            LabeledTextField(
+              label: S.photoDueDay,
+              controller: _photoDay,
+              enabled: owner,
+              keyboardType: TextInputType.number,
+              helperText: S.dayOfMonth,
+            ),
+            const SizedBox(height: AppSpacing.formFieldGap),
+            LabeledTextField(
+              label: S.payday,
+              controller: _payday,
+              enabled: owner,
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: AppSpacing.formFieldGap),
+            LabeledTextField(
+              label: S.remindDay,
+              controller: _remind,
+              enabled: owner,
+              keyboardType: TextInputType.number,
+            ),
+            if (_error != null) ...[
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                _error!,
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
+            ],
+            if (owner) ...[
+              const SizedBox(height: AppSpacing.lg),
+              FilledButton(
+                onPressed: _saving ? null : _save,
+                child: const Text(S.save),
+              ),
+            ],
+            const SizedBox(height: AppSpacing.md),
+            OutlinedButton.icon(
+              onPressed: () {
+                final ics = const IcsExportService().buildCalendar(widget.home);
+                saveTextFile(filename: "${widget.home.name}.ics", content: ics);
+              },
+              icon: const Icon(Icons.calendar_month),
+              label: const Text(S.exportIcs),
             ),
           ],
-          if (owner) ...[
-            const SizedBox(height: AppSpacing.lg),
-            FilledButton(
-              onPressed: _saving ? null : _save,
-              child: const Text(S.save),
-            ),
-          ],
-          const SizedBox(height: AppSpacing.md),
-          OutlinedButton.icon(
-            onPressed: () {
-              final ics = const IcsExportService().buildCalendar(widget.home);
-              saveTextFile(filename: "${widget.home.name}.ics", content: ics);
-            },
-            icon: const Icon(Icons.calendar_month),
-            label: const Text(S.exportIcs),
-          ),
-        ],
         ),
       ),
     );

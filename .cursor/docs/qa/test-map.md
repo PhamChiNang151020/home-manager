@@ -31,6 +31,18 @@ Cập nhật khi thêm test file. Agent dùng bảng này để phát hiện gap
 | FMT-01 | compact k and tr labels | `test/unit/vnd_format_test.dart` | done |
 | AUTH-03 | auth gate loading state | `test/widget/auth_gate_test.dart` | planned |
 | HOME-03 | selectHome updates selected | `test/integration/session_controller_test.dart` | planned |
+| HOME-03 | resolveSelectedHome prefers persisted id | `test/unit/selected_home_test.dart` | done |
+| WAT-01 | water meter validation | `test/unit/water_validation_test.dart` | done |
+| WAT-02 | water upsert is_paid / month change | `test/integration/water_service_test.dart` | done |
+| WAT-03 | pathFor water subfolder | `test/unit/bill_photo_service_test.dart` | done |
+| WAT-04 | Home.fromJson m3_rate | `test/unit/home_water_model_test.dart` | done |
+| EXP-01 | spendByCategory / fromJson | `test/unit/expense_totals_test.dart` | done |
+| EXP-02 | expense form invalid amount | `test/widget/expense_form_test.dart` | done |
+| INC-01 | MonthBalance net | `test/unit/month_balance_test.dart` | done |
+| ICO-01 | expense icon_key maps to PNG | `test/unit/app_icons_test.dart` | done |
+| OVW-01 | overview summary card | `test/widget/overview_summary_card_test.dart` | done |
+| REM-02 | same-day reminder order photo → payday → remind | `test/widget/reminder_banner_test.dart` | done |
+| ELEC-M05 | upsert omits is_paid when null | `test/integration/electricity_service_test.dart` | done |
 | INV-03 | Home.fromJson parses fields | `test/unit/models_test.dart` | planned |
 
 ## Test layout

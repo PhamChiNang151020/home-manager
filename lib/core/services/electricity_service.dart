@@ -62,27 +62,30 @@ class ElectricityService {
     double? consumptionKwh,
     String? photoPath,
     String? note,
-    bool isPaid = false,
+    bool? isPaid,
     String? editingId,
     DateTime? editingOriginalMonth,
     DateTime? recordedAt,
   }) async {
+    final payload = <String, dynamic>{
+      "home_id": homeId,
+      "period_month": monthKey(periodMonth),
+      "amount_vnd": amountVnd,
+      "previous_kwh": previousKwh,
+      "new_kwh": newKwh,
+      "consumption_kwh": consumptionKwh,
+      "photo_path": photoPath,
+      "note": note,
+      "recorded_at": (recordedAt ?? DateTime.now()).toUtc().toIso8601String(),
+    };
+    if (isPaid != null) {
+      payload["is_paid"] = isPaid;
+    }
+
     final row =
         await _client
             .from("electricity_periods")
-            .upsert({
-              "home_id": homeId,
-              "period_month": monthKey(periodMonth),
-              "amount_vnd": amountVnd,
-              "previous_kwh": previousKwh,
-              "new_kwh": newKwh,
-              "consumption_kwh": consumptionKwh,
-              "photo_path": photoPath,
-              "note": note,
-              "is_paid": isPaid,
-              "recorded_at":
-                  (recordedAt ?? DateTime.now()).toUtc().toIso8601String(),
-            }, onConflict: "home_id,period_month")
+            .upsert(payload, onConflict: "home_id,period_month")
             .select()
             .single();
 
@@ -104,23 +107,42 @@ class ElectricityService {
   }
 }
 
+enum BillPhotoKind { electricity, water, expense }
+
 class BillPhotoService {
   BillPhotoService(this._client);
 
   final SupabaseClient _client;
   static const bucket = "bill-photos";
 
-  String pathFor({required String homeId, required DateTime month}) {
+  String pathFor({
+    required String homeId,
+    required DateTime month,
+    BillPhotoKind kind = BillPhotoKind.electricity,
+    String? expenseId,
+  }) {
     final stamp = DateFormat("yyyy-MM").format(month);
-    return "homes/$homeId/$stamp.jpg";
+    return switch (kind) {
+      BillPhotoKind.electricity => "homes/$homeId/$stamp.jpg",
+      BillPhotoKind.water => "homes/$homeId/water/$stamp.jpg",
+      BillPhotoKind.expense =>
+        "homes/$homeId/expenses/${expenseId ?? stamp}.jpg",
+    };
   }
 
   Future<String> upload({
     required String homeId,
     required DateTime month,
     required Uint8List bytes,
+    BillPhotoKind kind = BillPhotoKind.electricity,
+    String? expenseId,
   }) async {
-    final path = pathFor(homeId: homeId, month: month);
+    final path = pathFor(
+      homeId: homeId,
+      month: month,
+      kind: kind,
+      expenseId: expenseId,
+    );
     await _client.storage
         .from(bucket)
         .uploadBinary(

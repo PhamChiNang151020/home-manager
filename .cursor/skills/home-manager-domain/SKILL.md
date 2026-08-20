@@ -10,14 +10,15 @@ description: >-
 
 Read `.cursor/notes.md` and `.cursor/docs/architecture.md` first.
 
-## Product (v1)
+## Product (v2)
 
-Vietnamese UI. Electricity only.
+Vietnamese UI. Electricity, water, expenses, income.
 
-- **Nhà tôi (`meter`):** enter new kWh; previous from last period; amount = delta × rate (default 3500).
-- **Nhà ba mẹ (`invoice`):** enter bill amount + photo (MoMo/bank). No kWh required.
+- **Nhà tôi (`meter`):** enter new kWh / m³; previous from last period; amount = delta × rate (`kwh_rate` default 3500, `m3_rate` default 10000).
+- **Nhà ba mẹ (`invoice`):** enter bill amount + photo. No meter math.
+- Shell: Tổng quan · Chi tiêu · Cài đặt. Điện / Nước / Thu nhập from Tổng quan.
 - Owner invites per home by Google email.
-- Calendar days: photo due, payday, remind.
+- Calendar days: photo due, payday, remind (shared for điện + nước).
 
 ## Storage
 
@@ -36,10 +37,10 @@ Vietnamese UI. Electricity only.
 - Switch home in the shell. Electricity form follows `tracking_mode`.
 - Empty states when no homes or no periods.
 
-## Out of scope for v1
+## Out of scope for v2
 
 - Native iOS install
-- Water, expenses, shopping
+- Shopping list
 - Web Push (documented in `.cursor/docs/web-push.md`)
 - Paid hosting
 

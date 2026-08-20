@@ -7,6 +7,7 @@ class Home {
     required this.trackingMode,
     required this.kwhRate,
     required this.createdBy,
+    this.m3Rate = 10000,
     this.photoDueDay,
     this.paydayDay,
     this.remindDay,
@@ -17,6 +18,7 @@ class Home {
   final String name;
   final TrackingMode trackingMode;
   final double kwhRate;
+  final double m3Rate;
   final String createdBy;
   final int? photoDueDay;
   final int? paydayDay;
@@ -31,6 +33,7 @@ class Home {
       name: json["name"] as String,
       trackingMode: TrackingMode.fromString(json["tracking_mode"] as String),
       kwhRate: (json["kwh_rate"] as num).toDouble(),
+      m3Rate: (json["m3_rate"] as num?)?.toDouble() ?? 10000,
       createdBy: json["created_by"] as String,
       photoDueDay: json["photo_due_day"] as int?,
       paydayDay: json["payday_day"] as int?,

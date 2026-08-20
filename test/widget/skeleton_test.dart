@@ -12,9 +12,7 @@ void main() {
           brightness: Brightness.dark,
           accent: AppAccent.amber,
         ),
-        home: const Scaffold(
-          body: SkeletonBox(width: 120, height: 16),
-        ),
+        home: const Scaffold(body: SkeletonBox(width: 120, height: 16)),
       ),
     );
 

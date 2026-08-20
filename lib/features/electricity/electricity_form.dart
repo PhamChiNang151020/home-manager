@@ -508,6 +508,7 @@ class _ElectricityPeriodDialogState extends State<_ElectricityPeriodDialog> {
         consumptionKwh: used,
         photoPath: photoPath,
         note: _note.text.trim().isEmpty ? null : _note.text.trim(),
+        isPaid: widget.existing.isPaid,
         editingId: widget.existing.id,
         editingOriginalMonth: widget.existing.periodMonth,
         recordedAt: _recordedAt,

@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:home_manager/core/theme/app_icons.dart";
 
 enum AppAccent {
   amber,
@@ -14,6 +15,8 @@ enum AppAccent {
   };
 
   String get storageKey => name;
+
+  String get previewAsset => AppIcons.accentPreview(name);
 
   static AppAccent fromStorage(String? value) {
     return AppAccent.values.firstWhere(

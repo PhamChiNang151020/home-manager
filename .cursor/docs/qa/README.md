@@ -1,4 +1,4 @@
-# QA — home_manager v1
+# QA — home_manager
 
 Index for agents and developers. Read this before writing tests or shipping features.
 
@@ -6,15 +6,16 @@ Index for agents and developers. Read this before writing tests or shipping feat
 
 | File | Purpose |
 |------|---------|
-| [v1-feature-inventory.md](v1-feature-inventory.md) | All v1 features + test type + coverage status |
-| [v1-manual-e2e.md](v1-manual-e2e.md) | Manual checklist (Chrome; Safari/iPhone when UI/storage) |
+| [v1-feature-inventory.md](v1-feature-inventory.md) | v1 electricity / auth / homes coverage |
+| [v2-feature-inventory.md](v2-feature-inventory.md) | v2 water / expenses / income / overview |
+| [v1-manual-e2e.md](v1-manual-e2e.md) | Manual checklist (v1 + v2; Chrome; Safari/iPhone when UI/storage) |
 | [test-map.md](test-map.md) | Checklist ID → automated test file |
 | [checklist-template.md](checklist-template.md) | Copy for each new feature or bug fix |
 | [checklists/](checklists/) | Per-feature checklists (create as needed) |
 
 ## Workflow
 
-1. Open [v1-feature-inventory.md](v1-feature-inventory.md) — find your module.
+1. Open [v1-feature-inventory.md](v1-feature-inventory.md) or [v2-feature-inventory.md](v2-feature-inventory.md) — find your module.
 2. Copy [checklist-template.md](checklist-template.md) → `checklists/<name>.md`.
 3. Implement + add tests under `test/unit/`, `test/widget/`, `test/integration/`.
 4. Update inventory status and [test-map.md](test-map.md) when adding tests.

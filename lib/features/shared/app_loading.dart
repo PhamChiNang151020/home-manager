@@ -28,7 +28,8 @@ class AppLoader extends StatefulWidget {
   State<AppLoader> createState() => _AppLoaderState();
 }
 
-class _AppLoaderState extends State<AppLoader> with SingleTickerProviderStateMixin {
+class _AppLoaderState extends State<AppLoader>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _pulse;
 
@@ -39,9 +40,10 @@ class _AppLoaderState extends State<AppLoader> with SingleTickerProviderStateMix
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     )..repeat();
-    _pulse = Tween<double>(begin: 0.55, end: 1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _pulse = Tween<double>(
+      begin: 0.55,
+      end: 1,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -56,10 +58,7 @@ class _AppLoaderState extends State<AppLoader> with SingleTickerProviderStateMix
     return AnimatedBuilder(
       animation: _pulse,
       builder: (context, child) {
-        return Opacity(
-          opacity: _pulse.value,
-          child: child,
-        );
+        return Opacity(opacity: _pulse.value, child: child);
       },
       child: SizedBox(
         width: widget.size,
@@ -151,7 +150,7 @@ class BrandedLoadingScreen extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const AppBrandLogo(size: 56),
+                    const AppBrandLogo(size: 72),
                     const SizedBox(height: AppSpacing.md),
                     Text(
                       S.appName,

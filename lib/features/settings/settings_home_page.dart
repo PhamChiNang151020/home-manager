@@ -28,6 +28,7 @@ class SettingsHomePage extends StatefulWidget {
 class _SettingsHomePageState extends State<SettingsHomePage> {
   late final TextEditingController _name;
   late final TextEditingController _rate;
+  late final TextEditingController _m3Rate;
   String? _error;
   bool _saving = false;
 
@@ -36,12 +37,14 @@ class _SettingsHomePageState extends State<SettingsHomePage> {
     super.initState();
     _name = TextEditingController(text: widget.home.name);
     _rate = TextEditingController(text: VndFormat.input(widget.home.kwhRate));
+    _m3Rate = TextEditingController(text: VndFormat.input(widget.home.m3Rate));
   }
 
   @override
   void dispose() {
     _name.dispose();
     _rate.dispose();
+    _m3Rate.dispose();
     super.dispose();
   }
 
@@ -58,6 +61,10 @@ class _SettingsHomePageState extends State<SettingsHomePage> {
         kwhRate:
             widget.home.trackingMode == TrackingMode.meter
                 ? VndFormat.parse(_rate.text)
+                : null,
+        m3Rate:
+            widget.home.trackingMode == TrackingMode.meter
+                ? VndFormat.parse(_m3Rate.text)
                 : null,
       );
       widget.onChanged();
@@ -77,36 +84,43 @@ class _SettingsHomePageState extends State<SettingsHomePage> {
       body: MobileViewport(
         child: ListView(
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-        children: [
-          LabeledTextField(
-            label: S.homeName,
-            controller: _name,
-            enabled: owner,
-          ),
-          if (widget.home.trackingMode == TrackingMode.meter) ...[
-            const SizedBox(height: AppSpacing.formFieldGap),
-            LabeledMoneyField(
-              label: S.kwhRate,
-              controller: _rate,
+          children: [
+            LabeledTextField(
+              label: S.homeName,
+              controller: _name,
               enabled: owner,
-              suffix: "đ/kWh",
             ),
+            if (widget.home.trackingMode == TrackingMode.meter) ...[
+              const SizedBox(height: AppSpacing.formFieldGap),
+              LabeledMoneyField(
+                label: S.kwhRate,
+                controller: _rate,
+                enabled: owner,
+                suffix: "đ/kWh",
+              ),
+              const SizedBox(height: AppSpacing.formFieldGap),
+              LabeledMoneyField(
+                label: S.m3Rate,
+                controller: _m3Rate,
+                enabled: owner,
+                suffix: "đ/m³",
+              ),
+            ],
+            if (_error != null) ...[
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                _error!,
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
+            ],
+            if (owner) ...[
+              const SizedBox(height: AppSpacing.lg),
+              FilledButton(
+                onPressed: _saving ? null : _save,
+                child: const Text(S.save),
+              ),
+            ],
           ],
-          if (_error != null) ...[
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              _error!,
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
-          ],
-          if (owner) ...[
-            const SizedBox(height: AppSpacing.lg),
-            FilledButton(
-              onPressed: _saving ? null : _save,
-              child: const Text(S.save),
-            ),
-          ],
-        ],
         ),
       ),
     );

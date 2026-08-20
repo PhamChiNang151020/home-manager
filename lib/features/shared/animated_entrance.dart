@@ -2,11 +2,7 @@ import "package:flutter/material.dart";
 import "package:home_manager/core/theme/app_motion.dart";
 
 class AnimatedEntrance extends StatefulWidget {
-  const AnimatedEntrance({
-    super.key,
-    required this.index,
-    required this.child,
-  });
+  const AnimatedEntrance({super.key, required this.index, required this.child});
 
   final int index;
   final Widget child;

@@ -17,10 +17,7 @@ void main() {
         ),
         home: Scaffold(
           body: SizedBox.expand(
-            child: LoadingOverlay(
-              loading: true,
-              child: Text("content"),
-            ),
+            child: LoadingOverlay(loading: true, child: Text("content")),
           ),
         ),
       ),
@@ -39,10 +36,7 @@ void main() {
         ),
         home: Scaffold(
           body: SizedBox.expand(
-            child: LoadingOverlay(
-              loading: false,
-              child: Text("content"),
-            ),
+            child: LoadingOverlay(loading: false, child: Text("content")),
           ),
         ),
       ),

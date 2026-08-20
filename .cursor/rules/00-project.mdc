@@ -34,7 +34,7 @@ Flutter **Web** PWA: family electricity for two homes (meter vs invoice), Google
 
 1. Web-only in v1 — do not add iOS/Android without approval.
 2. Supabase is the source of truth. Widgets do not call Supabase.
-3. V1 is electricity only (no water/expenses/shopping unless asked).
+3. V2 covers electricity, water, expenses, and income. Do not add shopping or native iOS/Android without approval.
 4. Match `flutter_lints`. Keep diffs small.
 5. Do not commit service role keys, `.env` secrets, or bill photos.
 6. Feature or bug fix → read `04-testing.mdc` and `skills/qa-testing/SKILL.md`.

@@ -92,4 +92,46 @@ void main() {
 
     expect(deletedIds, ["p99"]);
   });
+
+  test("upsert omits is_paid when editing without sending isPaid", () async {
+    final captured = <Map<String, dynamic>>[];
+    stubPeriodUpsert(
+      client: client,
+      table: table,
+      row: _periodRow,
+      capturedPayloads: captured,
+    );
+    stubPeriodDelete(table: table, deletedIds: <String>[]);
+
+    await service.upsert(
+      homeId: "h1",
+      periodMonth: DateTime(2026, 3),
+      amountVnd: 70000,
+      editingId: "p1",
+      editingOriginalMonth: DateTime(2026, 3),
+    );
+
+    expect(captured, isNotEmpty);
+    expect(captured.first.containsKey("is_paid"), isFalse);
+  });
+
+  test("upsert includes is_paid when explicitly provided", () async {
+    final captured = <Map<String, dynamic>>[];
+    stubPeriodUpsert(
+      client: client,
+      table: table,
+      row: {..._periodRow, "is_paid": true},
+      capturedPayloads: captured,
+    );
+    stubPeriodDelete(table: table, deletedIds: <String>[]);
+
+    await service.upsert(
+      homeId: "h1",
+      periodMonth: DateTime(2026, 3),
+      amountVnd: 70000,
+      isPaid: true,
+    );
+
+    expect(captured.first["is_paid"], isTrue);
+  });
 }

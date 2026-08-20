@@ -18,4 +18,15 @@ void main() {
       "homes/abc/2026-03.jpg",
     );
   });
+
+  test("pathFor water uses homes/id/water/yyyy-mm.jpg", () {
+    expect(
+      photos.pathFor(
+        homeId: "abc",
+        month: DateTime(2026, 3),
+        kind: BillPhotoKind.water,
+      ),
+      "homes/abc/water/2026-03.jpg",
+    );
+  });
 }

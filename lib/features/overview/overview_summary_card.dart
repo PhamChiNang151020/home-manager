@@ -1,0 +1,82 @@
+import "package:flutter/material.dart";
+import "package:home_manager/core/domain/month_balance.dart";
+import "package:home_manager/core/l10n/strings.dart";
+import "package:home_manager/core/theme/app_color_scheme.dart";
+import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/features/shared/app_card.dart";
+import "package:home_manager/features/shared/money_text.dart";
+
+class OverviewSummaryCard extends StatelessWidget {
+  const OverviewSummaryCard({super.key, required this.balance});
+
+  final MonthBalance balance;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return AppCard(
+      child: Column(
+        children: [
+          _Row(
+            label: S.monthIncome,
+            amount: balance.income,
+            color: colors.success,
+          ),
+          _Row(
+            label: S.monthSpend,
+            amount: balance.totalOut,
+            color: colors.error,
+          ),
+          const Divider(),
+          _Row(
+            label: S.monthNet,
+            amount: balance.net,
+            color: balance.net >= 0 ? colors.success : colors.error,
+            large: true,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Row extends StatelessWidget {
+  const _Row({
+    required this.label,
+    required this.amount,
+    required this.color,
+    this.large = false,
+  });
+
+  final String label;
+  final double amount;
+  final Color color;
+  final bool large;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontWeight: large ? FontWeight.w700 : FontWeight.w500,
+            ),
+          ),
+          MoneyText(
+            amount: amount,
+            large: large,
+            style: TextStyle(
+              color: color,
+              fontWeight: FontWeight.w700,
+              fontSize: large ? 22 : 16,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

@@ -38,7 +38,7 @@ class SignInPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Center(child: AppBrandLogo(size: 44)),
+                        const Center(child: AppBrandLogo(size: 64)),
                         const SizedBox(height: AppSpacing.md),
                         Text(
                           S.appName,

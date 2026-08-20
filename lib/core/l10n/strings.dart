@@ -1,12 +1,34 @@
 abstract final class S {
-  static const appName = "My Home";
-  static const appTagline = "My Home";
+  static const appName = "Tổ Ấm";
+  static const appTagline = "Tổ Ấm";
   static const signInGoogle = "Đăng nhập bằng Google";
   static const signInHint =
       "Dùng tài khoản Google để đồng bộ điện với gia đình.";
   static const missingConfig =
       "Chưa cấu hình Supabase. Chạy với --dart-define=SUPABASE_URL và SUPABASE_ANON_KEY.";
   static const electricity = "Điện";
+  static const water = "Nước";
+  static const overview = "Tổng quan";
+  static const income = "Thu nhập";
+  static const addIncome = "Lưu lương tháng";
+  static const noIncome = "Chưa nhập lương tháng này";
+  static const incomeSource = "Nguồn";
+  static const salary = "Lương";
+  static const monthIncome = "Tổng thu";
+  static const monthSpend = "Tổng chi";
+  static const monthNet = "Chênh lệch";
+  static const expenses = "Chi tiêu";
+  static const addExpense = "Thêm chi tiêu";
+  static const editExpense = "Sửa chi tiêu";
+  static const deleteExpense = "Xóa chi tiêu";
+  static const deleteExpenseConfirm = "Xóa khoản chi này? Không thể hoàn tác.";
+  static const noExpenses = "Chưa có chi tiêu nào trong tháng này";
+  static const category = "Danh mục";
+  static const paidBy = "Người trả";
+  static const expenseDate = "Ngày chi";
+  static const receiptPhoto = "Ảnh hoá đơn";
+  static const spendByCategory = "Chi theo danh mục";
+  static const invalidExpenseAmount = "Nhập số tiền chi hợp lệ.";
   static const settings = "Cài đặt";
   static const signOut = "Đăng xuất";
   static const homes = "Nhà";
@@ -20,8 +42,11 @@ abstract final class S {
   static const delete = "Xóa";
   static const cancel = "Huỷ";
   static const kwhRate = "Đơn giá (đ/kWh)";
+  static const m3Rate = "Đơn giá (đ/m³)";
   static const previousKwh = "Số cũ (kWh)";
   static const newKwh = "Số mới (kWh)";
+  static const previousM3 = "Số cũ (m³)";
+  static const newM3 = "Số mới (m³)";
   static const consumption = "Tiêu thụ";
   static const amount = "Số tiền (đ)";
   static const month = "Tháng";
@@ -34,13 +59,23 @@ abstract final class S {
   static const editPeriod = "Sửa kỳ điện";
   static const deletePeriod = "Xóa kỳ điện";
   static const deletePeriodConfirm = "Xóa kỳ điện này? Không thể hoàn tác.";
+  static const addWaterPeriod = "Thêm kỳ nước";
+  static const editWaterPeriod = "Sửa kỳ nước";
+  static const deleteWaterPeriod = "Xóa kỳ nước";
+  static const deleteWaterPeriodConfirm =
+      "Xóa kỳ nước này? Không thể hoàn tác.";
   static const duplicatePeriodTitle = "Kỳ điện đã tồn tại";
   static const duplicatePeriodConfirm =
       "Tháng này đã có kỳ điện. Ghi đè dữ liệu cũ?";
   static const duplicatePeriodHint = "Tháng này đã có kỳ điện";
+  static const duplicateWaterPeriodTitle = "Kỳ nước đã tồn tại";
+  static const duplicateWaterPeriodConfirm =
+      "Tháng này đã có kỳ nước. Ghi đè dữ liệu cũ?";
+  static const duplicateWaterPeriodHint = "Tháng này đã có kỳ nước";
   static const overwrite = "Ghi đè";
   static const noHomes = "Chưa có nhà. Tạo nhà hoặc nhận lời mời.";
   static const noPeriods = "Chưa có kỳ điện nào được ghi nhận";
+  static const noWaterPeriods = "Chưa có kỳ nước nào được ghi nhận";
   static const invite = "Mời thành viên";
   static const inviteEmail = "Email Google";
   static const sendInvite = "Gửi lời mời";
@@ -53,10 +88,11 @@ abstract final class S {
   static const remindDay = "Ngày nhắc";
   static const dayOfMonth = "Ngày trong tháng (1–31)";
   static const exportIcs = "Tải lịch nhắc (.ics)";
-  static const bannerPhoto = "Hôm nay đến ngày chụp hoá đơn điện.";
+  static const bannerPhoto = "Hôm nay đến ngày chụp hoá đơn điện / nước.";
   static const bannerPayday = "Hôm nay là ngày lãnh lương.";
-  static const bannerRemind = "Hôm nay đến ngày nhắc đóng / ghi điện.";
+  static const bannerRemind = "Hôm nay đến ngày nhắc đóng / ghi điện và nước.";
   static const firstPeriodHint = "Kỳ đầu: nhập cả số cũ và số mới.";
+  static const firstWaterPeriodHint = "Kỳ nước đầu: nhập cả số cũ và số mới.";
   static const invalidReadings = "Số mới phải lớn hơn hoặc bằng số cũ.";
   static const invalidAmount = "Nhập số tiền hợp lệ.";
   static const roleOwnerOnly = "Chỉ chủ nhà mới sửa cài đặt và mời người.";
@@ -74,7 +110,7 @@ abstract final class S {
   static const settingsMembers = "Thành viên";
   static const settingsAccount = "Tài khoản";
   static const settingsAppearance = "Giao diện";
-  static const settingsHomeDesc = "Tên nhà, đơn giá điện";
+  static const settingsHomeDesc = "Tên nhà, đơn giá điện / nước";
   static const settingsScheduleDesc = "Ngày chụp, lương, nhắc · xuất .ics";
   static const settingsMembersDesc = "Thành viên và lời mời";
   static const settingsAccountDesc = "Đăng xuất";
@@ -95,6 +131,9 @@ abstract final class S {
   static const selectRecordedAt = "Chọn ngày giờ ghi";
   static const hasNote = "Có ghi chú";
   static const noHistoryMatch = "Không có kỳ điện phù hợp bộ lọc";
+  static const noWaterHistoryMatch = "Không có kỳ nước phù hợp bộ lọc";
+  static const detailPeriod = "Chi tiết kỳ điện";
+  static const detailWaterPeriod = "Chi tiết kỳ nước";
   static const cancelInvite = "Huỷ lời mời";
   static const cancelInviteConfirm = "Huỷ lời mời đã gửi đến";
   static const pendingInviteHint = "Đang chờ chấp nhận";
@@ -103,6 +142,5 @@ abstract final class S {
   static const unpaid = "Chưa chốt số";
   static const markPaid = "Đánh dấu đã thanh toán";
   static const markUnpaid = "Bỏ đánh dấu";
-  static const detailPeriod = "Chi tiết kỳ điện";
   static const appVersion = "Phiên bản";
 }

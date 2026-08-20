@@ -2,8 +2,9 @@ import "package:flutter/material.dart";
 import "package:home_manager/core/domain/meter_math.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/models/home.dart";
-import "package:home_manager/core/theme/app_color_scheme.dart";
+import "package:home_manager/core/theme/app_icons.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/features/shared/app_asset_icon.dart";
 import "package:home_manager/features/shared/app_card.dart";
 
 class ReminderBanner extends StatelessWidget {
@@ -13,7 +14,6 @@ class ReminderBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.appColors;
     final messages = <String>[
       if (DayOfMonth.isToday(home.photoDueDay)) S.bannerPhoto,
       if (DayOfMonth.isToday(home.paydayDay)) S.bannerPayday,
@@ -29,7 +29,7 @@ class ReminderBanner extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(Icons.notifications_active_outlined, color: colors.warning),
+            const AppAssetIcon(AppIcons.reminder, size: 24),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Column(

@@ -5,6 +5,7 @@ import "package:home_manager/core/theme/app_accent.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/core/theme/mobile_viewport.dart";
+import "package:home_manager/features/shared/app_asset_icon.dart";
 
 class SettingsAppearancePage extends StatelessWidget {
   const SettingsAppearancePage({super.key, required this.theme});
@@ -22,55 +23,55 @@ class SettingsAppearancePage extends StatelessWidget {
           body: MobileViewport(
             child: ListView(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-            children: [
-              Text(
-                S.themeModeLabel,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleSmall?.copyWith(color: colors.textSecondary),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              SegmentedButton<ThemeMode>(
-                segments: const [
-                  ButtonSegment(
-                    value: ThemeMode.system,
-                    label: Text(S.themeModeSystem),
-                  ),
-                  ButtonSegment(
-                    value: ThemeMode.light,
-                    label: Text(S.themeModeLight),
-                  ),
-                  ButtonSegment(
-                    value: ThemeMode.dark,
-                    label: Text(S.themeModeDark),
-                  ),
-                ],
-                selected: {theme.mode},
-                onSelectionChanged: (selection) {
-                  theme.setMode(selection.first);
-                },
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              Text(
-                S.themeAccent,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleSmall?.copyWith(color: colors.textSecondary),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Wrap(
-                spacing: AppSpacing.md,
-                runSpacing: AppSpacing.md,
-                children: [
-                  for (final accent in AppAccent.values)
-                    _AccentChip(
-                      accent: accent,
-                      selected: theme.accent == accent,
-                      onTap: () => theme.setAccent(accent),
+              children: [
+                Text(
+                  S.themeModeLabel,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleSmall?.copyWith(color: colors.textSecondary),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                SegmentedButton<ThemeMode>(
+                  segments: const [
+                    ButtonSegment(
+                      value: ThemeMode.system,
+                      label: Text(S.themeModeSystem),
                     ),
-                ],
-              ),
-            ],
+                    ButtonSegment(
+                      value: ThemeMode.light,
+                      label: Text(S.themeModeLight),
+                    ),
+                    ButtonSegment(
+                      value: ThemeMode.dark,
+                      label: Text(S.themeModeDark),
+                    ),
+                  ],
+                  selected: {theme.mode},
+                  onSelectionChanged: (selection) {
+                    theme.setMode(selection.first);
+                  },
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                Text(
+                  S.themeAccent,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleSmall?.copyWith(color: colors.textSecondary),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Wrap(
+                  spacing: AppSpacing.md,
+                  runSpacing: AppSpacing.md,
+                  children: [
+                    for (final accent in AppAccent.values)
+                      _AccentChip(
+                        accent: accent,
+                        selected: theme.accent == accent,
+                        onTap: () => theme.setAccent(accent),
+                      ),
+                  ],
+                ),
+              ],
             ),
           ),
         );
@@ -99,22 +100,20 @@ class _AccentChip extends StatelessWidget {
       label: accent.name,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(28),
-        child: Container(
-          width: 56,
-          height: 56,
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          width: 72,
+          height: 72,
+          padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: accent.color,
-            shape: BoxShape.circle,
+            borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
             border: Border.all(
-              color: selected ? colors.textPrimary : Colors.transparent,
-              width: 2,
+              color: selected ? colors.textPrimary : colors.border,
+              width: selected ? 2 : 1,
             ),
           ),
-          child:
-              selected
-                  ? const Icon(Icons.check, color: Colors.white, size: 24)
-                  : null,
+          child: AppAssetIcon(accent.previewAsset, size: 64),
         ),
       ),
     );

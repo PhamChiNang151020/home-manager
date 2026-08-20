@@ -19,7 +19,10 @@ class SettingsAccountPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Spacer(),
-              OutlinedButton(onPressed: onSignOut, child: const Text(S.signOut)),
+              OutlinedButton(
+                onPressed: onSignOut,
+                child: const Text(S.signOut),
+              ),
               const Spacer(),
             ],
           ),

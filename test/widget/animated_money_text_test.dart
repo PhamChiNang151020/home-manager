@@ -6,7 +6,9 @@ import "package:home_manager/core/theme/app_theme.dart";
 import "package:home_manager/features/shared/animated_money_text.dart";
 
 void main() {
-  testWidgets("AnimatedMoneyText animates toward target amount", (tester) async {
+  testWidgets("AnimatedMoneyText animates toward target amount", (
+    tester,
+  ) async {
     await tester.pumpWidget(
       MaterialApp(
         theme: AppTheme.build(

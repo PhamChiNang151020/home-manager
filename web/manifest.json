@@ -1,11 +1,11 @@
 {
-    "name": "My Home",
-    "short_name": "My Home",
+    "name": "Tổ Ấm",
+    "short_name": "Tổ Ấm",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0B0D10",
     "theme_color": "#0B0D10",
-    "description": "Quản lý điện nhà cửa — gia đình",
+    "description": "Tổ Ấm — quản lý nhà cửa gia đình",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

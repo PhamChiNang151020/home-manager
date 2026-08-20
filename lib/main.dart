@@ -2,6 +2,7 @@ import "package:flutter/material.dart";
 import "package:home_manager/app.dart";
 import "package:home_manager/core/config/app_config.dart";
 import "package:home_manager/core/logging/app_log.dart";
+import "package:home_manager/core/services/app_services.dart";
 import "package:home_manager/core/services/auth_service.dart";
 import "package:home_manager/core/services/home_service.dart";
 import "package:home_manager/core/state/session_controller.dart";
@@ -26,10 +27,11 @@ Future<void> main() async {
     publishableKey: AppConfig.supabaseAnonKey,
   );
   final client = Supabase.instance.client;
+  final services = AppServices(client);
   final session = SessionController(
     auth: AuthService(client),
     homesApi: HomeService(client),
   );
   await session.start();
-  runApp(HomeManagerApp(session: session, theme: theme));
+  runApp(HomeManagerApp(session: session, theme: theme, services: services));
 }

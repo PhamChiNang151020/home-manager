@@ -25,17 +25,18 @@ Locked decisions. Do not change without discussion.
 - Anon key + project URL are public (RLS protects rows). Never commit the **service role** key.
 - Do not log PII or bill photos to analytics.
 
-## Homes (v1)
+## Homes
 
 - Two homes: **Nhà tôi** (`meter`) and **Nhà ba mẹ** (`invoice`).
-- `meter`: new kWh − previous period kWh, then × `kwh_rate` (default 3500 đ/kWh, editable per home).
-- `invoice`: amount + month + photo (MoMo / bank screenshot). No meter math.
-- Each home: `photo_due_day`, `payday_day`, `remind_day` (day of month 1–31).
+- `meter`: electricity uses kWh × `kwh_rate` (default 3500); water uses m³ × `m3_rate` (default 10000).
+- `invoice`: amount + month + photo. No meter math.
+- Each home: `photo_due_day`, `payday_day`, `remind_day` (day of month 1–31) — shared for electricity and water.
 
-## v1 product scope
+## v2 product scope
 
-- Electricity only. Water, expenses, shopping are later; keep `homes` reusable.
-- Reminders: in-app banner first, then `.ics` export, then Web Push (separate, after PWA install).
+- Electricity, water, expenses (5 default categories), monthly income per member, overview dashboard.
+- Shell tabs: **Tổng quan** · **Chi tiêu** · **Cài đặt**. Điện / Nước / Thu nhập open from Tổng quan.
+- Reminders: in-app banner (điện + nước, same calendar days), then `.ics` export, then Web Push (later).
 
 ## Flutter SDK
 

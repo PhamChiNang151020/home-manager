@@ -13,7 +13,7 @@ Read [`.cursor/skills/qa-testing/SKILL.md`](../skills/qa-testing/SKILL.md) befor
 ## Required for every feature / bug fix
 
 1. Plan (goal + files from CODEBASE_MAP)
-2. Checklist — copy [checklist-template.md](../docs/qa/checklist-template.md) or tick [v1-manual-e2e.md](../docs/qa/v1-manual-e2e.md) IDs
+2. Checklist — copy [checklist-template.md](../docs/qa/checklist-template.md) or tick [v1-manual-e2e.md](../docs/qa/v1-manual-e2e.md) IDs; see [v2-feature-inventory.md](../docs/qa/v2-feature-inventory.md) for water / expenses / income / overview
 3. Automated tests per [test-map.md](../docs/qa/test-map.md)
 4. `flutter analyze && flutter test` pass before PR
 

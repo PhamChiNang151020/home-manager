@@ -55,14 +55,22 @@ void stubPeriodUpsert({
   required MockSupabaseClient client,
   required MockSupabaseQueryBuilder table,
   required Map<String, dynamic> row,
+  List<Map<String, dynamic>>? capturedPayloads,
+  String tableName = "electricity_periods",
 }) {
   final upsertBuilder = MockPostgrestFilterBuilder();
   final selectBuilder = MockPostgrestFilterBuilder();
 
-  when(() => client.from("electricity_periods")).thenAnswer((_) => table);
+  when(() => client.from(tableName)).thenAnswer((_) => table);
   when(
     () => table.upsert(any(), onConflict: any(named: "onConflict")),
-  ).thenAnswer((_) => upsertBuilder);
+  ).thenAnswer((invocation) {
+    final payload = invocation.positionalArguments[0];
+    if (capturedPayloads != null && payload is Map) {
+      capturedPayloads.add(Map<String, dynamic>.from(payload));
+    }
+    return upsertBuilder;
+  });
   when(() => upsertBuilder.select()).thenAnswer((_) => selectBuilder);
   when(
     () => selectBuilder.single(),

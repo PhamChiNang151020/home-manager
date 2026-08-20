@@ -1,14 +1,18 @@
 import "dart:async";
 
 import "package:flutter/foundation.dart";
+import "package:home_manager/core/domain/selected_home.dart";
 import "package:home_manager/core/logging/app_log.dart";
 import "package:home_manager/core/models/home.dart";
 import "package:home_manager/core/services/auth_service.dart";
 import "package:home_manager/core/services/home_service.dart";
+import "package:shared_preferences/shared_preferences.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
 
 class SessionController extends ChangeNotifier {
   SessionController({required this.auth, required this.homesApi});
+
+  static const selectedHomeKey = "selected_home_id";
 
   final AuthService auth;
   final HomeService homesApi;
@@ -63,13 +67,17 @@ class SessionController extends ChangeNotifier {
       await homesApi.acceptPendingInvites();
       homes = await homesApi.listHomes();
       if (_disposed) return;
+      final prefs = await SharedPreferences.getInstance();
+      if (_disposed) return;
+      selected = resolveSelectedHome(
+        homes: homes,
+        current: selected,
+        persistedId: prefs.getString(selectedHomeKey),
+      );
       if (selected != null) {
-        selected = homes.cast<Home?>().firstWhere(
-          (home) => home?.id == selected!.id,
-          orElse: () => homes.isEmpty ? null : homes.first,
-        );
-      } else if (homes.isNotEmpty) {
-        selected = homes.first;
+        await prefs.setString(selectedHomeKey, selected!.id);
+      } else {
+        await prefs.remove(selectedHomeKey);
       }
     } catch (e, st) {
       if (_disposed || _isClosedClientError(e)) {
@@ -94,6 +102,12 @@ class SessionController extends ChangeNotifier {
   void selectHome(Home home) {
     selected = home;
     notifyListeners();
+    unawaited(_persistSelectedHomeId(home.id));
+  }
+
+  Future<void> _persistSelectedHomeId(String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(selectedHomeKey, id);
   }
 
   Future<void> signIn() => auth.signInWithGoogle();

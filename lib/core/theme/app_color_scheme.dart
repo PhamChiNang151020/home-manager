@@ -15,6 +15,11 @@ class AppColorScheme extends ThemeExtension<AppColorScheme> {
     required this.success,
     required this.warning,
     required this.error,
+    required this.catFood,
+    required this.catLoan,
+    required this.catHealth,
+    required this.catTuition,
+    required this.catOther,
   });
 
   final Color bgBase;
@@ -28,12 +33,27 @@ class AppColorScheme extends ThemeExtension<AppColorScheme> {
   final Color success;
   final Color warning;
   final Color error;
+  final Color catFood;
+  final Color catLoan;
+  final Color catHealth;
+  final Color catTuition;
+  final Color catOther;
 
   Color accentMuted([double opacity = 0.18]) =>
       accent.withValues(alpha: opacity);
 
   Color warningMuted([double opacity = 0.15]) =>
       warning.withValues(alpha: opacity);
+
+  Color categoryColor(String colorKey) {
+    return switch (colorKey) {
+      "food" => catFood,
+      "loan" => catLoan,
+      "health" => catHealth,
+      "tuition" => catTuition,
+      _ => catOther,
+    };
+  }
 
   static AppColorScheme dark(Color accent) {
     return AppColorScheme(
@@ -48,6 +68,11 @@ class AppColorScheme extends ThemeExtension<AppColorScheme> {
       success: const Color(0xFF4ADE80),
       warning: const Color(0xFFFBBF24),
       error: const Color(0xFFF87171),
+      catFood: const Color(0xFFF97316),
+      catLoan: const Color(0xFF38BDF8),
+      catHealth: const Color(0xFF34D399),
+      catTuition: const Color(0xFFA78BFA),
+      catOther: const Color(0xFF94A3B8),
     );
   }
 
@@ -64,6 +89,11 @@ class AppColorScheme extends ThemeExtension<AppColorScheme> {
       success: const Color(0xFF16A34A),
       warning: const Color(0xFFD97706),
       error: const Color(0xFFDC2626),
+      catFood: const Color(0xFFEA580C),
+      catLoan: const Color(0xFF0284C7),
+      catHealth: const Color(0xFF059669),
+      catTuition: const Color(0xFF7C3AED),
+      catOther: const Color(0xFF64748B),
     );
   }
 
@@ -80,6 +110,11 @@ class AppColorScheme extends ThemeExtension<AppColorScheme> {
     Color? success,
     Color? warning,
     Color? error,
+    Color? catFood,
+    Color? catLoan,
+    Color? catHealth,
+    Color? catTuition,
+    Color? catOther,
   }) {
     return AppColorScheme(
       bgBase: bgBase ?? this.bgBase,
@@ -93,6 +128,11 @@ class AppColorScheme extends ThemeExtension<AppColorScheme> {
       success: success ?? this.success,
       warning: warning ?? this.warning,
       error: error ?? this.error,
+      catFood: catFood ?? this.catFood,
+      catLoan: catLoan ?? this.catLoan,
+      catHealth: catHealth ?? this.catHealth,
+      catTuition: catTuition ?? this.catTuition,
+      catOther: catOther ?? this.catOther,
     );
   }
 
@@ -112,6 +152,11 @@ class AppColorScheme extends ThemeExtension<AppColorScheme> {
       success: Color.lerp(success, other.success, t) ?? success,
       warning: Color.lerp(warning, other.warning, t) ?? warning,
       error: Color.lerp(error, other.error, t) ?? error,
+      catFood: Color.lerp(catFood, other.catFood, t) ?? catFood,
+      catLoan: Color.lerp(catLoan, other.catLoan, t) ?? catLoan,
+      catHealth: Color.lerp(catHealth, other.catHealth, t) ?? catHealth,
+      catTuition: Color.lerp(catTuition, other.catTuition, t) ?? catTuition,
+      catOther: Color.lerp(catOther, other.catOther, t) ?? catOther,
     );
   }
 }

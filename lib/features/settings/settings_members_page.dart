@@ -123,44 +123,44 @@ class _SettingsMembersPageState extends State<SettingsMembersPage> {
       body: MobileViewport(
         child: ListView(
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-        children: [
-          const SectionHeader(title: S.members),
-          for (final member in _members) _MemberTile(member: member),
-          if (owner) ...[
-            const SectionHeader(title: S.invite),
-            LabeledTextField(
-              label: S.inviteEmail,
-              controller: _inviteEmail,
-              keyboardType: TextInputType.emailAddress,
-              hint: "example@gmail.com",
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton.icon(
-                onPressed: _sending ? null : _sendInvite,
-                icon:
-                    _sending
-                        ? const AppLoader.compact(color: Colors.white)
-                        : const Icon(Icons.send_outlined, size: 18),
-                label: Text(_sending ? S.sending : S.sendInvite),
+          children: [
+            const SectionHeader(title: S.members),
+            for (final member in _members) _MemberTile(member: member),
+            if (owner) ...[
+              const SectionHeader(title: S.invite),
+              LabeledTextField(
+                label: S.inviteEmail,
+                controller: _inviteEmail,
+                keyboardType: TextInputType.emailAddress,
+                hint: "example@gmail.com",
               ),
-            ),
-            if (_pending.isNotEmpty) ...[
-              const SectionHeader(title: S.pendingInvites),
-              for (final invite in _pending)
-                _PendingInviteTile(
-                  invite: invite,
-                  onCancel: () => _cancelInvite(invite),
+              const SizedBox(height: AppSpacing.sm),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: _sending ? null : _sendInvite,
+                  icon:
+                      _sending
+                          ? const AppLoader.compact(color: Colors.white)
+                          : const Icon(Icons.send_outlined, size: 18),
+                  label: Text(_sending ? S.sending : S.sendInvite),
                 ),
+              ),
+              if (_pending.isNotEmpty) ...[
+                const SectionHeader(title: S.pendingInvites),
+                for (final invite in _pending)
+                  _PendingInviteTile(
+                    invite: invite,
+                    onCancel: () => _cancelInvite(invite),
+                  ),
+              ],
             ],
+            if (_error != null)
+              Padding(
+                padding: const EdgeInsets.only(top: AppSpacing.sm),
+                child: Text(_error!, style: TextStyle(color: colors.error)),
+              ),
           ],
-          if (_error != null)
-            Padding(
-              padding: const EdgeInsets.only(top: AppSpacing.sm),
-              child: Text(_error!, style: TextStyle(color: colors.error)),
-            ),
-        ],
         ),
       ),
     );

@@ -6,9 +6,10 @@ void updateWebThemeColor(Color color) {
       "#${color.toARGB32().toRadixString(16).padLeft(8, "0").substring(2)}";
   var meta = web.document.querySelector('meta[name="theme-color"]');
   if (meta == null) {
-    meta = web.HTMLMetaElement()
-      ..name = "theme-color"
-      ..content = hex;
+    meta =
+        web.HTMLMetaElement()
+          ..name = "theme-color"
+          ..content = hex;
     web.document.head?.appendChild(meta);
   } else {
     meta.setAttribute("content", hex);

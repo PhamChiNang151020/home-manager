@@ -45,3 +45,36 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+      - name: Notify Slack on success
+        if: success()
+        run: |
+          curl -s -X POST "${{ secrets.SLACK_WEBHOOK_URL }}" \
+            -H 'Content-type: application/json' \
+            --data '{
+              "text": "✅ *home-manager* deployed successfully!",
+              "attachments": [{
+                "color": "good",
+                "fields": [
+                  {"title": "Branch", "value": "'"${{ github.ref_name }}"'", "short": true},
+                  {"title": "Commit", "value": "'"${{ github.event.head_commit.message }}"'", "short": true},
+                  {"title": "URL", "value": "<https://phamchinang151020.github.io/home-manager/|Open App>", "short": true},
+                  {"title": "Deployed by", "value": "'"${{ github.actor }}"'", "short": true}
+                ]
+              }]
+            }'
+      - name: Notify Slack on failure
+        if: failure()
+        run: |
+          curl -s -X POST "${{ secrets.SLACK_WEBHOOK_URL }}" \
+            -H 'Content-type: application/json' \
+            --data '{
+              "text": "❌ *home-manager* deploy FAILED!",
+              "attachments": [{
+                "color": "danger",
+                "fields": [
+                  {"title": "Branch", "value": "'"${{ github.ref_name }}"'", "short": true},
+                  {"title": "Commit", "value": "'"${{ github.event.head_commit.message }}"'", "short": true},
+                  {"title": "Details", "value": "<'"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"'|View logs>", "short": true}
+                ]
+              }]
+            }'
