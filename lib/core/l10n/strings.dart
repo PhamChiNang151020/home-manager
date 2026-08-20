@@ -122,20 +122,26 @@ abstract final class S {
   static const settingsMembersDesc = "Thành viên và lời mời";
   static const settingsAccountDesc = "Đăng xuất";
   static const settingsAppearanceDesc = "Sáng / tối, màu nhấn";
-  static const settingsInstallDesc = "Mã QR gửi ảnh cho người nhà";
+  static const settingsInstallDesc = "iPhone: cài nhanh · QR gửi người nhà";
   static const installBannerTitle = "Thêm Tổ Ấm ra Màn hình chính";
   static const installBannerIosSafari =
-      "Safari → nút Chia sẻ → Thêm vào Màn hình chính.";
+      "Bấm Cài nhanh → Cài đặt → Cài. iOS có thể báo Chưa xác minh — bấm Cài tiếp.";
   static const installBannerIosInApp =
-      "Zalo/Messenger không cài được. Bấm ⋯ → Mở bằng Safari, rồi Chia sẻ → Thêm vào Màn hình chính.";
+      "Zalo không cài được. Bấm ⋯ → Mở bằng Safari, rồi bấm Cài nhanh trên iPhone.";
   static const installBannerAndroid =
       "Chrome → menu ⋮ → Cài đặt ứng dụng (hoặc Thêm vào màn hình chính).";
   static const installBannerAndroidInApp =
       "Mở bằng Chrome, đừng mở trong Zalo. Rồi menu ⋮ → Thêm vào màn hình chính.";
-  static const installGuide = "Xem mã QR";
+  static const installIosWebClip = "Cài nhanh trên iPhone";
+  static const installIosWebClipSteps =
+      "Cho phép tải profile → Cài đặt → Cài → Cài. iOS có thể báo \"Chưa xác minh\" — bấm Cài tiếp.";
+  static const installIosWebClipInApp =
+      "Mở bằng Safari trước, rồi bấm Cài nhanh trên iPhone.";
+  static const installGuide = "Mã QR gửi người nhà";
   static const installDismiss = "Đóng";
+  static const installQrSectionTitle = "Gửi cho người nhà";
   static const installQrHint =
-      "Chụp màn hình mã này rồi gửi ảnh. Người nhà mở Safari (iPhone) hoặc Chrome (Android), quét mã, rồi thêm ra Màn hình chính.";
+      "Chụp màn hình mã này rồi gửi ảnh. Người nhà mở Safari, quét mã, rồi bấm Cài nhanh trên iPhone.";
   static const installCopyLink = "Sao chép liên kết (cho bạn)";
   static const installLinkCopied = "Đã sao chép liên kết";
   static const themeModeLabel = "Chế độ";

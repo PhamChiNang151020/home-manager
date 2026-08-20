@@ -12,6 +12,8 @@ flutter build web --release --base-href /home-manager/ \
 
 CI: `.github/workflows/deploy-pages.yml` (Flutter 3.29.2, analyze, test, upload Pages artifact).
 
+**iOS Web Clip (unsigned):** `web/to-am.mobileconfig` — see [ios-web-clip.md](ios-web-clip.md).
+
 Enable: repo Settings → Pages → Source = GitHub Actions. Add secrets `SUPABASE_URL` and `SUPABASE_ANON_KEY`. Add the Pages origin to Supabase Auth redirect URLs.
 
 ## Private repo

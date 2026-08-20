@@ -3,6 +3,7 @@ import "package:home_manager/core/domain/pwa_install.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/navigation/app_page_route.dart";
 import "package:home_manager/core/services/pwa_install_runtime.dart";
+import "package:home_manager/core/services/pwa_open_url.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/pwa/install_home_screen_page.dart";
@@ -53,6 +54,16 @@ class _InstallHomeScreenBannerState extends State<InstallHomeScreenBanner> {
     setState(() => _dismissed = true);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(PwaInstall.bannerDismissedKey, true);
+  }
+
+  void _installIosWebClip(BuildContext context, PwaInstallSurface surface) {
+    if (surface == PwaInstallSurface.iosInApp) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text(S.installIosWebClipInApp)));
+      return;
+    }
+    openExternalUrl(currentIosWebClipProfileUrl());
   }
 
   @override
@@ -112,15 +123,31 @@ class _InstallHomeScreenBannerState extends State<InstallHomeScreenBanner> {
                     onPressed: _dismiss,
                     child: const Text(S.installDismiss),
                   ),
-                  FilledButton(
-                    onPressed:
-                        () => Navigator.of(context).push(
-                          AppPageRoute<void>(
-                            page: InstallHomeScreenPage(surface: surface),
+                  if (PwaInstall.isIosSurface(surface))
+                    FilledButton(
+                      onPressed: () => _installIosWebClip(context, surface),
+                      child: const Text(S.installIosWebClip),
+                    )
+                  else
+                    FilledButton(
+                      onPressed:
+                          () => Navigator.of(context).push(
+                            AppPageRoute<void>(
+                              page: InstallHomeScreenPage(surface: surface),
+                            ),
                           ),
-                        ),
-                    child: const Text(S.installGuide),
-                  ),
+                      child: const Text(S.installGuide),
+                    ),
+                  if (PwaInstall.isIosSurface(surface))
+                    OutlinedButton(
+                      onPressed:
+                          () => Navigator.of(context).push(
+                            AppPageRoute<void>(
+                              page: InstallHomeScreenPage(surface: surface),
+                            ),
+                          ),
+                      child: const Text(S.installGuide),
+                    ),
                 ],
               ),
             ],

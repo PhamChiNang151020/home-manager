@@ -12,6 +12,9 @@ PwaInstallSurface currentPwaInstallSurface() {
 
 String currentPwaShareUrl() => PwaInstall.shareUrlFrom(Uri.base);
 
+String currentIosWebClipProfileUrl() =>
+    PwaInstall.iosWebClipProfileUrlFrom(Uri.base);
+
 double currentPwaStandaloneTouchGap() {
   if (!pwaIsStandaloneWebApp()) return 0;
   return PwaViewport.standaloneTouchGap(

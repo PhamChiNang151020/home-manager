@@ -48,6 +48,7 @@ void main() {
 
     expect(find.text(S.installBannerTitle), findsOneWidget);
     expect(find.text(S.installBannerIosSafari), findsOneWidget);
+    expect(find.text(S.installIosWebClip), findsOneWidget);
 
     await tester.tap(find.text(S.installGuide));
     await tester.pumpAndSettle();
@@ -55,6 +56,21 @@ void main() {
     expect(find.byType(QrImageView), findsOneWidget);
     expect(find.text(S.installQrHint), findsOneWidget);
     expect(find.text(PwaInstall.productionAppUrl), findsNothing);
+  });
+
+  testWidgets("install page shows iOS web clip button", (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.build(
+          brightness: Brightness.light,
+          accent: AppAccent.amber,
+        ),
+        home: const InstallHomeScreenPage(surface: PwaInstallSurface.iosSafari),
+      ),
+    );
+
+    expect(find.text(S.installIosWebClip), findsWidgets);
+    expect(find.text(S.installIosWebClipSteps), findsOneWidget);
   });
 
   testWidgets("dismiss hides banner", (tester) async {
@@ -88,7 +104,7 @@ void main() {
     );
 
     expect(find.byType(QrImageView), findsOneWidget);
-    expect(find.text(S.installBannerIosInApp), findsOneWidget);
+    expect(find.text(S.installIosWebClipSteps), findsOneWidget);
     expect(find.text("https://example.test/app/"), findsNothing);
   });
 }

@@ -10,6 +10,11 @@ abstract final class PwaInstall {
   static const productionAppUrl =
       "https://phamchinang151020.github.io/home-manager/";
 
+  static const iosWebClipProfileFile = "to-am.mobileconfig";
+
+  static const productionIosWebClipProfileUrl =
+      "$productionAppUrl$iosWebClipProfileFile";
+
   static const bannerDismissedKey = "pwa_install_banner_dismissed";
 
   static PwaInstallSurface surface({
@@ -57,6 +62,17 @@ abstract final class PwaInstall {
       port: pageUri.hasPort ? pageUri.port : null,
       path: path,
     ).toString();
+  }
+
+  static String iosWebClipProfileUrlFrom(Uri pageUri) {
+    return "${shareUrlFrom(pageUri)}$iosWebClipProfileFile";
+  }
+
+  static bool isIosSurface(PwaInstallSurface surface) {
+    return switch (surface) {
+      PwaInstallSurface.iosSafari || PwaInstallSurface.iosInApp => true,
+      _ => false,
+    };
   }
 
   static bool _iosInAppBrowser(String ua) {

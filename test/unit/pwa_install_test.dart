@@ -113,4 +113,32 @@ void main() {
       );
     });
   });
+
+  group("PwaInstall.iosWebClipProfileUrlFrom", () {
+    test("appends mobileconfig to production base", () {
+      expect(
+        PwaInstall.iosWebClipProfileUrlFrom(
+          Uri.parse("https://phamchinang151020.github.io/home-manager/"),
+        ),
+        PwaInstall.productionIosWebClipProfileUrl,
+      );
+    });
+
+    test("uses production URL on localhost", () {
+      expect(
+        PwaInstall.iosWebClipProfileUrlFrom(
+          Uri.parse("http://localhost:5000/"),
+        ),
+        PwaInstall.productionIosWebClipProfileUrl,
+      );
+    });
+  });
+
+  group("PwaInstall.isIosSurface", () {
+    test("detects iOS surfaces", () {
+      expect(PwaInstall.isIosSurface(PwaInstallSurface.iosSafari), isTrue);
+      expect(PwaInstall.isIosSurface(PwaInstallSurface.iosInApp), isTrue);
+      expect(PwaInstall.isIosSurface(PwaInstallSurface.androidChrome), isFalse);
+    });
+  });
 }

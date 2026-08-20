@@ -3,6 +3,7 @@ import "package:flutter/services.dart";
 import "package:home_manager/core/domain/pwa_install.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/services/pwa_install_runtime.dart";
+import "package:home_manager/core/services/pwa_open_url.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/core/theme/mobile_viewport.dart";
@@ -19,8 +20,10 @@ class InstallHomeScreenPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final resolvedSurface = surface ?? currentPwaInstallSurface();
     final url = shareUrl ?? currentPwaShareUrl();
-    final steps = _stepsFor(surface ?? currentPwaInstallSurface());
+    final steps = _stepsFor(resolvedSurface);
+    final showIosWebClip = PwaInstall.isIosSurface(resolvedSurface);
     return Scaffold(
       appBar: AppBar(title: const Text(S.settingsInstall)),
       body: MobileViewport(
@@ -28,10 +31,42 @@ class InstallHomeScreenPage extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
           children: [
             const Center(child: AppBrandLogo(size: 56)),
-            const SizedBox(height: AppSpacing.md),
+            if (showIosWebClip) ...[
+              const SizedBox(height: AppSpacing.md),
+              AppCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      S.installIosWebClip,
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      S.installIosWebClipSteps,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: colors.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    FilledButton.icon(
+                      onPressed:
+                          () => _installIosWebClip(context, resolvedSurface),
+                      icon: const Icon(Icons.phone_iphone),
+                      label: const Text(S.installIosWebClip),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+            ],
+            Text(
+              S.installQrSectionTitle,
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
+            const SizedBox(height: AppSpacing.sm),
             Text(
               S.installQrHint,
-              textAlign: TextAlign.center,
               style: Theme.of(
                 context,
               ).textTheme.bodyMedium?.copyWith(color: colors.textSecondary),
@@ -72,6 +107,19 @@ class InstallHomeScreenPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  static void _installIosWebClip(
+    BuildContext context,
+    PwaInstallSurface surface,
+  ) {
+    if (surface == PwaInstallSurface.iosInApp) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text(S.installIosWebClipInApp)));
+      return;
+    }
+    openExternalUrl(currentIosWebClipProfileUrl());
   }
 
   static String _stepsFor(PwaInstallSurface surface) {
