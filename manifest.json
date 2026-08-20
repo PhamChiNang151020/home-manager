@@ -1,6 +1,6 @@
 {
-    "name": "Home Manager",
-    "short_name": "Nhà cửa",
+    "name": "My Home",
+    "short_name": "My Home",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0B0D10",
