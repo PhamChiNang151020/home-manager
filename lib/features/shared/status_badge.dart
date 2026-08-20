@@ -16,13 +16,13 @@ class StatusBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final (bg, fg) = switch (variant) {
-      StatusBadgeVariant.success =>
-        (colors.success.withValues(alpha: 0.15), colors.success),
-      StatusBadgeVariant.warning =>
-        (colors.warningMuted(), colors.warning),
+      StatusBadgeVariant.success => (
+        colors.success.withValues(alpha: 0.15),
+        colors.success,
+      ),
+      StatusBadgeVariant.warning => (colors.warningMuted(), colors.warning),
       StatusBadgeVariant.accent => (colors.accentMuted(), colors.accent),
-      StatusBadgeVariant.neutral =>
-        (colors.bgElevated, colors.textSecondary),
+      StatusBadgeVariant.neutral => (colors.bgElevated, colors.textSecondary),
     };
     return Container(
       padding: const EdgeInsets.symmetric(

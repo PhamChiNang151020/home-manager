@@ -14,7 +14,9 @@ import "package:home_manager/features/electricity/period_list_tile.dart";
 import "package:home_manager/features/electricity/reminder_banner.dart";
 import "package:home_manager/features/shared/empty_state_view.dart";
 import "package:home_manager/features/shared/error_view.dart";
-import "package:home_manager/features/shared/loading_view.dart";
+import "package:home_manager/features/shared/animated_entrance.dart";
+import "package:home_manager/features/electricity/electricity_page_skeleton.dart";
+import "package:home_manager/features/shared/app_loading.dart";
 import "package:home_manager/features/shared/section_header.dart";
 
 class ElectricityPage extends StatefulWidget {
@@ -168,61 +170,87 @@ class ElectricityPageState extends State<ElectricityPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) {
-      return const LoadingView();
-    }
     if (_error != null) {
       return ErrorView(message: _error!, onRetry: _load);
     }
 
-    return RefreshIndicator(
-      onRefresh: _load,
-      color: Theme.of(context).colorScheme.primary,
-      child: ListView(
-        padding: const EdgeInsets.only(
-          top: AppSpacing.sm,
-          bottom: AppSpacing.md,
-        ),
-        children: [
-          ReminderBanner(home: widget.home),
-          if (_items.isEmpty) ...[
-            const EmptyStateView(message: S.noPeriods),
-          ] else ...[
-            ElectricitySummaryCard(home: widget.home, periods: _items),
-            const SizedBox(height: AppSpacing.sm),
-            ElectricityTrendChart(periods: _items),
-            const SectionHeader(title: S.history),
-            PeriodHistoryFilterBar(
-              years: distinctPeriodYears(_items),
-              filterYear: _filterYear,
-              filterMonth: _filterMonth,
-              sortOrder: _sortOrder,
-              onYearChanged: (value) => setState(() => _filterYear = value),
-              onMonthChanged: (value) => setState(() => _filterMonth = value),
-              onSortChanged: (value) => setState(() => _sortOrder = value),
+    if (_loading && _items.isEmpty) {
+      return const ElectricityPageSkeleton();
+    }
+
+    return LoadingOverlay(
+      loading: _loading,
+      child: RefreshIndicator(
+        onRefresh: _load,
+        color: Theme.of(context).colorScheme.primary,
+        child: ListView(
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+          children: [
+            AnimatedEntrance(
+              index: 0,
+              child: ReminderBanner(home: widget.home),
             ),
-            if (_filteredItems.isEmpty)
-              const Padding(
-                padding: EdgeInsets.only(bottom: AppSpacing.md),
-                child: EmptyStateView(message: S.noHistoryMatch),
-              )
-            else
-              for (var i = 0; i < _filteredItems.length; i++)
-                PeriodListTile(
-                  period: _filteredItems[i],
-                  previousPeriod:
-                      i + 1 < _filteredItems.length
-                          ? _filteredItems[i + 1]
-                          : null,
+            if (_items.isEmpty) ...[
+              const AnimatedEntrance(
+                index: 1,
+                child: EmptyStateView(message: S.noPeriods),
+              ),
+            ] else ...[
+              AnimatedEntrance(
+                index: 1,
+                child: ElectricitySummaryCard(
                   home: widget.home,
-                  photos: widget.photos,
-                  onTap: () => _openPeriodDialog(_filteredItems[i]),
-                  onEdit: () => _openPeriodDialog(_filteredItems[i]),
-                  onDelete: () => _deletePeriod(_filteredItems[i]),
-                  onTogglePaid: () => _togglePaid(_filteredItems[i]),
+                  periods: _items,
                 ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              AnimatedEntrance(
+                index: 2,
+                child: ElectricityTrendChart(periods: _items),
+              ),
+              const AnimatedEntrance(
+                index: 3,
+                child: SectionHeader(title: S.history),
+              ),
+              AnimatedEntrance(
+                index: 4,
+                child: PeriodHistoryFilterBar(
+                  years: distinctPeriodYears(_items),
+                  filterYear: _filterYear,
+                  filterMonth: _filterMonth,
+                  sortOrder: _sortOrder,
+                  onYearChanged: (value) => setState(() => _filterYear = value),
+                  onMonthChanged:
+                      (value) => setState(() => _filterMonth = value),
+                  onSortChanged: (value) => setState(() => _sortOrder = value),
+                ),
+              ),
+              if (_filteredItems.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.only(bottom: AppSpacing.md),
+                  child: EmptyStateView(message: S.noHistoryMatch),
+                )
+              else
+                for (var i = 0; i < _filteredItems.length; i++)
+                  AnimatedEntrance(
+                    index: 5 + i,
+                    child: PeriodListTile(
+                      period: _filteredItems[i],
+                      previousPeriod:
+                          i + 1 < _filteredItems.length
+                              ? _filteredItems[i + 1]
+                              : null,
+                      home: widget.home,
+                      photos: widget.photos,
+                      onTap: () => _openPeriodDialog(_filteredItems[i]),
+                      onEdit: () => _openPeriodDialog(_filteredItems[i]),
+                      onDelete: () => _deletePeriod(_filteredItems[i]),
+                      onTogglePaid: () => _togglePaid(_filteredItems[i]),
+                    ),
+                  ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

@@ -1,11 +1,13 @@
 import "package:flutter/material.dart";
 import "package:home_manager/core/l10n/app_locale.dart";
 import "package:home_manager/core/l10n/strings.dart";
+import "package:home_manager/core/services/web_theme_color.dart";
 import "package:home_manager/core/state/session_controller.dart";
 import "package:home_manager/core/state/theme_controller.dart";
+import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_theme.dart";
 import "package:home_manager/features/auth/sign_in_page.dart";
-import "package:home_manager/features/shared/loading_view.dart";
+import "package:home_manager/features/shared/app_loading.dart";
 import "package:home_manager/features/shell/app_shell.dart";
 
 class HomeManagerApp extends StatelessWidget {
@@ -34,6 +36,7 @@ class HomeManagerApp extends StatelessWidget {
             accent: theme.accent,
           ),
           themeMode: theme.mode,
+          builder: _syncWebThemeColor,
           home: _AppHome(session: session, theme: theme),
         );
       },
@@ -65,11 +68,20 @@ class MissingConfigApp extends StatelessWidget {
             accent: theme.accent,
           ),
           themeMode: theme.mode,
+          builder: _syncWebThemeColor,
           home: const MissingConfigPage(),
         );
       },
     );
   }
+}
+
+Widget _syncWebThemeColor(BuildContext context, Widget? child) {
+  final colors = Theme.of(context).extension<AppColorScheme>();
+  if (colors != null) {
+    updateWebThemeColor(colors.bgBase);
+  }
+  return child ?? const SizedBox.shrink();
 }
 
 class _AppHome extends StatelessWidget {
@@ -84,7 +96,7 @@ class _AppHome extends StatelessWidget {
       animation: session,
       builder: (context, _) {
         if (session.loading && session.user == null) {
-          return const Scaffold(body: LoadingView());
+          return const BrandedLoadingScreen();
         }
         if (session.user == null) {
           return SignInPage(onGoogle: session.signIn, error: session.error);

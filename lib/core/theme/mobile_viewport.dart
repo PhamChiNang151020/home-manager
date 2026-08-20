@@ -12,7 +12,12 @@ class MobileViewport extends StatelessWidget {
       alignment: Alignment.topCenter,
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: AppSpacing.maxContentWidth),
-        child: SafeArea(child: child),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.screenHorizontal,
+          ),
+          child: SafeArea(top: false, bottom: false, child: child),
+        ),
       ),
     );
   }

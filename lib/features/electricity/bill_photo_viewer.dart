@@ -3,6 +3,7 @@ import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/services/electricity_service.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/features/shared/app_loading.dart";
 
 Future<void> showBillPhotoViewer({
   required BuildContext context,
@@ -111,7 +112,7 @@ class _BillPhotoSheetState extends State<_BillPhotoSheet> {
           if (_loading)
             const Padding(
               padding: EdgeInsets.all(AppSpacing.lg),
-              child: Center(child: CircularProgressIndicator()),
+              child: Center(child: AppLoader()),
             )
           else if (_error != null)
             Padding(
@@ -134,15 +135,7 @@ class _BillPhotoSheetState extends State<_BillPhotoSheet> {
                     if (progress == null) return child;
                     return SizedBox(
                       height: 200,
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          value:
-                              progress.expectedTotalBytes != null
-                                  ? progress.cumulativeBytesLoaded /
-                                      progress.expectedTotalBytes!
-                                  : null,
-                        ),
-                      ),
+                      child: Center(child: AppLoader(size: 28)),
                     );
                   },
                   errorBuilder:

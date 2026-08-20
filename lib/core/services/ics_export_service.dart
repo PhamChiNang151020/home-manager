@@ -7,13 +7,18 @@ class IcsExportService {
 
   String buildCalendar(Home home) {
     final now = DateTime.now();
-    final buffer = StringBuffer()
-      ..writeln("BEGIN:VCALENDAR")
-      ..writeln("VERSION:2.0")
-      ..writeln("PRODID:-//home-manager//VN")
-      ..writeln("CALSCALE:GREGORIAN");
+    final buffer =
+        StringBuffer()
+          ..writeln("BEGIN:VCALENDAR")
+          ..writeln("VERSION:2.0")
+          ..writeln("PRODID:-//home-manager//VN")
+          ..writeln("CALSCALE:GREGORIAN");
 
-    void event({required String uid, required int day, required String summary}) {
+    void event({
+      required String uid,
+      required int day,
+      required String summary,
+    }) {
       final clamped = DayOfMonth.clampToMonth(day, now);
       final start = DateTime(now.year, now.month, clamped);
       final stamp = DateFormat("yyyyMMdd").format(start);

@@ -5,6 +5,8 @@ import "package:home_manager/core/services/home_service.dart";
 import "package:home_manager/core/services/invite_service.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/core/theme/mobile_viewport.dart";
+import "package:home_manager/features/shared/app_loading.dart";
 import "package:home_manager/features/shared/labeled_text_field.dart";
 import "package:home_manager/features/shared/section_header.dart";
 
@@ -118,8 +120,9 @@ class _SettingsMembersPageState extends State<SettingsMembersPage> {
 
     return Scaffold(
       appBar: AppBar(title: const Text(S.settingsMembers)),
-      body: ListView(
-        padding: const EdgeInsets.all(AppSpacing.md),
+      body: MobileViewport(
+        child: ListView(
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
         children: [
           const SectionHeader(title: S.members),
           for (final member in _members) _MemberTile(member: member),
@@ -138,14 +141,7 @@ class _SettingsMembersPageState extends State<SettingsMembersPage> {
                 onPressed: _sending ? null : _sendInvite,
                 icon:
                     _sending
-                        ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
+                        ? const AppLoader.compact(color: Colors.white)
                         : const Icon(Icons.send_outlined, size: 18),
                 label: Text(_sending ? S.sending : S.sendInvite),
               ),
@@ -165,6 +161,7 @@ class _SettingsMembersPageState extends State<SettingsMembersPage> {
               child: Text(_error!, style: TextStyle(color: colors.error)),
             ),
         ],
+        ),
       ),
     );
   }

@@ -5,6 +5,7 @@ import "package:home_manager/core/models/home.dart";
 import "package:home_manager/core/models/tracking_mode.dart";
 import "package:home_manager/core/services/home_service.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/core/theme/mobile_viewport.dart";
 import "package:home_manager/features/shared/labeled_money_field.dart";
 import "package:home_manager/features/shared/labeled_text_field.dart";
 
@@ -54,9 +55,10 @@ class _SettingsHomePageState extends State<SettingsHomePage> {
       await widget.homesApi.updateSettings(
         homeId: widget.home.id,
         name: _name.text.trim(),
-        kwhRate: widget.home.trackingMode == TrackingMode.meter
-            ? VndFormat.parse(_rate.text)
-            : null,
+        kwhRate:
+            widget.home.trackingMode == TrackingMode.meter
+                ? VndFormat.parse(_rate.text)
+                : null,
       );
       widget.onChanged();
       if (mounted) Navigator.pop(context);
@@ -72,8 +74,9 @@ class _SettingsHomePageState extends State<SettingsHomePage> {
     final owner = widget.home.isOwner;
     return Scaffold(
       appBar: AppBar(title: const Text(S.settingsHome)),
-      body: ListView(
-        padding: const EdgeInsets.all(AppSpacing.md),
+      body: MobileViewport(
+        child: ListView(
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
         children: [
           LabeledTextField(
             label: S.homeName,
@@ -91,7 +94,10 @@ class _SettingsHomePageState extends State<SettingsHomePage> {
           ],
           if (_error != null) ...[
             const SizedBox(height: AppSpacing.sm),
-            Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+            Text(
+              _error!,
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
           ],
           if (owner) ...[
             const SizedBox(height: AppSpacing.lg),
@@ -101,6 +107,7 @@ class _SettingsHomePageState extends State<SettingsHomePage> {
             ),
           ],
         ],
+        ),
       ),
     );
   }

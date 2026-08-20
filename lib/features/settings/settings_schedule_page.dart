@@ -5,6 +5,7 @@ import "package:home_manager/core/services/home_service.dart";
 import "package:home_manager/core/services/ics_export_service.dart";
 import "package:home_manager/core/services/web_file_saver.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/core/theme/mobile_viewport.dart";
 import "package:home_manager/features/shared/labeled_text_field.dart";
 
 class SettingsSchedulePage extends StatefulWidget {
@@ -33,9 +34,15 @@ class _SettingsSchedulePageState extends State<SettingsSchedulePage> {
   @override
   void initState() {
     super.initState();
-    _photoDay = TextEditingController(text: widget.home.photoDueDay?.toString() ?? "");
-    _payday = TextEditingController(text: widget.home.paydayDay?.toString() ?? "");
-    _remind = TextEditingController(text: widget.home.remindDay?.toString() ?? "");
+    _photoDay = TextEditingController(
+      text: widget.home.photoDueDay?.toString() ?? "",
+    );
+    _payday = TextEditingController(
+      text: widget.home.paydayDay?.toString() ?? "",
+    );
+    _remind = TextEditingController(
+      text: widget.home.remindDay?.toString() ?? "",
+    );
   }
 
   @override
@@ -81,8 +88,9 @@ class _SettingsSchedulePageState extends State<SettingsSchedulePage> {
     final owner = widget.home.isOwner;
     return Scaffold(
       appBar: AppBar(title: const Text(S.settingsSchedule)),
-      body: ListView(
-        padding: const EdgeInsets.all(AppSpacing.md),
+      body: MobileViewport(
+        child: ListView(
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
         children: [
           LabeledTextField(
             label: S.photoDueDay,
@@ -107,7 +115,10 @@ class _SettingsSchedulePageState extends State<SettingsSchedulePage> {
           ),
           if (_error != null) ...[
             const SizedBox(height: AppSpacing.sm),
-            Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+            Text(
+              _error!,
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
           ],
           if (owner) ...[
             const SizedBox(height: AppSpacing.lg),
@@ -126,6 +137,7 @@ class _SettingsSchedulePageState extends State<SettingsSchedulePage> {
             label: const Text(S.exportIcs),
           ),
         ],
+        ),
       ),
     );
   }

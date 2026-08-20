@@ -1,6 +1,7 @@
 import "package:flutter/material.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/core/theme/mobile_viewport.dart";
 
 class SettingsAccountPage extends StatelessWidget {
   const SettingsAccountPage({super.key, required this.onSignOut});
@@ -11,18 +12,17 @@ class SettingsAccountPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text(S.settingsAccount)),
-      body: Padding(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Spacer(),
-            OutlinedButton(
-              onPressed: onSignOut,
-              child: const Text(S.signOut),
-            ),
-            const Spacer(),
-          ],
+      body: MobileViewport(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Spacer(),
+              OutlinedButton(onPressed: onSignOut, child: const Text(S.signOut)),
+              const Spacer(),
+            ],
+          ),
         ),
       ),
     );

@@ -5,6 +5,7 @@ import "package:home_manager/core/models/home.dart";
 import "package:home_manager/core/models/tracking_mode.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/features/shared/animated_money_text.dart";
 import "package:home_manager/features/shared/app_card.dart";
 import "package:home_manager/features/shared/money_text.dart";
 import "package:intl/intl.dart";
@@ -64,7 +65,7 @@ class ElectricitySummaryCard extends StatelessWidget {
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: AppSpacing.xs),
-          MoneyText(amount: latest.amountVnd, large: true),
+          AnimatedMoneyText(amount: latest.amountVnd, large: true),
           if (home.trackingMode == TrackingMode.meter &&
               latest.consumptionKwh != null) ...[
             const SizedBox(height: AppSpacing.xs),

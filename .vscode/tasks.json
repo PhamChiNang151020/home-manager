@@ -1,0 +1,43 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "boot-ios-simulator",
+      "type": "shell",
+      "command": "xcrun simctl boot 45FF47A0-7D0C-4418-A867-E427176E6EA8 2>/dev/null; open -a Simulator; nohup \"${workspaceFolder}/.vscode/open_safari_when_ready.sh\" > /tmp/home-manager-safari-open.log 2>&1 & echo \"Simulator ready — Safari waiter started (log: /tmp/home-manager-safari-open.log)\"",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "focus": false
+      }
+    },
+    {
+      "label": "open-safari-on-simulator",
+      "type": "shell",
+      "command": "IP=$(ipconfig getifaddr en0); xcrun simctl openurl booted \"http://$IP:8080\"",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "safari-waiter-log",
+      "type": "shell",
+      "command": "tail -f /tmp/home-manager-safari-open.log",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": false
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": { "regexp": "^$" },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          "endsPattern": "Safari opened"
+        }
+      }
+    }
+  ]
+}

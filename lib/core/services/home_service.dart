@@ -27,13 +27,11 @@ class HomeService {
         .from("home_members")
         .select("home_id, role, homes(*)")
         .eq("user_id", uid);
-    return (memberships as List)
-        .map((row) {
-          final map = Map<String, dynamic>.from(row as Map);
-          final homeJson = Map<String, dynamic>.from(map["homes"] as Map);
-          return Home.fromJson(homeJson, myRole: map["role"] as String);
-        })
-        .toList();
+    return (memberships as List).map((row) {
+      final map = Map<String, dynamic>.from(row as Map);
+      final homeJson = Map<String, dynamic>.from(map["homes"] as Map);
+      return Home.fromJson(homeJson, myRole: map["role"] as String);
+    }).toList();
   }
 
   Future<String> createHome({

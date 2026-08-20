@@ -1,5 +1,6 @@
 abstract final class S {
-  static const appName = "Nhà cửa";
+  static const appName = "My Home";
+  static const appTagline = "My Home";
   static const signInGoogle = "Đăng nhập bằng Google";
   static const signInHint =
       "Dùng tài khoản Google để đồng bộ điện với gia đình.";
@@ -103,4 +104,5 @@ abstract final class S {
   static const markPaid = "Đánh dấu đã thanh toán";
   static const markUnpaid = "Bỏ đánh dấu";
   static const detailPeriod = "Chi tiết kỳ điện";
+  static const appVersion = "Phiên bản";
 }

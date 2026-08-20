@@ -4,6 +4,7 @@ import "package:home_manager/core/state/theme_controller.dart";
 import "package:home_manager/core/theme/app_accent.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/core/theme/mobile_viewport.dart";
 
 class SettingsAppearancePage extends StatelessWidget {
   const SettingsAppearancePage({super.key, required this.theme});
@@ -18,14 +19,15 @@ class SettingsAppearancePage extends StatelessWidget {
         final colors = context.appColors;
         return Scaffold(
           appBar: AppBar(title: const Text(S.settingsAppearance)),
-          body: ListView(
-            padding: const EdgeInsets.all(AppSpacing.md),
+          body: MobileViewport(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
             children: [
               Text(
                 S.themeModeLabel,
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: colors.textSecondary,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleSmall?.copyWith(color: colors.textSecondary),
               ),
               const SizedBox(height: AppSpacing.sm),
               SegmentedButton<ThemeMode>(
@@ -51,9 +53,9 @@ class SettingsAppearancePage extends StatelessWidget {
               const SizedBox(height: AppSpacing.lg),
               Text(
                 S.themeAccent,
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: colors.textSecondary,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleSmall?.copyWith(color: colors.textSecondary),
               ),
               const SizedBox(height: AppSpacing.sm),
               Wrap(
@@ -69,6 +71,7 @@ class SettingsAppearancePage extends StatelessWidget {
                 ],
               ),
             ],
+            ),
           ),
         );
       },
@@ -108,9 +111,10 @@ class _AccentChip extends StatelessWidget {
               width: 2,
             ),
           ),
-          child: selected
-              ? const Icon(Icons.check, color: Colors.white, size: 24)
-              : null,
+          child:
+              selected
+                  ? const Icon(Icons.check, color: Colors.white, size: 24)
+                  : null,
         ),
       ),
     );

@@ -1,9 +1,10 @@
 import "package:flutter/material.dart";
 import "package:home_manager/core/format/vnd_format.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
+import "package:home_manager/core/theme/app_motion.dart";
 
-class MoneyText extends StatelessWidget {
-  const MoneyText({
+class AnimatedMoneyText extends StatelessWidget {
+  const AnimatedMoneyText({
     super.key,
     required this.amount,
     this.style,
@@ -28,6 +29,17 @@ class MoneyText extends StatelessWidget {
               color: colors.textPrimary,
               fontWeight: FontWeight.w600,
             );
-    return Text(VndFormat.format(amount), style: style ?? defaultStyle);
+
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: amount),
+      duration: AppMotion.slow,
+      curve: AppCurves.enter,
+      builder: (context, value, _) {
+        return Text(
+          VndFormat.format(value),
+          style: style ?? defaultStyle,
+        );
+      },
+    );
   }
 }

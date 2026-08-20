@@ -30,9 +30,9 @@ class LabeledMoneyField extends StatelessWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: colors.textSecondary,
-                fontWeight: FontWeight.w500,
-              ),
+            color: colors.textSecondary,
+            fontWeight: FontWeight.w500,
+          ),
         ),
         const SizedBox(height: AppSpacing.xs),
         TextField(
@@ -42,9 +42,7 @@ class LabeledMoneyField extends StatelessWidget {
           onChanged: onChanged,
           keyboardType: TextInputType.number,
           inputFormatters: readOnly ? null : [VndInputFormatter()],
-          decoration: InputDecoration(
-            suffixText: suffix,
-          ),
+          decoration: InputDecoration(suffixText: suffix),
         ),
       ],
     );

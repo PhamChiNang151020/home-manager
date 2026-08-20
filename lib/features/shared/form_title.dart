@@ -13,9 +13,9 @@ class FormTitle extends StatelessWidget {
       child: Text(
         title,
         textAlign: TextAlign.center,
-        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
+        style: Theme.of(
+          context,
+        ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
       ),
     );
   }

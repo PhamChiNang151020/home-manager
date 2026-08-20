@@ -11,19 +11,16 @@ class SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(
-        top: AppSpacing.sm,
-        bottom: AppSpacing.sm,
-      ),
+      padding: const EdgeInsets.only(top: AppSpacing.sm, bottom: AppSpacing.sm),
       child: Row(
         children: [
           Expanded(
             child: Text(
               title,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: context.appColors.textSecondary,
-                    letterSpacing: 0.5,
-                  ),
+                color: context.appColors.textSecondary,
+                letterSpacing: 0.5,
+              ),
             ),
           ),
           if (trailing != null) trailing!,

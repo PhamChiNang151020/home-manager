@@ -19,9 +19,9 @@ class StickyPrimaryBar extends StatelessWidget {
     final colors = context.appColors;
     return Container(
       padding: const EdgeInsets.fromLTRB(
-        AppSpacing.md,
+        AppSpacing.screenHorizontal,
         AppSpacing.sm,
-        AppSpacing.md,
+        AppSpacing.screenHorizontal,
         AppSpacing.sm,
       ),
       decoration: BoxDecoration(

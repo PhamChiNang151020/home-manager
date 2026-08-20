@@ -33,9 +33,9 @@ class LabeledTextField extends StatelessWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: colors.textSecondary,
-                fontWeight: FontWeight.w500,
-              ),
+            color: colors.textSecondary,
+            fontWeight: FontWeight.w500,
+          ),
         ),
         const SizedBox(height: AppSpacing.xs),
         TextField(
@@ -44,10 +44,7 @@ class LabeledTextField extends StatelessWidget {
           readOnly: readOnly,
           enabled: enabled,
           onChanged: onChanged,
-          decoration: InputDecoration(
-            hintText: hint,
-            helperText: helperText,
-          ),
+          decoration: InputDecoration(hintText: hint, helperText: helperText),
         ),
       ],
     );
@@ -79,9 +76,9 @@ class LabeledDropdownField<T> extends StatelessWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: colors.textSecondary,
-                fontWeight: FontWeight.w500,
-              ),
+            color: colors.textSecondary,
+            fontWeight: FontWeight.w500,
+          ),
         ),
         const SizedBox(height: AppSpacing.xs),
         DropdownButtonFormField<T>(
@@ -120,26 +117,24 @@ class LabeledPickerField extends StatelessWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: colors.textSecondary,
-                fontWeight: FontWeight.w500,
-              ),
+            color: colors.textSecondary,
+            fontWeight: FontWeight.w500,
+          ),
         ),
         const SizedBox(height: AppSpacing.xs),
         InkWell(
           onTap: enabled ? onTap : null,
           borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
           child: InputDecorator(
-            decoration: InputDecoration(
-              enabled: enabled,
-            ),
+            decoration: InputDecoration(enabled: enabled),
             child: Row(
               children: [
                 Expanded(
                   child: Text(
                     value,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: colors.textPrimary,
-                        ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyLarge?.copyWith(color: colors.textPrimary),
                   ),
                 ),
                 IconTheme(

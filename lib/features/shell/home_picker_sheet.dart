@@ -17,7 +17,9 @@ Future<void> showHomePickerSheet({
     context: context,
     backgroundColor: context.appColors.bgSurface,
     shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.cardRadius)),
+      borderRadius: BorderRadius.vertical(
+        top: Radius.circular(AppSpacing.cardRadius),
+      ),
     ),
     builder: (context) {
       final colors = context.appColors;
@@ -33,10 +35,7 @@ Future<void> showHomePickerSheet({
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                S.switchHome,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
+              Text(S.switchHome, style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: AppSpacing.md),
               for (final home in homes)
                 ListTile(
@@ -45,9 +44,10 @@ Future<void> showHomePickerSheet({
                     home.id == selected?.id
                         ? Icons.radio_button_checked
                         : Icons.radio_button_off,
-                    color: home.id == selected?.id
-                        ? colors.accent
-                        : colors.textMuted,
+                    color:
+                        home.id == selected?.id
+                            ? colors.accent
+                            : colors.textMuted,
                   ),
                   title: Text(home.name),
                   subtitle: Text(
@@ -81,8 +81,9 @@ Future<void> showHomePickerSheet({
 Widget trackingModeChip(TrackingMode mode) {
   return StatusBadge(
     label: mode == TrackingMode.meter ? S.modeMeterShort : S.modeInvoiceShort,
-    variant: mode == TrackingMode.meter
-        ? StatusBadgeVariant.accent
-        : StatusBadgeVariant.neutral,
+    variant:
+        mode == TrackingMode.meter
+            ? StatusBadgeVariant.accent
+            : StatusBadgeVariant.neutral,
   );
 }

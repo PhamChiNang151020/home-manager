@@ -11,6 +11,19 @@
         "--web-port=8080",
         "--dart-define-from-file=.vscode/supabase.local.json"
       ]
+    },
+    {
+      "name": "home-manager (iOS Simulator via Safari)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "deviceId": "chrome",
+      "toolArgs": [
+        "--web-port=8080",
+        "--web-hostname=0.0.0.0",
+        "--dart-define-from-file=.vscode/supabase.local.json"
+      ],
+      "preLaunchTask": "boot-ios-simulator"
     }
   ]
 }

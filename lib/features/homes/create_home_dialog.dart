@@ -34,10 +34,7 @@ Future<void> showCreateHomeDialog({
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  LabeledTextField(
-                    label: S.homeName,
-                    controller: name,
-                  ),
+                  LabeledTextField(label: S.homeName, controller: name),
                   const SizedBox(height: AppSpacing.formFieldGap),
                   LabeledDropdownField<TrackingMode>(
                     label: S.trackingMode,
@@ -52,8 +49,7 @@ Future<void> showCreateHomeDialog({
                         child: Text(S.modeInvoice),
                       ),
                     ],
-                    onChanged: (value) =>
-                        setState(() => mode = value ?? mode),
+                    onChanged: (value) => setState(() => mode = value ?? mode),
                   ),
                   if (mode == TrackingMode.meter) ...[
                     const SizedBox(height: AppSpacing.formFieldGap),
