@@ -63,7 +63,7 @@ class _InstallHomeScreenBannerState extends State<InstallHomeScreenBanner> {
       ).showSnackBar(const SnackBar(content: Text(S.installIosWebClipInApp)));
       return;
     }
-    openExternalUrl(currentIosWebClipProfileUrl());
+    openExternalUrl(currentIosInstallLandingUrl());
   }
 
   @override

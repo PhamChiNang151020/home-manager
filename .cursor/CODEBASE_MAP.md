@@ -27,7 +27,7 @@ Consult this file before grepping the repo. Update when adding modules under `li
 | Income | `lib/features/income/income_page.dart` |
 | Settings | `settings_hub_page.dart`, `settings_home_page.dart`, `settings_schedule_page.dart`, `settings_members_page.dart`, `settings_account_page.dart`, `settings_appearance_page.dart` |
 | PWA install | `lib/features/pwa/install_home_screen_banner.dart`, `install_home_screen_page.dart` |
-| iOS Web Clip | `web/to-am.mobileconfig`, `tool/generate_ios_webclip_profile.dart` |
+| iOS Web Clip | `web/install-ios.html`, `web/to-am.mobileconfig`, `tool/generate_ios_webclip_profile.dart` |
 
 ## Shared UI
 

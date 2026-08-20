@@ -23,16 +23,21 @@ class InstallHomeScreenPage extends StatelessWidget {
     final colors = context.appColors;
     final resolvedSurface = surface ?? currentPwaInstallSurface();
     final steps = _stepsFor(resolvedSurface);
-    final showIosWebClip = PwaInstall.isIosSurface(resolvedSurface);
+    final ua = pwaUserAgent();
+    final showIosWebClip = PwaInstall.showsIosInstallUi(
+      surface: resolvedSurface,
+      userAgent: ua,
+    );
     final showIosProfileGuide = PwaInstall.showsIosProfileGuide(
       surface: resolvedSurface,
-      userAgent: pwaUserAgent(),
+      userAgent: ua,
     );
     final appUrl = shareUrl ?? currentPwaShareUrl();
     final qrUrl = resolveQrUrl(
       surface: resolvedSurface,
+      userAgent: ua,
       appUrl: appUrl,
-      iosWebClipProfileUrl: currentIosWebClipProfileUrl(),
+      iosInstallLandingUrl: currentIosInstallLandingUrl(),
     );
     return Scaffold(
       appBar: AppBar(title: const Text(S.settingsInstall)),
@@ -133,15 +138,18 @@ class InstallHomeScreenPage extends StatelessWidget {
       ).showSnackBar(const SnackBar(content: Text(S.installIosWebClipInApp)));
       return;
     }
-    openExternalUrl(currentIosWebClipProfileUrl());
+    openExternalUrl(currentIosInstallLandingUrl());
   }
 
   static String resolveQrUrl({
     required PwaInstallSurface surface,
+    required String userAgent,
     required String appUrl,
-    required String iosWebClipProfileUrl,
+    required String iosInstallLandingUrl,
   }) {
-    return PwaInstall.isIosSurface(surface) ? iosWebClipProfileUrl : appUrl;
+    return PwaInstall.showsIosInstallUi(surface: surface, userAgent: userAgent)
+        ? iosInstallLandingUrl
+        : appUrl;
   }
 
   static String _stepsFor(PwaInstallSurface surface) {

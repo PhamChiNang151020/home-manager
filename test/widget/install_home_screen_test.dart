@@ -78,14 +78,15 @@ void main() {
     expect(find.text(S.installIosProfileRemoveSteps), findsOneWidget);
   });
 
-  test("iOS QR points to mobileconfig profile", () {
+  test("iOS QR points to install landing page", () {
     expect(
       InstallHomeScreenPage.resolveQrUrl(
         surface: PwaInstallSurface.iosSafari,
+        userAgent: "iPhone",
         appUrl: PwaInstall.productionAppUrl,
-        iosWebClipProfileUrl: PwaInstall.productionIosWebClipProfileUrl,
+        iosInstallLandingUrl: PwaInstall.productionIosInstallLandingUrl,
       ),
-      PwaInstall.productionIosWebClipProfileUrl,
+      PwaInstall.productionIosInstallLandingUrl,
     );
   });
 
@@ -109,10 +110,23 @@ void main() {
     expect(
       InstallHomeScreenPage.resolveQrUrl(
         surface: PwaInstallSurface.androidChrome,
+        userAgent: "Android",
         appUrl: "https://example.test/app/",
-        iosWebClipProfileUrl: PwaInstall.productionIosWebClipProfileUrl,
+        iosInstallLandingUrl: PwaInstall.productionIosInstallLandingUrl,
       ),
       "https://example.test/app/",
+    );
+  });
+
+  test("standalone iPhone QR still uses install landing page", () {
+    expect(
+      InstallHomeScreenPage.resolveQrUrl(
+        surface: PwaInstallSurface.hidden,
+        userAgent: "iPhone",
+        appUrl: PwaInstall.productionAppUrl,
+        iosInstallLandingUrl: PwaInstall.productionIosInstallLandingUrl,
+      ),
+      PwaInstall.productionIosInstallLandingUrl,
     );
   });
 

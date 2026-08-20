@@ -11,9 +11,16 @@ abstract final class PwaInstall {
       "https://phamchinang151020.github.io/home-manager/";
 
   static const iosWebClipProfileFile = "to-am.mobileconfig";
+  static const iosInstallLandingFile = "install-ios.html";
 
   static const productionIosWebClipProfileUrl =
       "$productionAppUrl$iosWebClipProfileFile";
+
+  /// HTML landing page that installs the profile with the correct MIME type.
+  /// GitHub Pages serves `.mobileconfig` as `application/octet-stream`, which
+  /// Safari often refuses to treat as a configuration profile.
+  static const productionIosInstallLandingUrl =
+      "$productionAppUrl$iosInstallLandingFile";
 
   static const bannerDismissedKey = "pwa_install_banner_dismissed";
 
@@ -68,6 +75,10 @@ abstract final class PwaInstall {
     return "${shareUrlFrom(pageUri)}$iosWebClipProfileFile";
   }
 
+  static String iosInstallLandingUrlFrom(Uri pageUri) {
+    return "${shareUrlFrom(pageUri)}$iosInstallLandingFile";
+  }
+
   static bool isIosSurface(PwaInstallSurface surface) {
     return switch (surface) {
       PwaInstallSurface.iosSafari || PwaInstallSurface.iosInApp => true,
@@ -80,13 +91,20 @@ abstract final class PwaInstall {
     return ua.contains("iphone") || ua.contains("ipad") || ua.contains("ipod");
   }
 
-  static bool showsIosProfileGuide({
+  /// Show install / profile UI on any iPhone session, including already-installed
+  /// standalone / Web Clip (surface [hidden]).
+  static bool showsIosInstallUi({
     required PwaInstallSurface surface,
     required String userAgent,
   }) {
     return isIosSurface(surface) ||
         (surface == PwaInstallSurface.hidden && isIosUserAgent(userAgent));
   }
+
+  static bool showsIosProfileGuide({
+    required PwaInstallSurface surface,
+    required String userAgent,
+  }) => showsIosInstallUi(surface: surface, userAgent: userAgent);
 
   static bool _iosInAppBrowser(String ua) {
     if (_sharedInAppMarkers(ua)) return true;

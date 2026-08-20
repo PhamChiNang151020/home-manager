@@ -134,6 +134,17 @@ void main() {
     });
   });
 
+  group("PwaInstall.iosInstallLandingUrlFrom", () {
+    test("appends install-ios.html to production base", () {
+      expect(
+        PwaInstall.iosInstallLandingUrlFrom(
+          Uri.parse("https://phamchinang151020.github.io/home-manager/"),
+        ),
+        PwaInstall.productionIosInstallLandingUrl,
+      );
+    });
+  });
+
   group("PwaInstall.isIosSurface", () {
     test("detects iOS surfaces", () {
       expect(PwaInstall.isIosSurface(PwaInstallSurface.iosSafari), isTrue);

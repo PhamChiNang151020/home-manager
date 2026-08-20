@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Cài Tổ Ấm lên iPhone</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0B0D10;
+      --card: #151A21;
+      --text: #E9EEF5;
+      --muted: #94A3B8;
+      --accent: #FBBF24;
+      --warn: #FBBF24;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 20px 48px;
+    }
+    img.logo {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+      margin-bottom: 16px;
+    }
+    h1 {
+      font-size: 22px;
+      margin: 0 0 8px;
+      text-align: center;
+    }
+    p {
+      margin: 0 0 12px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.45;
+      max-width: 360px;
+    }
+    .card {
+      width: 100%;
+      max-width: 360px;
+      background: var(--card);
+      border-radius: 16px;
+      padding: 16px;
+      margin-top: 8px;
+    }
+    .card ol {
+      margin: 0;
+      padding-left: 1.2em;
+      color: var(--text);
+      line-height: 1.55;
+    }
+    button {
+      margin-top: 20px;
+      width: 100%;
+      max-width: 360px;
+      border: 0;
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 16px;
+      font-weight: 600;
+      background: var(--accent);
+      color: #0B0D10;
+    }
+    button:disabled {
+      opacity: 0.6;
+    }
+    .status {
+      margin-top: 12px;
+      min-height: 1.4em;
+      font-size: 14px;
+      color: var(--warn);
+      text-align: center;
+      max-width: 360px;
+    }
+    a.back {
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <img class="logo" src="icons/Icon-192.png" alt="Tổ Ấm" width="72" height="72">
+  <h1>Cài Tổ Ấm lên iPhone</h1>
+  <p>Bấm nút bên dưới để tải profile. iOS có thể báo <strong>Chưa xác minh</strong> — vẫn bấm Cài.</p>
+  <div class="card">
+    <ol>
+      <li>Bấm <strong>Cài nhanh</strong></li>
+      <li>Cho phép tải profile</li>
+      <li>Mở <strong>Cài đặt</strong> → Profile đã tải</li>
+      <li>Bấm <strong>Cài</strong> vài lần → xong</li>
+    </ol>
+  </div>
+  <button id="install" type="button">Cài nhanh</button>
+  <p class="status" id="status" aria-live="polite"></p>
+  <a class="back" href="./">Quay lại Tổ Ấm</a>
+  <script>
+    (function () {
+      var PROFILE = "to-am.mobileconfig";
+      var MIME = "application/x-apple-aspen-config";
+      var btn = document.getElementById("install");
+      var status = document.getElementById("status");
+
+      function setStatus(msg) {
+        status.textContent = msg || "";
+      }
+
+      function isIos() {
+        return /iPhone|iPad|iPod/i.test(navigator.userAgent);
+      }
+
+      async function installProfile() {
+        setStatus("Đang tải profile…");
+        btn.disabled = true;
+        try {
+          var res = await fetch(PROFILE, { cache: "no-store" });
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          var buf = await res.arrayBuffer();
+          var blob = new Blob([buf], { type: MIME });
+          var url = URL.createObjectURL(blob);
+          // Safari needs a real navigation to offer profile install.
+          window.location.assign(url);
+        } catch (e) {
+          setStatus("Không tải được profile. Thử mở bằng Safari rồi bấm lại.");
+          btn.disabled = false;
+        }
+      }
+
+      btn.addEventListener("click", installProfile);
+
+      if (!isIos()) {
+        setStatus("Mở trang này bằng Safari trên iPhone để cài.");
+      }
+    })();
+  </script>
+</body>
+</html>

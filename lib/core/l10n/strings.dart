@@ -134,14 +134,14 @@ abstract final class S {
       "Mở bằng Chrome, đừng mở trong Zalo. Rồi menu ⋮ → Thêm vào màn hình chính.";
   static const installIosWebClip = "Cài nhanh trên iPhone";
   static const installIosWebClipSteps =
-      "Cho phép tải profile → Cài đặt → Cài → Cài. iOS có thể báo \"Chưa xác minh\" — bấm Cài tiếp.";
+      "Bấm Cài nhanh → Cho phép → Cài đặt → Cài. iOS có thể báo \"Chưa xác minh\" — bấm Cài tiếp.";
   static const installIosWebClipInApp =
       "Mở bằng Safari trước, rồi bấm Cài nhanh trên iPhone.";
   static const installGuide = "Mã QR gửi người nhà";
   static const installDismiss = "Đóng";
   static const installQrSectionTitle = "Gửi cho người nhà";
   static const installQrHint =
-      "Chụp màn hình mã này rồi gửi ảnh. iPhone quét mã sẽ mở link cài profile; Android quét mã sẽ mở app.";
+      "Chụp màn hình mã này rồi gửi ảnh. Người nhà mở Safari, quét mã, bấm Cài nhanh trên trang mở ra.";
   static const installCopyLink = "Sao chép liên kết (cho bạn)";
   static const installLinkCopied = "Đã sao chép liên kết";
   static const installIosProfileRemoveTitle = "Gỡ profile khỏi iPhone";

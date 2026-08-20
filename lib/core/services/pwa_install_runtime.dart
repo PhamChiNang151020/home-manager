@@ -14,4 +14,7 @@ String currentPwaShareUrl() => PwaInstall.shareUrlFrom(Uri.base);
 String currentIosWebClipProfileUrl() =>
     PwaInstall.iosWebClipProfileUrlFrom(Uri.base);
 
+String currentIosInstallLandingUrl() =>
+    PwaInstall.iosInstallLandingUrlFrom(Uri.base);
+
 double currentPwaStandaloneTouchGap() => 0;

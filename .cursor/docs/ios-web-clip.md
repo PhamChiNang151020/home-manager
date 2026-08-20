@@ -17,16 +17,22 @@ dart run tool/generate_ios_webclip_profile.dart
 
 ## Production URL
 
+Install landing (preferred — correct MIME for Safari):
+
+`https://phamchinang151020.github.io/home-manager/install-ios.html`
+
+Raw profile (may fail on Safari because GitHub Pages serves `application/octet-stream`):
+
 `https://phamchinang151020.github.io/home-manager/to-am.mobileconfig`
 
 ## Install flow (do for family once)
 
-1. Open the app in **Safari** on iPhone (not Zalo in-app browser).
-2. **Cài đặt → Thêm ra Màn hình chính → Cài nhanh trên iPhone**  
-   Or open the profile URL directly in Safari.
-3. Allow download → **Settings → Profile downloaded → Install** (tap Install several times).
-4. iOS may show **Not Verified** — expected for unsigned profiles; tap **Install** again.
-5. Icon **Tổ Ấm** appears on the home screen.
+1. Open **Safari** on iPhone (not Zalo in-app browser).
+2. Open the landing page above, or in-app: **Cài đặt → Thêm ra Màn hình chính → Cài nhanh trên iPhone**.
+3. Tap **Cài nhanh** on the landing page (creates a Blob with `application/x-apple-aspen-config`).
+4. Allow download → **Settings → Profile Downloaded → Install**.
+5. iOS may show **Not Verified** — expected for unsigned profiles; tap **Install** again.
+6. Icon **Tổ Ấm** appears on the home screen.
 
 ## Remove
 
