@@ -27,3 +27,7 @@ flutter run -d chrome --web-port=8080 \
 Copy `.vscode/supabase.local.json.example` → `.vscode/supabase.local.json`, fill values, then **Run → home-manager (Chrome)**.
 
 Storage paths: `homes/{home_id}/{yyyy-mm}.jpg` in bucket `bill-photos`.
+
+## Seed demo data (optional)
+
+After creating a home named **Testing** in the app, run [`seeds/seed_home_testing.sql`](seeds/seed_home_testing.sql) in the SQL editor. It fills 6 months of điện / nước / chi / lương for that home (meter or invoice from the row). Re-run replaces those rows only.

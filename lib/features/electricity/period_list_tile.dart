@@ -27,9 +27,6 @@ class PeriodListTile extends StatelessWidget {
     required this.home,
     required this.photos,
     required this.onTap,
-    required this.onEdit,
-    required this.onDelete,
-    required this.onTogglePaid,
     this.previousPeriod,
   });
 
@@ -38,9 +35,6 @@ class PeriodListTile extends StatelessWidget {
   final Home home;
   final BillPhotoService photos;
   final VoidCallback onTap;
-  final VoidCallback onEdit;
-  final VoidCallback onDelete;
-  final VoidCallback onTogglePaid;
 
   _TrendData? _trend() {
     final prev = previousPeriod;
@@ -74,23 +68,12 @@ class PeriodListTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // ── Row 1: tháng (trái) + kebab (phải) ──────────────────────
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    monthLabel,
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                _KebabMenu(
-                  isPaid: period.isPaid,
-                  onEdit: onEdit,
-                  onDelete: onDelete,
-                  onTogglePaid: onTogglePaid,
-                ),
-              ],
+            // ── Row 1: tháng ────────────────────────────────────────────
+            Text(
+              monthLabel,
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 2),
             // ── Row 2: tiền + trend (trái) | trạng thái paid (phải) ──────
@@ -170,7 +153,7 @@ class PeriodListTile extends StatelessWidget {
                               )
                               : null,
                       child: StatusBadge(
-                        label: hasPhoto ? S.hasPhoto : S.noPhoto,
+                        label: hasPhoto ? S.viewPhoto : S.noPhoto,
                         variant:
                             hasPhoto
                                 ? StatusBadgeVariant.success
@@ -254,81 +237,3 @@ class _TrendChip extends StatelessWidget {
     );
   }
 }
-
-// ── Kebab menu ──────────────────────────────────────────────────────────────
-
-class _KebabMenu extends StatelessWidget {
-  const _KebabMenu({
-    required this.isPaid,
-    required this.onEdit,
-    required this.onDelete,
-    required this.onTogglePaid,
-  });
-
-  final bool isPaid;
-  final VoidCallback onEdit;
-  final VoidCallback onDelete;
-  final VoidCallback onTogglePaid;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.appColors;
-    return PopupMenuButton<_MenuAction>(
-      icon: Icon(Icons.more_vert, size: 20, color: colors.textMuted),
-      iconSize: 20,
-      padding: EdgeInsets.zero,
-      onSelected: (action) {
-        switch (action) {
-          case _MenuAction.edit:
-            onEdit();
-          case _MenuAction.delete:
-            onDelete();
-          case _MenuAction.togglePaid:
-            onTogglePaid();
-        }
-      },
-      itemBuilder:
-          (context) => [
-            PopupMenuItem(
-              value: _MenuAction.edit,
-              child: ListTile(
-                dense: true,
-                contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.edit_outlined, size: 18),
-                title: const Text(S.edit),
-              ),
-            ),
-            PopupMenuItem(
-              value: _MenuAction.togglePaid,
-              child: ListTile(
-                dense: true,
-                contentPadding: EdgeInsets.zero,
-                leading: Icon(
-                  isPaid
-                      ? Icons.unpublished_outlined
-                      : Icons.check_circle_outline,
-                  size: 18,
-                ),
-                title: Text(isPaid ? S.markUnpaid : S.markPaid),
-              ),
-            ),
-            const PopupMenuDivider(),
-            PopupMenuItem(
-              value: _MenuAction.delete,
-              child: ListTile(
-                dense: true,
-                contentPadding: EdgeInsets.zero,
-                leading: Icon(
-                  Icons.delete_outline,
-                  size: 18,
-                  color: colors.error,
-                ),
-                title: Text(S.delete, style: TextStyle(color: colors.error)),
-              ),
-            ),
-          ],
-    );
-  }
-}
-
-enum _MenuAction { edit, delete, togglePaid }

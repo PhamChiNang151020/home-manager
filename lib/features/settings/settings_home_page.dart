@@ -4,6 +4,7 @@ import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/models/home.dart";
 import "package:home_manager/core/models/tracking_mode.dart";
 import "package:home_manager/core/services/home_service.dart";
+import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/core/theme/mobile_viewport.dart";
 import "package:home_manager/features/shared/labeled_money_field.dart";
@@ -89,6 +90,29 @@ class _SettingsHomePageState extends State<SettingsHomePage> {
               label: S.homeName,
               controller: _name,
               enabled: owner,
+            ),
+            const SizedBox(height: AppSpacing.formFieldGap),
+            Text(
+              S.trackingMode,
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: context.appColors.textSecondary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              widget.home.trackingMode == TrackingMode.meter
+                  ? S.modeMeter
+                  : S.modeInvoice,
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              widget.home.trackingMode == TrackingMode.meter
+                  ? S.modeMeterHint
+                  : S.modeInvoiceHint,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: context.appColors.textMuted,
+              ),
             ),
             if (widget.home.trackingMode == TrackingMode.meter) ...[
               const SizedBox(height: AppSpacing.formFieldGap),

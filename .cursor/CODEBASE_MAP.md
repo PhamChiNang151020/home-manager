@@ -20,21 +20,23 @@ Consult this file before grepping the repo. Update when adding modules under `li
 |------|------|
 | Sign in | `lib/features/auth/sign_in_page.dart` |
 | Create home | `lib/features/homes/create_home_dialog.dart` |
-| Overview hub | `lib/features/overview/overview_page.dart`, `overview_summary_card.dart` |
+| Overview hub | `lib/features/overview/overview_page.dart`, `overview_summary_card.dart`, `overview_shortcut_grid.dart`, `overview_spend_trend_chart.dart` |
 | Electricity | `lib/features/electricity/` (page, form, summary, chart, cards, reminder) |
 | Water | `lib/features/water/` (mirror of electricity) |
 | Expenses | `lib/features/expenses/` (list, form, category chart) |
 | Income | `lib/features/income/income_page.dart` |
 | Settings | `settings_hub_page.dart`, `settings_home_page.dart`, `settings_schedule_page.dart`, `settings_members_page.dart`, `settings_account_page.dart`, `settings_appearance_page.dart` |
+| PWA install | `lib/features/pwa/install_home_screen_banner.dart`, `install_home_screen_page.dart` |
 
 ## Shared UI
 
 | Item | Path |
 |------|------|
-| Card, money, badges | `lib/features/shared/app_card.dart`, `money_text.dart`, `status_badge.dart` |
-| Loading / error / empty | `loading_view.dart`, `error_view.dart`, `empty_state_view.dart` |
+| Card, money, badges | `lib/features/shared/app_card.dart`, `money_text.dart`, `status_badge.dart`, `trend_chip.dart` |
+| Period detail | `lib/features/shared/period_detail_view.dart` (điện / nước view-only) |
+| Fields | `labeled_text_field.dart` (`LabeledDropdownField` → select sheet), `labeled_money_field.dart`, `month_picker.dart`, `month_stepper_field.dart`, `select_sheet.dart` |
+| Loading / error / empty | `app_loading.dart` (logo + spinning ring), `loading_view.dart`, `error_view.dart`, `empty_state_view.dart` |
 | Sticky CTA / feature scaffold | `sticky_primary_bar.dart`, `feature_page_scaffold.dart` |
-| Fields | `labeled_text_field.dart` (`LabeledDropdownField`), `labeled_money_field.dart`, `month_picker.dart` |
 | Brand logo | `lib/features/shared/app_brand_logo.dart` (`assets/brand/logo.png`) |
 | Feature / category icons | `lib/core/theme/app_icons.dart` + `app_asset_icon.dart` (`assets/*.png`) |
 | Accent previews | `assets/brand/appearance_preview/icon-accent-*.png` |
@@ -47,7 +49,7 @@ Consult this file before grepping the repo. Update when adding modules under `li
 | Copy (VI) | `lib/core/l10n/strings.dart` |
 | Theme | `lib/core/theme/app_theme.dart` (Nunito), `app_color_scheme.dart` (incl. category colors), `app_spacing.dart` |
 | Fonts | `assets/fonts/Nunito/static/` (Regular 400 · Medium 500 · SemiBold 600 · Bold 700) |
-| Domain | `electricity_validation.dart`, `water_validation.dart`, `meter_math.dart`, `month_balance.dart`, `expense_totals.dart`, `selected_home.dart`, `period_history_filter.dart` |
+| Domain | `electricity_validation.dart`, `water_validation.dart`, `meter_math.dart`, `month_balance.dart`, `month_clamp.dart`, `expense_totals.dart`, `selected_home.dart`, `period_history_filter.dart`, `pwa_install.dart` |
 | Models | `home.dart`, `electricity_period.dart`, `water_period.dart`, `expense.dart`, `income.dart`, `tracking_mode.dart` |
 | Services | `home_service.dart`, `invite_service.dart`, `electricity_service.dart` (`BillPhotoService`), `water_service.dart`, `expense_service.dart`, `income_service.dart` |
 
@@ -81,5 +83,6 @@ Consult this file before grepping the repo. Update when adding modules under `li
 - `lib/features/income/`
 - `lib/features/homes/`
 - `lib/features/settings/`
+- `lib/features/pwa/`
 - `lib/features/shared/`
 - `lib/features/shell/`

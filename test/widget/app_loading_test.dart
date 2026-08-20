@@ -5,7 +5,6 @@ import "package:home_manager/core/theme/app_accent.dart";
 import "package:home_manager/core/theme/app_theme.dart";
 import "package:home_manager/features/shared/app_brand_logo.dart";
 import "package:home_manager/features/shared/app_loading.dart";
-import "package:home_manager/features/shared/skeleton.dart";
 
 void main() {
   testWidgets("LoadingOverlay shows loader when loading", (tester) async {
@@ -24,7 +23,9 @@ void main() {
     );
 
     expect(find.text("content"), findsOneWidget);
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.byType(AppLoader), findsOneWidget);
+    expect(find.byType(AppBrandLogo), findsOneWidget);
+    expect(tester.widget<AppLoader>(find.byType(AppLoader)).size, 88);
   });
 
   testWidgets("LoadingOverlay hides loader when not loading", (tester) async {
@@ -43,10 +44,10 @@ void main() {
     );
 
     expect(find.text("content"), findsOneWidget);
-    expect(find.byType(CircularProgressIndicator), findsNothing);
+    expect(find.byType(AppLoader), findsNothing);
   });
 
-  testWidgets("BrandedLoadingScreen shows logo, tagline, and skeleton", (
+  testWidgets("BrandedLoadingScreen shows logo spinner and tagline", (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -59,10 +60,10 @@ void main() {
       ),
     );
 
+    expect(find.byType(AppLoader), findsOneWidget);
     expect(find.byType(AppBrandLogo), findsOneWidget);
     expect(find.text(S.appName), findsOneWidget);
-    expect(find.byType(SkeletonBox), findsWidgets);
-    expect(find.byType(CircularProgressIndicator), findsNothing);
+    expect(find.text(S.appTagline), findsOneWidget);
   });
 
   testWidgets("LoadingScreen delegates to BrandedLoadingScreen", (

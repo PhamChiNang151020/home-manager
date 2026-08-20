@@ -1,6 +1,10 @@
 import "package:flutter/material.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/features/shared/select_sheet.dart";
+
+export "package:home_manager/features/shared/select_sheet.dart"
+    show SelectOption;
 
 class LabeledTextField extends StatelessWidget {
   const LabeledTextField({
@@ -59,33 +63,90 @@ class LabeledDropdownField<T> extends StatelessWidget {
     required this.items,
     required this.onChanged,
     this.enabled = true,
+    this.helperText,
+    this.compact = false,
   });
 
   final String label;
   final T value;
-  final List<DropdownMenuItem<T>> items;
+  final List<SelectOption<T>> items;
   final ValueChanged<T?>? onChanged;
   final bool enabled;
+  final String? helperText;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final labelStyle =
+        compact
+            ? Theme.of(
+              context,
+            ).textTheme.labelSmall?.copyWith(color: colors.textSecondary)
+            : Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: colors.textSecondary,
+              fontWeight: FontWeight.w500,
+            );
+    SelectOption<T>? selected;
+    for (final item in items) {
+      if (item.value == value) {
+        selected = item;
+        break;
+      }
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          label,
-          style: Theme.of(context).textTheme.labelLarge?.copyWith(
-            color: colors.textSecondary,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
+        Text(label, style: labelStyle),
         const SizedBox(height: AppSpacing.xs),
-        DropdownButtonFormField<T>(
-          value: value,
-          items: items,
-          onChanged: enabled ? onChanged : null,
-          decoration: const InputDecoration(),
+        InkWell(
+          onTap:
+              enabled
+                  ? () async {
+                    final choice = await showSelectSheet<T>(
+                      context: context,
+                      title: label,
+                      value: value,
+                      items: items,
+                    );
+                    if (choice != null) onChanged?.call(choice.value);
+                  }
+                  : null,
+          borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+          child: InputDecorator(
+            decoration: InputDecoration(
+              enabled: enabled,
+              helperText: helperText,
+              helperMaxLines: 3,
+              isDense: compact,
+              contentPadding:
+                  compact
+                      ? const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.sm,
+                        vertical: AppSpacing.sm,
+                      )
+                      : null,
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: DefaultTextStyle.merge(
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(color: colors.textPrimary),
+                    child:
+                        selected?.builder(context) ?? const SizedBox.shrink(),
+                  ),
+                ),
+                Icon(
+                  Icons.expand_more,
+                  color: colors.textSecondary,
+                  size: compact ? 18 : 22,
+                ),
+              ],
+            ),
+          ),
         ),
       ],
     );

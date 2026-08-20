@@ -19,6 +19,7 @@ import "package:home_manager/features/shared/form_title.dart";
 import "package:home_manager/features/shared/labeled_money_field.dart";
 import "package:home_manager/features/shared/labeled_text_field.dart";
 import "package:home_manager/features/shared/month_picker.dart";
+import "package:home_manager/features/shared/period_detail_view.dart";
 import "package:image_picker/image_picker.dart";
 import "package:intl/intl.dart";
 
@@ -622,11 +623,18 @@ class _WaterPeriodDialogState extends State<_WaterPeriodDialog> {
               ],
             ),
             if (!_editing) ...[
-              // ── VIEW MODE ─────────────────────────────────────────────
-              _PeriodDetailView(
-                existing: widget.existing,
-                colors: colors,
-                isMeter: _isMeter,
+              PeriodDetailView(
+                month: widget.existing.periodMonth,
+                amountVnd: widget.existing.amountVnd,
+                recordedAt: widget.existing.recordedAt,
+                isPaid: widget.existing.isPaid,
+                consumptionIcon: Icons.water_drop_outlined,
+                consumptionValue:
+                    _isMeter
+                        ? "${_fmtM3Form(widget.existing.previousM3)} → ${_fmtM3Form(widget.existing.newM3)} m³"
+                            "${widget.existing.consumptionM3 != null ? "  (${_fmtM3Form(widget.existing.consumptionM3!)} m³)" : ""}"
+                        : null,
+                photoPath: widget.existing.photoPath,
                 onViewPhoto:
                     hasPhoto
                         ? () => showBillPhotoViewer(
@@ -635,6 +643,7 @@ class _WaterPeriodDialogState extends State<_WaterPeriodDialog> {
                           photos: widget.photos,
                         )
                         : null,
+                note: widget.existing.note,
               ),
             ] else ...[
               // ── EDIT MODE ─────────────────────────────────────────────
@@ -721,7 +730,7 @@ class _WaterPeriodDialogState extends State<_WaterPeriodDialog> {
                                 ),
                         icon: const Icon(Icons.image_outlined),
                         label: Text(
-                          _photoBytes != null ? S.pickPhoto : S.hasPhoto,
+                          _photoBytes != null ? S.pickPhoto : S.viewPhoto,
                         ),
                       ),
                     ),
@@ -775,192 +784,4 @@ String _fmtM3Form(double? kwh) {
   return kwh == rounded.toDouble()
       ? rounded.toString()
       : kwh.toStringAsFixed(1);
-}
-
-// ── Period detail view (read-only, 2-column info layout) ───────────────────
-
-class _PeriodDetailView extends StatelessWidget {
-  const _PeriodDetailView({
-    required this.existing,
-    required this.colors,
-    required this.isMeter,
-    required this.onViewPhoto,
-  });
-
-  final WaterPeriod existing;
-  final AppColorScheme colors;
-  final bool isMeter;
-  final VoidCallback? onViewPhoto;
-
-  @override
-  Widget build(BuildContext context) {
-    final monthLabel = DateFormat("MM/yyyy").format(existing.periodMonth);
-    final recordedLabel = DateFormat(
-      "dd/MM/yyyy HH:mm",
-    ).format(existing.recordedAt.toLocal());
-    final hasNote = existing.note != null && existing.note!.isNotEmpty;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: AppSpacing.sm),
-        // ── tháng ─────────────────────────────────────────────────────────
-        _InfoRow(
-          icon: Icons.calendar_today_outlined,
-          label: S.month,
-          value: monthLabel,
-          colors: colors,
-        ),
-        const Divider(height: AppSpacing.md),
-        // ── số tiền ───────────────────────────────────────────────────────
-        _InfoRow(
-          icon: Icons.payments_outlined,
-          label: S.amount,
-          value: VndFormat.format(existing.amountVnd),
-          valueColor: colors.accent,
-          valueBold: true,
-          colors: colors,
-        ),
-        if (isMeter) ...[
-          const Divider(height: AppSpacing.md),
-          // ── số cũ → số mới ─────────────────────────────────────────────
-          _InfoRow(
-            icon: Icons.water_drop_outlined,
-            label: S.consumption,
-            value:
-                "${_fmtM3Form(existing.previousM3)} → ${_fmtM3Form(existing.newM3)} m³"
-                "${existing.consumptionM3 != null ? "  (${_fmtM3Form(existing.consumptionM3!)} m³)" : ""}",
-            colors: colors,
-          ),
-        ],
-        const Divider(height: AppSpacing.md),
-        // ── ngày ghi + ảnh (2 cột) ────────────────────────────────────────
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: _InfoRow(
-                icon: Icons.schedule_outlined,
-                label: S.recordedAt,
-                value: recordedLabel,
-                colors: colors,
-              ),
-            ),
-            const SizedBox(width: AppSpacing.sm),
-            Expanded(
-              child: _InfoRow(
-                icon: Icons.image_outlined,
-                label: S.photo,
-                value: existing.photoPath != null ? S.hasPhoto : S.noPhoto,
-                valueColor:
-                    existing.photoPath != null
-                        ? colors.success
-                        : colors.textMuted,
-                onTap: onViewPhoto,
-                colors: colors,
-              ),
-            ),
-          ],
-        ),
-        const Divider(height: AppSpacing.md),
-        // ── trạng thái + ghi chú (2 cột) ─────────────────────────────────
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: _InfoRow(
-                icon: Icons.check_circle_outline,
-                label: S.paid,
-                value: existing.isPaid ? S.paid : S.unpaid,
-                valueColor:
-                    existing.isPaid ? colors.success : colors.textSecondary,
-                colors: colors,
-              ),
-            ),
-            if (hasNote) ...[
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: _InfoRow(
-                  icon: Icons.notes_outlined,
-                  label: S.note,
-                  value: existing.note!,
-                  colors: colors,
-                ),
-              ),
-            ],
-          ],
-        ),
-        const SizedBox(height: AppSpacing.sm),
-      ],
-    );
-  }
-}
-
-class _InfoRow extends StatelessWidget {
-  const _InfoRow({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.colors,
-    this.valueColor,
-    this.valueBold = false,
-    this.onTap,
-  });
-
-  final IconData icon;
-  final String label;
-  final String value;
-  final AppColorScheme colors;
-  final Color? valueColor;
-  final bool valueBold;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final valueWidget = Text(
-      value,
-      style: TextStyle(
-        color: valueColor ?? colors.textPrimary,
-        fontWeight: valueBold ? FontWeight.w600 : FontWeight.normal,
-        fontSize: 14,
-      ),
-    );
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(icon, size: 14, color: colors.textSecondary),
-              const SizedBox(width: 4),
-              Text(
-                label,
-                style: TextStyle(
-                  color: colors.textSecondary,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          onTap != null
-              ? DecoratedBox(
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: colors.accent.withValues(alpha: 0.5),
-                      width: 1,
-                    ),
-                  ),
-                ),
-                child: valueWidget,
-              )
-              : valueWidget,
-        ],
-      ),
-    );
-  }
 }

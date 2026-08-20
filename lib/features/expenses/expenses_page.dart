@@ -1,5 +1,6 @@
 import "package:flutter/material.dart";
 import "package:home_manager/core/domain/expense_totals.dart";
+import "package:home_manager/core/domain/month_clamp.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/logging/app_log.dart";
 import "package:home_manager/core/models/expense.dart";
@@ -20,7 +21,7 @@ import "package:home_manager/features/shared/error_view.dart";
 import "package:home_manager/features/shared/loading_view.dart";
 import "package:home_manager/features/shared/labeled_text_field.dart";
 import "package:home_manager/features/shared/money_text.dart";
-import "package:home_manager/features/shared/month_picker.dart";
+import "package:home_manager/features/shared/month_stepper_field.dart";
 import "package:home_manager/features/shared/section_header.dart";
 import "package:intl/intl.dart";
 
@@ -57,8 +58,7 @@ class ExpensesPageState extends State<ExpensesPage> {
   @override
   void initState() {
     super.initState();
-    final now = DateTime.now();
-    _month = DateTime(now.year, now.month);
+    _month = currentMonth();
     _load();
   }
 
@@ -168,24 +168,15 @@ class ExpensesPageState extends State<ExpensesPage> {
       child: RefreshIndicator(
         onRefresh: _load,
         child: ListView(
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+          padding: AppSpacing.shellListPadding,
           children: [
             AnimatedEntrance(
               index: 0,
-              child: LabeledPickerField(
-                label: S.month,
-                value: DateFormat("MM/yyyy").format(_month),
-                onTap: () async {
-                  final picked = await showMonthPicker(
-                    context: context,
-                    initialDate: _month,
-                  );
-                  if (picked != null) {
-                    setState(
-                      () => _month = DateTime(picked.year, picked.month),
-                    );
-                    _load();
-                  }
+              child: MonthStepperField(
+                month: _month,
+                onChanged: (value) {
+                  setState(() => _month = value);
+                  _load();
                 },
               ),
             ),
@@ -197,14 +188,14 @@ class ExpensesPageState extends State<ExpensesPage> {
                     label: S.category,
                     value: _filterCategoryId,
                     items: [
-                      const DropdownMenuItem(
+                      SelectOption(
                         value: null,
-                        child: Text(S.filterAll),
+                        builder: (_) => const Text(S.filterAll),
                       ),
                       for (final category in _categories)
-                        DropdownMenuItem(
+                        SelectOption(
                           value: category.id,
-                          child: Text(category.name),
+                          builder: (_) => Text(category.name),
                         ),
                     ],
                     onChanged: (value) {
@@ -219,16 +210,19 @@ class ExpensesPageState extends State<ExpensesPage> {
                     label: S.paidBy,
                     value: _filterPaidBy,
                     items: [
-                      const DropdownMenuItem(
+                      SelectOption(
                         value: null,
-                        child: Text(S.filterAll),
+                        builder: (_) => const Text(S.filterAll),
                       ),
                       for (final member in _members)
-                        DropdownMenuItem(
+                        SelectOption(
                           value: member.userId,
-                          child: Text(
-                            member.displayName ?? member.email ?? member.userId,
-                          ),
+                          builder:
+                              (_) => Text(
+                                member.displayName ??
+                                    member.email ??
+                                    member.userId,
+                              ),
                         ),
                     ],
                     onChanged: (value) {

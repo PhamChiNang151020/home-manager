@@ -11,6 +11,7 @@ import "package:home_manager/core/theme/mobile_viewport.dart";
 import "package:home_manager/features/expenses/expenses_page.dart";
 import "package:home_manager/features/homes/create_home_dialog.dart";
 import "package:home_manager/features/overview/overview_page.dart";
+import "package:home_manager/features/pwa/install_home_screen_banner.dart";
 import "package:home_manager/features/settings/settings_hub_page.dart";
 import "package:home_manager/features/shared/app_asset_icon.dart";
 import "package:home_manager/features/shared/app_loading.dart";
@@ -48,7 +49,6 @@ class _AppShellState extends State<AppShell> {
       color: colors.bgBase,
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        extendBody: true,
         appBar: AppBar(
           backgroundColor: colors.bgBase,
           surfaceTintColor: Colors.transparent,
@@ -83,80 +83,78 @@ class _AppShellState extends State<AppShell> {
                       ],
                     ),
                   ),
-          actions: [
-            if (home != null)
-              Padding(
-                padding: const EdgeInsets.only(
-                  right: AppSpacing.screenHorizontal,
-                ),
-                child: Center(child: trackingModeChip(home.trackingMode)),
-              ),
-          ],
         ),
         body: MobileViewport(
-          child: LoadingOverlay(
-            loading: session.loading,
-            child:
-                home == null
-                    ? Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Text(S.noHomes),
-                          const SizedBox(height: AppSpacing.md),
-                          FilledButton(
-                            onPressed:
-                                () => showCreateHomeDialog(
-                                  context: context,
-                                  homesApi: services.homes,
-                                  onCreated: session.refreshHomes,
+          child: Column(
+            children: [
+              const InstallHomeScreenBanner(),
+              Expanded(
+                child: LoadingOverlay(
+                  loading: session.loading,
+                  child:
+                      home == null
+                          ? Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Text(S.noHomes),
+                                const SizedBox(height: AppSpacing.md),
+                                FilledButton(
+                                  onPressed:
+                                      () => showCreateHomeDialog(
+                                        context: context,
+                                        homesApi: services.homes,
+                                        onCreated: session.refreshHomes,
+                                      ),
+                                  child: const Text(S.addHome),
                                 ),
-                            child: const Text(S.addHome),
+                              ],
+                            ),
+                          )
+                          : AnimatedSwitcher(
+                            duration: AppMotion.normal,
+                            switchInCurve: AppCurves.enter,
+                            switchOutCurve: AppCurves.exit,
+                            transitionBuilder: (child, animation) {
+                              return FadeTransition(
+                                opacity: animation,
+                                child: SlideTransition(
+                                  position: Tween<Offset>(
+                                    begin: const Offset(0, 0.02),
+                                    end: Offset.zero,
+                                  ).animate(animation),
+                                  child: child,
+                                ),
+                              );
+                            },
+                            child: switch (_tab) {
+                              0 => OverviewPage(
+                                key: ValueKey("overview-${home.id}"),
+                                home: home,
+                                services: services,
+                              ),
+                              1 => ExpensesPage(
+                                key: _expensesKey,
+                                home: home,
+                                expenses: services.expenses,
+                                homesApi: services.homes,
+                                photos: services.photos,
+                                currentUserId: session.user?.id ?? "",
+                              ),
+                              _ => SettingsHubPage(
+                                key: ValueKey("settings-${home.id}"),
+                                home: home,
+                                homesApi: services.homes,
+                                invites: services.invites,
+                                theme: widget.theme,
+                                onChanged: session.refreshHomes,
+                                onSignOut: session.signOut,
+                              ),
+                            },
                           ),
-                        ],
-                      ),
-                    )
-                    : AnimatedSwitcher(
-                      duration: AppMotion.normal,
-                      switchInCurve: AppCurves.enter,
-                      switchOutCurve: AppCurves.exit,
-                      transitionBuilder: (child, animation) {
-                        return FadeTransition(
-                          opacity: animation,
-                          child: SlideTransition(
-                            position: Tween<Offset>(
-                              begin: const Offset(0, 0.02),
-                              end: Offset.zero,
-                            ).animate(animation),
-                            child: child,
-                          ),
-                        );
-                      },
-                      child: switch (_tab) {
-                        0 => OverviewPage(
-                          key: ValueKey("overview-${home.id}"),
-                          home: home,
-                          services: services,
-                        ),
-                        1 => ExpensesPage(
-                          key: _expensesKey,
-                          home: home,
-                          expenses: services.expenses,
-                          homesApi: services.homes,
-                          photos: services.photos,
-                          currentUserId: session.user?.id ?? "",
-                        ),
-                        _ => SettingsHubPage(
-                          key: ValueKey("settings-${home.id}"),
-                          home: home,
-                          homesApi: services.homes,
-                          invites: services.invites,
-                          theme: widget.theme,
-                          onChanged: session.refreshHomes,
-                          onSignOut: session.signOut,
-                        ),
-                      },
-                    ),
+                ),
+              ),
+            ],
           ),
         ),
         bottomNavigationBar:

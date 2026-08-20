@@ -1,10 +1,8 @@
 import "package:flutter/material.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/models/home.dart";
-import "package:home_manager/core/models/tracking_mode.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
-import "package:home_manager/features/shared/status_badge.dart";
 
 Future<void> showHomePickerSheet({
   required BuildContext context,
@@ -50,11 +48,6 @@ Future<void> showHomePickerSheet({
                             : colors.textMuted,
                   ),
                   title: Text(home.name),
-                  subtitle: Text(
-                    home.trackingMode == TrackingMode.meter
-                        ? S.modeMeter
-                        : S.modeInvoice,
-                  ),
                   onTap: () {
                     Navigator.pop(context);
                     onSelected(home);
@@ -75,15 +68,5 @@ Future<void> showHomePickerSheet({
         ),
       );
     },
-  );
-}
-
-Widget trackingModeChip(TrackingMode mode) {
-  return StatusBadge(
-    label: mode == TrackingMode.meter ? S.modeMeterShort : S.modeInvoiceShort,
-    variant:
-        mode == TrackingMode.meter
-            ? StatusBadgeVariant.accent
-            : StatusBadgeVariant.neutral,
   );
 }

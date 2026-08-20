@@ -1,6 +1,28 @@
 import "package:flutter/material.dart";
+import "package:home_manager/core/domain/month_clamp.dart";
 import "package:home_manager/core/l10n/app_locale.dart";
 import "package:home_manager/core/l10n/strings.dart";
+
+Future<DateTime?> showAppDatePicker({
+  required BuildContext context,
+  required DateTime initialDate,
+  DateTime? firstDate,
+  DateTime? lastDate,
+  String? helpText,
+}) {
+  final first = firstDate ?? DateTime(2020);
+  final last = lastDate ?? today();
+  return showDatePicker(
+    context: context,
+    locale: AppLocale.locale,
+    initialDate: clampDate(initialDate, first: first, last: last),
+    firstDate: first,
+    lastDate: last,
+    helpText: helpText,
+    cancelText: S.cancel,
+    confirmText: S.ok,
+  );
+}
 
 Future<DateTime?> showDateTimePicker({
   required BuildContext context,
@@ -8,15 +30,12 @@ Future<DateTime?> showDateTimePicker({
   DateTime? firstDate,
   DateTime? lastDate,
 }) async {
-  final date = await showDatePicker(
+  final date = await showAppDatePicker(
     context: context,
-    locale: AppLocale.locale,
     initialDate: initialDateTime,
-    firstDate: firstDate ?? DateTime(2020),
-    lastDate: lastDate ?? DateTime(2100),
+    firstDate: firstDate,
+    lastDate: lastDate,
     helpText: S.selectRecordedAt,
-    cancelText: S.cancel,
-    confirmText: S.ok,
   );
   if (date == null || !context.mounted) return null;
 

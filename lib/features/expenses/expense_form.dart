@@ -11,6 +11,7 @@ import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/electricity/bill_photo_viewer.dart";
 import "package:home_manager/features/expenses/expense_category_style.dart";
+import "package:home_manager/features/shared/datetime_picker.dart";
 import "package:home_manager/features/shared/form_title.dart";
 import "package:home_manager/features/shared/labeled_money_field.dart";
 import "package:home_manager/features/shared/labeled_text_field.dart";
@@ -210,19 +211,20 @@ class _ExpenseFormSheetState extends State<_ExpenseFormSheet> {
               value: _categoryId,
               items: [
                 for (final category in widget.categories)
-                  DropdownMenuItem(
+                  SelectOption(
                     value: category.id,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ExpenseCategoryIcon(
-                          iconKey: category.iconKey,
-                          size: 20,
+                    builder:
+                        (_) => Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ExpenseCategoryIcon(
+                              iconKey: category.iconKey,
+                              size: 20,
+                            ),
+                            const SizedBox(width: AppSpacing.sm),
+                            Text(category.name),
+                          ],
                         ),
-                        const SizedBox(width: AppSpacing.sm),
-                        Text(category.name),
-                      ],
-                    ),
                   ),
               ],
               onChanged: (value) {
@@ -235,13 +237,14 @@ class _ExpenseFormSheetState extends State<_ExpenseFormSheet> {
               value: _paidBy,
               items: [
                 if (widget.members.every((member) => member.userId != _paidBy))
-                  DropdownMenuItem(value: _paidBy, child: Text(_paidBy)),
+                  SelectOption(value: _paidBy, builder: (_) => Text(_paidBy)),
                 for (final member in widget.members)
-                  DropdownMenuItem(
+                  SelectOption(
                     value: member.userId,
-                    child: Text(
-                      member.displayName ?? member.email ?? member.userId,
-                    ),
+                    builder:
+                        (_) => Text(
+                          member.displayName ?? member.email ?? member.userId,
+                        ),
                   ),
               ],
               onChanged: (value) {
@@ -253,13 +256,9 @@ class _ExpenseFormSheetState extends State<_ExpenseFormSheet> {
               label: S.expenseDate,
               value: DateFormat("dd/MM/yyyy").format(_date),
               onTap: () async {
-                final picked = await showDatePicker(
+                final picked = await showAppDatePicker(
                   context: context,
                   initialDate: _date,
-                  firstDate: DateTime(2020),
-                  lastDate: DateTime(2100),
-                  cancelText: S.cancel,
-                  confirmText: S.ok,
                 );
                 if (picked != null) setState(() => _date = picked);
               },
@@ -267,33 +266,48 @@ class _ExpenseFormSheetState extends State<_ExpenseFormSheet> {
             const SizedBox(height: AppSpacing.formFieldGap),
             LabeledTextField(label: S.note, controller: _note),
             const SizedBox(height: AppSpacing.md),
-            OutlinedButton.icon(
-              onPressed: () async {
-                final file = await ImagePicker().pickImage(
-                  source: ImageSource.gallery,
-                  imageQuality: 70,
-                  maxWidth: 1600,
-                );
-                if (file != null) {
-                  final bytes = await file.readAsBytes();
-                  setState(() => _photoBytes = bytes);
-                }
-              },
-              icon: const Icon(Icons.photo_camera_outlined),
-              label: Text(
-                _photoBytes != null || hasPhoto ? "${S.photo} ✓" : S.pickPhoto,
-              ),
-            ),
-            if (hasPhoto && _photoBytes == null)
-              TextButton(
-                onPressed:
-                    () => showBillPhotoViewer(
-                      context: context,
-                      photoPath: existing.receiptPhotoPath!,
-                      photos: widget.photos,
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      final file = await ImagePicker().pickImage(
+                        source: ImageSource.gallery,
+                        imageQuality: 70,
+                        maxWidth: 1600,
+                      );
+                      if (file != null) {
+                        final bytes = await file.readAsBytes();
+                        setState(() => _photoBytes = bytes);
+                      }
+                    },
+                    icon: const Icon(Icons.photo_camera_outlined),
+                    label: Text(
+                      _photoBytes != null ? "${S.photo} ✓" : S.pickPhoto,
                     ),
-                child: const Text(S.hasPhoto),
-              ),
+                  ),
+                ),
+                if (hasPhoto || _photoBytes != null) ...[
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed:
+                          _photoBytes != null
+                              ? null
+                              : () => showBillPhotoViewer(
+                                context: context,
+                                photoPath: existing!.receiptPhotoPath!,
+                                photos: widget.photos,
+                              ),
+                      icon: const Icon(Icons.image_outlined),
+                      label: Text(
+                        _photoBytes != null ? S.pickPhoto : S.viewPhoto,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
             if (_error != null)
               Padding(
                 padding: const EdgeInsets.only(top: AppSpacing.sm),

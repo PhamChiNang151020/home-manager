@@ -31,4 +31,30 @@ void main() {
     expect(find.text(S.monthSpend), findsOneWidget);
     expect(find.text(S.monthNet), findsOneWidget);
   });
+
+  testWidgets("shows spend delta chip when percent is provided", (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.build(
+          brightness: Brightness.light,
+          accent: AppAccent.amber,
+        ),
+        home: const Scaffold(
+          body: OverviewSummaryCard(
+            balance: MonthBalance(
+              income: 20000000,
+              electricity: 700000,
+              water: 150000,
+              expenses: 4000000,
+            ),
+            spendDeltaPercent: 12,
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text("+12%"), findsOneWidget);
+  });
 }

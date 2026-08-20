@@ -7,10 +7,12 @@ class StatusBadge extends StatelessWidget {
     super.key,
     required this.label,
     this.variant = StatusBadgeVariant.neutral,
+    this.large = false,
   });
 
   final String label;
   final StatusBadgeVariant variant;
+  final bool large;
 
   @override
   Widget build(BuildContext context) {
@@ -25,9 +27,9 @@ class StatusBadge extends StatelessWidget {
       StatusBadgeVariant.neutral => (colors.bgElevated, colors.textSecondary),
     };
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.xs,
+      padding: EdgeInsets.symmetric(
+        horizontal: large ? AppSpacing.md : AppSpacing.sm,
+        vertical: large ? AppSpacing.sm : AppSpacing.xs,
       ),
       decoration: BoxDecoration(
         color: bg,
@@ -35,7 +37,11 @@ class StatusBadge extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: TextStyle(color: fg, fontSize: 12, fontWeight: FontWeight.w500),
+        style: TextStyle(
+          color: fg,
+          fontSize: large ? 15 : 12,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }

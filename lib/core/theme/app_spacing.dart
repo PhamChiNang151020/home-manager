@@ -1,3 +1,5 @@
+import "package:flutter/material.dart";
+
 abstract final class AppSpacing {
   static const xs = 4.0;
   static const sm = 8.0;
@@ -9,4 +11,5 @@ abstract final class AppSpacing {
   static const cardRadius = 16.0;
   static const inputRadius = 12.0;
   static const maxContentWidth = 480.0;
+  static const shellListPadding = EdgeInsets.fromLTRB(0, sm, 0, lg);
 }

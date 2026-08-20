@@ -1,6 +1,6 @@
 abstract final class S {
   static const appName = "Tổ Ấm";
-  static const appTagline = "Tổ Ấm";
+  static const appTagline = "Giữ ấm tổ ấm, giữ vững chi tiêu";
   static const signInGoogle = "Đăng nhập bằng Google";
   static const signInHint =
       "Dùng tài khoản Google để đồng bộ điện với gia đình.";
@@ -34,9 +34,13 @@ abstract final class S {
   static const homes = "Nhà";
   static const addHome = "Thêm nhà";
   static const homeName = "Tên nhà";
-  static const trackingMode = "Cách ghi điện";
-  static const modeMeter = "Công tơ (nhập số điện)";
-  static const modeInvoice = "Hoá đơn (MoMo / ngân hàng)";
+  static const trackingMode = "Cách nhập điện / nước";
+  static const modeMeter = "Nhập số công tơ — tự tính tiền";
+  static const modeInvoice = "Nhập tiền trên hoá đơn";
+  static const modeMeterHint =
+      "Nhà có đồng hồ. Mỗi kỳ nhập số cũ và số mới; app nhân với đơn giá.";
+  static const modeInvoiceHint =
+      "Nhà nhận hoá đơn MoMo hoặc ngân hàng. Chỉ nhập số tiền và ảnh.";
   static const save = "Lưu";
   static const edit = "Sửa";
   static const delete = "Xóa";
@@ -51,6 +55,9 @@ abstract final class S {
   static const amount = "Số tiền (đ)";
   static const month = "Tháng";
   static const selectMonth = "Chọn tháng";
+  static const previousMonth = "Tháng trước";
+  static const nextMonth = "Tháng sau";
+  static const spendTrend = "Tổng chi 6 tháng";
   static const ok = "OK";
   static const note = "Ghi chú";
   static const photo = "Ảnh hoá đơn";
@@ -97,12 +104,11 @@ abstract final class S {
   static const invalidAmount = "Nhập số tiền hợp lệ.";
   static const roleOwnerOnly = "Chỉ chủ nhà mới sửa cài đặt và mời người.";
   static const switchHome = "Chọn nhà";
-  static const modeMeterShort = "Công tơ";
-  static const modeInvoiceShort = "Hoá đơn";
   static const lastPeriod = "Kỳ gần nhất";
   static const avgSixMonths = "TB 6 tháng";
   static const trendSixMonths = "6 tháng gần đây";
   static const hasPhoto = "Có ảnh";
+  static const viewPhoto = "Xem ảnh";
   static const noPhoto = "Chưa ảnh";
   static const retry = "Thử lại";
   static const settingsHome = "Nhà";
@@ -110,11 +116,28 @@ abstract final class S {
   static const settingsMembers = "Thành viên";
   static const settingsAccount = "Tài khoản";
   static const settingsAppearance = "Giao diện";
+  static const settingsInstall = "Thêm ra Màn hình chính";
   static const settingsHomeDesc = "Tên nhà, đơn giá điện / nước";
   static const settingsScheduleDesc = "Ngày chụp, lương, nhắc · xuất .ics";
   static const settingsMembersDesc = "Thành viên và lời mời";
   static const settingsAccountDesc = "Đăng xuất";
   static const settingsAppearanceDesc = "Sáng / tối, màu nhấn";
+  static const settingsInstallDesc = "Mã QR gửi ảnh cho người nhà";
+  static const installBannerTitle = "Thêm Tổ Ấm ra Màn hình chính";
+  static const installBannerIosSafari =
+      "Safari → nút Chia sẻ → Thêm vào Màn hình chính.";
+  static const installBannerIosInApp =
+      "Zalo/Messenger không cài được. Bấm ⋯ → Mở bằng Safari, rồi Chia sẻ → Thêm vào Màn hình chính.";
+  static const installBannerAndroid =
+      "Chrome → menu ⋮ → Cài đặt ứng dụng (hoặc Thêm vào màn hình chính).";
+  static const installBannerAndroidInApp =
+      "Mở bằng Chrome, đừng mở trong Zalo. Rồi menu ⋮ → Thêm vào màn hình chính.";
+  static const installGuide = "Xem mã QR";
+  static const installDismiss = "Đóng";
+  static const installQrHint =
+      "Chụp màn hình mã này rồi gửi ảnh. Người nhà mở Safari (iPhone) hoặc Chrome (Android), quét mã, rồi thêm ra Màn hình chính.";
+  static const installCopyLink = "Sao chép liên kết (cho bạn)";
+  static const installLinkCopied = "Đã sao chép liên kết";
   static const themeModeLabel = "Chế độ";
   static const themeModeSystem = "Hệ thống";
   static const themeModeLight = "Sáng";

@@ -39,14 +39,18 @@ Future<void> showCreateHomeDialog({
                   LabeledDropdownField<TrackingMode>(
                     label: S.trackingMode,
                     value: mode,
-                    items: const [
-                      DropdownMenuItem(
+                    helperText:
+                        mode == TrackingMode.meter
+                            ? S.modeMeterHint
+                            : S.modeInvoiceHint,
+                    items: [
+                      SelectOption(
                         value: TrackingMode.meter,
-                        child: Text(S.modeMeter),
+                        builder: (_) => const Text(S.modeMeter),
                       ),
-                      DropdownMenuItem(
+                      SelectOption(
                         value: TrackingMode.invoice,
-                        child: Text(S.modeInvoice),
+                        builder: (_) => const Text(S.modeInvoice),
                       ),
                     ],
                     onChanged: (value) => setState(() => mode = value ?? mode),

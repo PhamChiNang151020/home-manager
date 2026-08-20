@@ -1,21 +1,22 @@
+import "dart:math" as math;
+
 import "package:flutter/material.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/shared/app_brand_logo.dart";
-import "package:home_manager/features/shared/skeleton.dart";
 
 class AppLoader extends StatefulWidget {
   const AppLoader({
     super.key,
-    this.size = 36,
-    this.strokeWidth = 3,
+    this.size = 56,
+    this.strokeWidth = 2.5,
     this.color,
   });
 
   const AppLoader.compact({
     super.key,
-    this.size = 16,
+    this.size = 28,
     this.strokeWidth = 2,
     this.color,
   });
@@ -31,19 +32,14 @@ class AppLoader extends StatefulWidget {
 class _AppLoaderState extends State<AppLoader>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  late final Animation<double> _pulse;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1200),
+      duration: const Duration(milliseconds: 900),
     )..repeat();
-    _pulse = Tween<double>(
-      begin: 0.55,
-      end: 1,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -55,20 +51,66 @@ class _AppLoaderState extends State<AppLoader>
   @override
   Widget build(BuildContext context) {
     final color = widget.color ?? context.appColors.accent;
-    return AnimatedBuilder(
-      animation: _pulse,
-      builder: (context, child) {
-        return Opacity(opacity: _pulse.value, child: child);
-      },
+    final logoSize = widget.size * 0.55;
+    return Semantics(
+      label: S.appName,
       child: SizedBox(
         width: widget.size,
         height: widget.size,
-        child: CircularProgressIndicator(
-          strokeWidth: widget.strokeWidth,
-          color: color,
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return Stack(
+              alignment: Alignment.center,
+              children: [
+                Transform.rotate(
+                  angle: _controller.value * 2 * math.pi,
+                  child: CustomPaint(
+                    size: Size.square(widget.size),
+                    painter: _ArcSpinnerPainter(
+                      color: color,
+                      strokeWidth: widget.strokeWidth,
+                    ),
+                  ),
+                ),
+                child!,
+              ],
+            );
+          },
+          child: AppBrandLogo(size: logoSize),
         ),
       ),
     );
+  }
+}
+
+class _ArcSpinnerPainter extends CustomPainter {
+  _ArcSpinnerPainter({required this.color, required this.strokeWidth});
+
+  final Color color;
+  final double strokeWidth;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final inset = strokeWidth / 2;
+    final rect = Rect.fromLTWH(
+      inset,
+      inset,
+      size.width - strokeWidth,
+      size.height - strokeWidth,
+    );
+    final paint =
+        Paint()
+          ..color = color
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = strokeWidth
+          ..strokeCap = StrokeCap.round;
+    canvas.drawArc(rect, -math.pi / 2, math.pi * 1.35, false, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _ArcSpinnerPainter oldDelegate) {
+    return oldDelegate.color != color || oldDelegate.strokeWidth != strokeWidth;
   }
 }
 
@@ -98,7 +140,7 @@ class LoadingOverlay extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const AppLoader(),
+                    const AppLoader(size: 88),
                     if (message != null) ...[
                       const SizedBox(height: 16),
                       Text(
@@ -143,49 +185,36 @@ class BrandedLoadingScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         body: SafeArea(
           child: Center(
-            child: SingleChildScrollView(
+            child: Padding(
               padding: const EdgeInsets.all(AppSpacing.lg),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 320),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const AppBrandLogo(size: 72),
-                    const SizedBox(height: AppSpacing.md),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const AppLoader(size: 88),
+                  const SizedBox(height: AppSpacing.md),
+                  Text(
+                    S.appName,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: colors.textSecondary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    S.appTagline,
+                    style: TextStyle(color: colors.textMuted),
+                    textAlign: TextAlign.center,
+                  ),
+                  if (message != null) ...[
+                    const SizedBox(height: AppSpacing.sm),
                     Text(
-                      S.appName,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: colors.textSecondary,
-                        fontWeight: FontWeight.w500,
-                      ),
+                      message!,
+                      style: TextStyle(color: colors.textMuted),
                       textAlign: TextAlign.center,
                     ),
-                    if (message != null) ...[
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        message!,
-                        style: TextStyle(color: colors.textMuted),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                    const SizedBox(height: AppSpacing.lg),
-                    const SkeletonLine(height: 12),
-                    const SizedBox(height: AppSpacing.sm),
-                    const SkeletonLine(width: 220, height: 12),
-                    const SizedBox(height: AppSpacing.sm),
-                    const SkeletonBox(
-                      width: double.infinity,
-                      height: 88,
-                      borderRadius: AppSpacing.cardRadius,
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    const SkeletonBox(
-                      width: double.infinity,
-                      height: 48,
-                      borderRadius: AppSpacing.inputRadius,
-                    ),
                   ],
-                ),
+                ],
               ),
             ),
           ),

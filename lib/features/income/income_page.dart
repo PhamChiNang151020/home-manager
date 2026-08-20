@@ -1,5 +1,6 @@
 import "package:flutter/material.dart";
 import "package:home_manager/core/domain/month_balance.dart";
+import "package:home_manager/core/domain/month_clamp.dart";
 import "package:home_manager/core/format/vnd_format.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/logging/app_log.dart";
@@ -14,11 +15,9 @@ import "package:home_manager/features/shared/app_loading.dart";
 import "package:home_manager/features/shared/error_view.dart";
 import "package:home_manager/features/shared/feature_page_scaffold.dart";
 import "package:home_manager/features/shared/labeled_money_field.dart";
-import "package:home_manager/features/shared/labeled_text_field.dart";
 import "package:home_manager/features/shared/money_text.dart";
-import "package:home_manager/features/shared/month_picker.dart";
+import "package:home_manager/features/shared/month_stepper_field.dart";
 import "package:home_manager/features/shared/section_header.dart";
-import "package:intl/intl.dart";
 
 class IncomeRoutePage extends StatelessWidget {
   const IncomeRoutePage({
@@ -62,8 +61,7 @@ class _IncomePageState extends State<IncomePage> {
   @override
   void initState() {
     super.initState();
-    final now = DateTime.now();
-    _month = DateTime(now.year, now.month);
+    _month = currentMonth();
     _load();
   }
 
@@ -192,18 +190,11 @@ class _IncomePageState extends State<IncomePage> {
       child: ListView(
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
         children: [
-          LabeledPickerField(
-            label: S.month,
-            value: DateFormat("MM/yyyy").format(_month),
-            onTap: () async {
-              final picked = await showMonthPicker(
-                context: context,
-                initialDate: _month,
-              );
-              if (picked != null) {
-                setState(() => _month = DateTime(picked.year, picked.month));
-                _load();
-              }
+          MonthStepperField(
+            month: _month,
+            onChanged: (value) {
+              setState(() => _month = value);
+              _load();
             },
           ),
           if (balance != null) ...[

@@ -5,11 +5,17 @@ import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/shared/app_card.dart";
 import "package:home_manager/features/shared/money_text.dart";
+import "package:home_manager/features/shared/trend_chip.dart";
 
 class OverviewSummaryCard extends StatelessWidget {
-  const OverviewSummaryCard({super.key, required this.balance});
+  const OverviewSummaryCard({
+    super.key,
+    required this.balance,
+    this.spendDeltaPercent,
+  });
 
   final MonthBalance balance;
+  final double? spendDeltaPercent;
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +32,10 @@ class OverviewSummaryCard extends StatelessWidget {
             label: S.monthSpend,
             amount: balance.totalOut,
             color: colors.error,
+            trailing:
+                spendDeltaPercent == null
+                    ? null
+                    : TrendChip(percent: spendDeltaPercent!),
           ),
           const Divider(),
           _Row(
@@ -46,12 +56,14 @@ class _Row extends StatelessWidget {
     required this.amount,
     required this.color,
     this.large = false,
+    this.trailing,
   });
 
   final String label;
   final double amount;
   final Color color;
   final bool large;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -66,14 +78,22 @@ class _Row extends StatelessWidget {
               fontWeight: large ? FontWeight.w700 : FontWeight.w500,
             ),
           ),
-          MoneyText(
-            amount: amount,
-            large: large,
-            style: TextStyle(
-              color: color,
-              fontWeight: FontWeight.w700,
-              fontSize: large ? 22 : 16,
-            ),
+          Row(
+            children: [
+              if (trailing != null) ...[
+                trailing!,
+                const SizedBox(width: AppSpacing.sm),
+              ],
+              MoneyText(
+                amount: amount,
+                large: large,
+                style: TextStyle(
+                  color: color,
+                  fontWeight: FontWeight.w700,
+                  fontSize: large ? 22 : 16,
+                ),
+              ),
+            ],
           ),
         ],
       ),

@@ -23,6 +23,7 @@ void main() {
     expect(find.byType(AppBrandLogo), findsOneWidget);
     expect(find.byIcon(Icons.bolt), findsNothing);
     expect(find.text(S.appName), findsOneWidget);
+    expect(find.text(S.appTagline), findsOneWidget);
     expect(find.text(S.signInGoogle), findsOneWidget);
   });
 }

@@ -9,6 +9,7 @@ import "package:home_manager/core/state/theme_controller.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_icons.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/features/pwa/install_home_screen_page.dart";
 import "package:home_manager/features/settings/settings_account_page.dart";
 import "package:home_manager/features/settings/settings_appearance_page.dart";
 import "package:home_manager/features/settings/settings_home_page.dart";
@@ -39,7 +40,7 @@ class SettingsHubPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+      padding: AppSpacing.shellListPadding,
       children: [
         if (!home.isOwner)
           Padding(
@@ -131,6 +132,22 @@ class SettingsHubPage extends StatelessWidget {
           index: 4,
           child: _SettingsTile(
             leading: Icon(
+              Icons.add_to_home_screen,
+              color: context.appColors.accent,
+            ),
+            title: S.settingsInstall,
+            subtitle: S.settingsInstallDesc,
+            onTap:
+                () => Navigator.push(
+                  context,
+                  AppPageRoute<void>(page: const InstallHomeScreenPage()),
+                ),
+          ),
+        ),
+        AnimatedEntrance(
+          index: 5,
+          child: _SettingsTile(
+            leading: Icon(
               Icons.person_outline,
               color: context.appColors.accent,
             ),
@@ -146,15 +163,27 @@ class SettingsHubPage extends StatelessWidget {
           ),
         ),
         AnimatedEntrance(
-          index: 5,
+          index: 6,
           child: Padding(
             padding: const EdgeInsets.only(top: AppSpacing.lg),
             child: Center(
-              child: Text(
-                "${S.appVersion} ${AppVersion.label}",
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: context.appColors.textMuted,
-                ),
+              child: Column(
+                children: [
+                  Text(
+                    S.appTagline,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: context.appColors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    "${S.appVersion} ${AppVersion.label}",
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: context.appColors.textMuted,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

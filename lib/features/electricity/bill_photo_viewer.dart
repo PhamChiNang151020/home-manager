@@ -10,25 +10,29 @@ Future<void> showBillPhotoViewer({
   required String photoPath,
   required BillPhotoService photos,
 }) async {
-  await showModalBottomSheet<void>(
+  await showGeneralDialog<void>(
     context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    builder: (context) => _BillPhotoSheet(photoPath: photoPath, photos: photos),
+    barrierDismissible: true,
+    barrierLabel: S.photo,
+    barrierColor: Colors.black.withValues(alpha: 0.92),
+    transitionDuration: const Duration(milliseconds: 200),
+    pageBuilder: (context, animation, secondaryAnimation) {
+      return _BillPhotoFullscreen(photoPath: photoPath, photos: photos);
+    },
   );
 }
 
-class _BillPhotoSheet extends StatefulWidget {
-  const _BillPhotoSheet({required this.photoPath, required this.photos});
+class _BillPhotoFullscreen extends StatefulWidget {
+  const _BillPhotoFullscreen({required this.photoPath, required this.photos});
 
   final String photoPath;
   final BillPhotoService photos;
 
   @override
-  State<_BillPhotoSheet> createState() => _BillPhotoSheetState();
+  State<_BillPhotoFullscreen> createState() => _BillPhotoFullscreenState();
 }
 
-class _BillPhotoSheetState extends State<_BillPhotoSheet> {
+class _BillPhotoFullscreenState extends State<_BillPhotoFullscreen> {
   String? _url;
   String? _error;
   bool _loading = true;
@@ -61,99 +65,62 @@ class _BillPhotoSheetState extends State<_BillPhotoSheet> {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
-    final screenH = MediaQuery.sizeOf(context).height;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: colors.bgSurface,
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(AppSpacing.cardRadius),
-        ),
-      ),
-      constraints: BoxConstraints(maxHeight: screenH * 0.88),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // drag handle
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-            child: Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: colors.border,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.xs,
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    S.photo,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                ),
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close),
-                  visualDensity: VisualDensity.compact,
-                  color: colors.textSecondary,
-                ),
-              ],
-            ),
-          ),
-          const Divider(height: 1),
-          if (_loading)
-            const Padding(
-              padding: EdgeInsets.all(AppSpacing.lg),
-              child: Center(child: AppLoader()),
-            )
-          else if (_error != null)
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Text(
-                _error!,
-                style: TextStyle(color: colors.error),
-                textAlign: TextAlign.center,
-              ),
-            )
-          else if (_url != null)
-            Flexible(
-              child: InteractiveViewer(
-                minScale: 0.5,
-                maxScale: 4.0,
-                child: Image.network(
-                  _url!,
-                  fit: BoxFit.contain,
-                  loadingBuilder: (context, child, progress) {
-                    if (progress == null) return child;
-                    return SizedBox(
-                      height: 200,
-                      child: Center(child: AppLoader(size: 28)),
-                    );
-                  },
-                  errorBuilder:
-                      (_, __, ___) => Padding(
-                        padding: const EdgeInsets.all(AppSpacing.lg),
-                        child: Text(
-                          S.noPhoto,
-                          style: TextStyle(color: colors.textMuted),
-                          textAlign: TextAlign.center,
+    return SafeArea(
+      child: Material(
+        color: Colors.transparent,
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: Center(
+                child:
+                    _loading
+                        ? const AppLoader(size: 72)
+                        : _error != null
+                        ? Padding(
+                          padding: const EdgeInsets.all(AppSpacing.lg),
+                          child: Text(
+                            _error!,
+                            style: TextStyle(color: colors.error),
+                            textAlign: TextAlign.center,
+                          ),
+                        )
+                        : _url == null
+                        ? const SizedBox.shrink()
+                        : InteractiveViewer(
+                          minScale: 0.5,
+                          maxScale: 4,
+                          child: Image.network(
+                            _url!,
+                            fit: BoxFit.contain,
+                            loadingBuilder: (context, child, progress) {
+                              if (progress == null) return child;
+                              return const SizedBox(
+                                width: 120,
+                                height: 120,
+                                child: Center(child: AppLoader()),
+                              );
+                            },
+                            errorBuilder:
+                                (_, __, ___) => Text(
+                                  S.noPhoto,
+                                  style: TextStyle(color: colors.textMuted),
+                                ),
+                          ),
                         ),
-                      ),
-                ),
               ),
             ),
-          SizedBox(
-            height: MediaQuery.paddingOf(context).bottom + AppSpacing.sm,
-          ),
-        ],
+            Positioned(
+              top: AppSpacing.sm,
+              right: AppSpacing.sm,
+              child: IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.close),
+                color: Colors.white,
+                tooltip: S.cancel,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

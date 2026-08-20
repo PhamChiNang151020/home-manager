@@ -41,6 +41,12 @@ Cập nhật khi thêm test file. Agent dùng bảng này để phát hiện gap
 | INC-01 | MonthBalance net | `test/unit/month_balance_test.dart` | done |
 | ICO-01 | expense icon_key maps to PNG | `test/unit/app_icons_test.dart` | done |
 | OVW-01 | overview summary card | `test/widget/overview_summary_card_test.dart` | done |
+| OVW-02 | month clamp and stepper next disabled | `test/unit/month_clamp_test.dart`, `test/widget/month_stepper_field_test.dart` | done |
+| OVW-03 | balancesForMonths and MoM percent | `test/unit/month_balance_test.dart` | done |
+| PWA-01 | PWA install UA and share URL | `test/unit/pwa_install_test.dart` | done |
+| PWA-02 | install banner and QR page | `test/widget/install_home_screen_test.dart` | done |
+| UI-01 | select sheet reports tap, ignore dismiss | `test/widget/select_sheet_test.dart` | done |
+| UI-02 | period detail stacked rows + unpaid badge | `test/widget/period_detail_view_test.dart` | done |
 | REM-02 | same-day reminder order photo → payday → remind | `test/widget/reminder_banner_test.dart` | done |
 | ELEC-M05 | upsert omits is_paid when null | `test/integration/electricity_service_test.dart` | done |
 | INV-03 | Home.fromJson parses fields | `test/unit/models_test.dart` | planned |

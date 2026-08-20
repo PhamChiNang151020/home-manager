@@ -93,50 +93,6 @@ class ElectricityPageState extends State<ElectricityPage> {
 
   void openAddForm() => _openAddForm();
 
-  Future<void> _deletePeriod(ElectricityPeriod period) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text(S.deletePeriod),
-            content: const Text(S.deletePeriodConfirm),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text(S.cancel),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.pop(context, true),
-                style: FilledButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.error,
-                ),
-                child: const Text(S.delete),
-              ),
-            ],
-          ),
-    );
-    if (confirmed != true || !mounted) return;
-    try {
-      final path = period.photoPath;
-      if (path != null && path.isNotEmpty) {
-        await widget.photos.remove(path);
-      }
-      await widget.electricity.delete(period.id);
-      _load();
-    } catch (e) {
-      AppLog.e("Delete period failed", error: e);
-    }
-  }
-
-  Future<void> _togglePaid(ElectricityPeriod period) async {
-    try {
-      await widget.electricity.setPaid(period.id, isPaid: !period.isPaid);
-      _load();
-    } catch (e) {
-      AppLog.e("Toggle paid failed", error: e);
-    }
-  }
-
   Future<void> _openAddForm() async {
     final previous = _items.isEmpty ? null : _items.first;
     await showElectricityAddForm(
@@ -243,9 +199,6 @@ class ElectricityPageState extends State<ElectricityPage> {
                       home: widget.home,
                       photos: widget.photos,
                       onTap: () => _openPeriodDialog(_filteredItems[i]),
-                      onEdit: () => _openPeriodDialog(_filteredItems[i]),
-                      onDelete: () => _deletePeriod(_filteredItems[i]),
-                      onTogglePaid: () => _togglePaid(_filteredItems[i]),
                     ),
                   ),
             ],
