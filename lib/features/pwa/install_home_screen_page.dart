@@ -4,6 +4,7 @@ import "package:home_manager/core/domain/pwa_install.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/services/pwa_install_runtime.dart";
 import "package:home_manager/core/services/pwa_open_url.dart";
+import "package:home_manager/core/services/pwa_runtime.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/core/theme/mobile_viewport.dart";
@@ -21,9 +22,18 @@ class InstallHomeScreenPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final resolvedSurface = surface ?? currentPwaInstallSurface();
-    final url = shareUrl ?? currentPwaShareUrl();
     final steps = _stepsFor(resolvedSurface);
     final showIosWebClip = PwaInstall.isIosSurface(resolvedSurface);
+    final showIosProfileGuide = PwaInstall.showsIosProfileGuide(
+      surface: resolvedSurface,
+      userAgent: pwaUserAgent(),
+    );
+    final appUrl = shareUrl ?? currentPwaShareUrl();
+    final qrUrl = resolveQrUrl(
+      surface: resolvedSurface,
+      appUrl: appUrl,
+      iosWebClipProfileUrl: currentIosWebClipProfileUrl(),
+    );
     return Scaffold(
       appBar: AppBar(title: const Text(S.settingsInstall)),
       body: MobileViewport(
@@ -60,6 +70,10 @@ class InstallHomeScreenPage extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.lg),
             ],
+            if (showIosProfileGuide) ...[
+              _IosProfileRemovalCallout(colors: colors),
+              const SizedBox(height: AppSpacing.lg),
+            ],
             Text(
               S.installQrSectionTitle,
               style: Theme.of(context).textTheme.titleSmall,
@@ -81,7 +95,7 @@ class InstallHomeScreenPage extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(AppSpacing.md),
                   child: QrImageView(
-                    data: url,
+                    data: qrUrl,
                     size: 220,
                     backgroundColor: Colors.white,
                   ),
@@ -95,7 +109,7 @@ class InstallHomeScreenPage extends StatelessWidget {
             const SizedBox(height: AppSpacing.md),
             TextButton(
               onPressed: () async {
-                await Clipboard.setData(ClipboardData(text: url));
+                await Clipboard.setData(ClipboardData(text: qrUrl));
                 if (!context.mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text(S.installLinkCopied)),
@@ -122,6 +136,14 @@ class InstallHomeScreenPage extends StatelessWidget {
     openExternalUrl(currentIosWebClipProfileUrl());
   }
 
+  static String resolveQrUrl({
+    required PwaInstallSurface surface,
+    required String appUrl,
+    required String iosWebClipProfileUrl,
+  }) {
+    return PwaInstall.isIosSurface(surface) ? iosWebClipProfileUrl : appUrl;
+  }
+
   static String _stepsFor(PwaInstallSurface surface) {
     return switch (surface) {
       PwaInstallSurface.iosInApp => S.installBannerIosInApp,
@@ -130,5 +152,61 @@ class InstallHomeScreenPage extends StatelessWidget {
       PwaInstallSurface.iosSafari ||
       PwaInstallSurface.hidden => S.installBannerIosSafari,
     };
+  }
+}
+
+class _IosProfileRemovalCallout extends StatelessWidget {
+  const _IosProfileRemovalCallout({required this.colors});
+
+  final AppColorScheme colors;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colors.warningMuted(0.22),
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+        border: Border.all(color: colors.warning, width: 2),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.info_outline, color: colors.warning, size: 22),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Text(
+                    S.installIosProfileRemoveTitle,
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      color: colors.warning,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              S.installIosProfileRemoveSteps,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: colors.textPrimary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              S.installIosProfileRemoveNote,
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: colors.textSecondary),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

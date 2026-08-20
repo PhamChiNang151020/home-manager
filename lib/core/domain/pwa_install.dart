@@ -75,6 +75,19 @@ abstract final class PwaInstall {
     };
   }
 
+  static bool isIosUserAgent(String userAgent) {
+    final ua = userAgent.toLowerCase();
+    return ua.contains("iphone") || ua.contains("ipad") || ua.contains("ipod");
+  }
+
+  static bool showsIosProfileGuide({
+    required PwaInstallSurface surface,
+    required String userAgent,
+  }) {
+    return isIosSurface(surface) ||
+        (surface == PwaInstallSurface.hidden && isIosUserAgent(userAgent));
+  }
+
   static bool _iosInAppBrowser(String ua) {
     if (_sharedInAppMarkers(ua)) return true;
     if (ua.contains("crios") || ua.contains("fxios") || ua.contains("edgios")) {

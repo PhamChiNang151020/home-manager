@@ -141,4 +141,47 @@ void main() {
       expect(PwaInstall.isIosSurface(PwaInstallSurface.androidChrome), isFalse);
     });
   });
+
+  group("PwaInstall.showsIosProfileGuide", () {
+    test("shows on iOS Safari and in-app", () {
+      const ua =
+          "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15";
+      expect(
+        PwaInstall.showsIosProfileGuide(
+          surface: PwaInstallSurface.iosSafari,
+          userAgent: ua,
+        ),
+        isTrue,
+      );
+      expect(
+        PwaInstall.showsIosProfileGuide(
+          surface: PwaInstallSurface.iosInApp,
+          userAgent: ua,
+        ),
+        isTrue,
+      );
+    });
+
+    test("shows when standalone on iPhone", () {
+      expect(
+        PwaInstall.showsIosProfileGuide(
+          surface: PwaInstallSurface.hidden,
+          userAgent:
+              "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15",
+        ),
+        isTrue,
+      );
+    });
+
+    test("hides on desktop hidden surface", () {
+      expect(
+        PwaInstall.showsIosProfileGuide(
+          surface: PwaInstallSurface.hidden,
+          userAgent:
+              "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15",
+        ),
+        isFalse,
+      );
+    });
+  });
 }

@@ -141,9 +141,14 @@ abstract final class S {
   static const installDismiss = "Đóng";
   static const installQrSectionTitle = "Gửi cho người nhà";
   static const installQrHint =
-      "Chụp màn hình mã này rồi gửi ảnh. Người nhà mở Safari, quét mã, rồi bấm Cài nhanh trên iPhone.";
+      "Chụp màn hình mã này rồi gửi ảnh. iPhone quét mã sẽ mở link cài profile; Android quét mã sẽ mở app.";
   static const installCopyLink = "Sao chép liên kết (cho bạn)";
   static const installLinkCopied = "Đã sao chép liên kết";
+  static const installIosProfileRemoveTitle = "Gỡ profile khỏi iPhone";
+  static const installIosProfileRemoveSteps =
+      "Cài đặt → Cài đặt chung → VPN và Quản lý thiết bị → Cài Tổ Ấm lên iPhone → Gỡ cấu hình.";
+  static const installIosProfileRemoveNote =
+      "Gỡ profile sẽ xóa icon Tổ Ấm trên Màn hình chính. Cài lại bằng Cài nhanh trên iPhone ở trên.";
   static const themeModeLabel = "Chế độ";
   static const themeModeSystem = "Hệ thống";
   static const themeModeLight = "Sáng";

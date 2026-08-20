@@ -53,6 +53,9 @@ void main() {
     await tester.tap(find.text(S.installGuide));
     await tester.pumpAndSettle();
 
+    await tester.scrollUntilVisible(find.byType(QrImageView), 200);
+    await tester.pumpAndSettle();
+
     expect(find.byType(QrImageView), findsOneWidget);
     expect(find.text(S.installQrHint), findsOneWidget);
     expect(find.text(PwaInstall.productionAppUrl), findsNothing);
@@ -71,6 +74,19 @@ void main() {
 
     expect(find.text(S.installIosWebClip), findsWidgets);
     expect(find.text(S.installIosWebClipSteps), findsOneWidget);
+    expect(find.text(S.installIosProfileRemoveTitle), findsOneWidget);
+    expect(find.text(S.installIosProfileRemoveSteps), findsOneWidget);
+  });
+
+  test("iOS QR points to mobileconfig profile", () {
+    expect(
+      InstallHomeScreenPage.resolveQrUrl(
+        surface: PwaInstallSurface.iosSafari,
+        appUrl: PwaInstall.productionAppUrl,
+        iosWebClipProfileUrl: PwaInstall.productionIosWebClipProfileUrl,
+      ),
+      PwaInstall.productionIosWebClipProfileUrl,
+    );
   });
 
   testWidgets("dismiss hides banner", (tester) async {
@@ -89,6 +105,17 @@ void main() {
     expect(find.text(S.installBannerTitle), findsNothing);
   });
 
+  test("non-iOS QR uses provided app link", () {
+    expect(
+      InstallHomeScreenPage.resolveQrUrl(
+        surface: PwaInstallSurface.androidChrome,
+        appUrl: "https://example.test/app/",
+        iosWebClipProfileUrl: PwaInstall.productionIosWebClipProfileUrl,
+      ),
+      "https://example.test/app/",
+    );
+  });
+
   testWidgets("install page shows QR without printing the URL", (tester) async {
     await tester.pumpWidget(
       MaterialApp(
@@ -103,8 +130,10 @@ void main() {
       ),
     );
 
+    await tester.scrollUntilVisible(find.byType(QrImageView), 200);
+    await tester.pumpAndSettle();
+
     expect(find.byType(QrImageView), findsOneWidget);
-    expect(find.text(S.installIosWebClipSteps), findsOneWidget);
     expect(find.text("https://example.test/app/"), findsNothing);
   });
 }
