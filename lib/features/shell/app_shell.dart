@@ -160,47 +160,50 @@ class _AppShellState extends State<AppShell> {
         bottomNavigationBar:
             home == null
                 ? null
-                : Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (_tab == 1)
-                      StickyPrimaryBar(
-                        label: S.addExpense,
-                        onPressed:
-                            () => _expensesKey.currentState?.openAddForm(),
+                : SafeArea(
+                  top: false,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (_tab == 1)
+                        StickyPrimaryBar(
+                          label: S.addExpense,
+                          onPressed:
+                              () => _expensesKey.currentState?.openAddForm(),
+                        ),
+                      NavigationBar(
+                        selectedIndex: _tab,
+                        onDestinationSelected:
+                            (index) => setState(() => _tab = index),
+                        destinations: const [
+                          NavigationDestination(
+                            icon: AppAssetIcon(AppIcons.dashboard, size: 24),
+                            selectedIcon: AppAssetIcon(
+                              AppIcons.dashboard,
+                              size: 26,
+                            ),
+                            label: S.overview,
+                          ),
+                          NavigationDestination(
+                            icon: AppAssetIcon(AppIcons.expenses, size: 24),
+                            selectedIcon: AppAssetIcon(
+                              AppIcons.expenses,
+                              size: 26,
+                            ),
+                            label: S.expenses,
+                          ),
+                          NavigationDestination(
+                            icon: AppAssetIcon(AppIcons.settings, size: 24),
+                            selectedIcon: AppAssetIcon(
+                              AppIcons.settings,
+                              size: 26,
+                            ),
+                            label: S.settings,
+                          ),
+                        ],
                       ),
-                    NavigationBar(
-                      selectedIndex: _tab,
-                      onDestinationSelected:
-                          (index) => setState(() => _tab = index),
-                      destinations: const [
-                        NavigationDestination(
-                          icon: AppAssetIcon(AppIcons.dashboard, size: 24),
-                          selectedIcon: AppAssetIcon(
-                            AppIcons.dashboard,
-                            size: 26,
-                          ),
-                          label: S.overview,
-                        ),
-                        NavigationDestination(
-                          icon: AppAssetIcon(AppIcons.expenses, size: 24),
-                          selectedIcon: AppAssetIcon(
-                            AppIcons.expenses,
-                            size: 26,
-                          ),
-                          label: S.expenses,
-                        ),
-                        NavigationDestination(
-                          icon: AppAssetIcon(AppIcons.settings, size: 24),
-                          selectedIcon: AppAssetIcon(
-                            AppIcons.settings,
-                            size: 26,
-                          ),
-                          label: S.settings,
-                        ),
-                      ],
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
       ),
     );

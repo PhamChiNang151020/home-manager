@@ -7,6 +7,7 @@ import "package:home_manager/core/state/session_controller.dart";
 import "package:home_manager/core/state/theme_controller.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_theme.dart";
+import "package:home_manager/core/theme/pwa_viewport_scope.dart";
 import "package:home_manager/features/auth/sign_in_page.dart";
 import "package:home_manager/features/shared/app_loading.dart";
 import "package:home_manager/features/shell/app_shell.dart";
@@ -88,7 +89,7 @@ Widget _syncWebThemeColor(BuildContext context, Widget? child) {
   if (colors != null) {
     updateWebThemeColor(colors.bgBase);
   }
-  return child ?? const SizedBox.shrink();
+  return PwaViewportScope(child: child ?? const SizedBox.shrink());
 }
 
 class _AppHome extends StatelessWidget {
