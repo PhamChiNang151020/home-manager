@@ -16,9 +16,14 @@ String currentIosWebClipProfileUrl() =>
     PwaInstall.iosWebClipProfileUrlFrom(Uri.base);
 
 double currentPwaStandaloneTouchGap() {
-  if (!pwaIsStandaloneWebApp()) return 0;
+  if (!_isIosUserAgent(pwaUserAgent())) return 0;
   return PwaViewport.standaloneTouchGap(
     screenMaxDimension: pwaScreenMaxDimension(),
     innerHeight: pwaInnerHeight(),
   );
+}
+
+bool _isIosUserAgent(String userAgent) {
+  final ua = userAgent.toLowerCase();
+  return ua.contains("iphone") || ua.contains("ipad") || ua.contains("ipod");
 }

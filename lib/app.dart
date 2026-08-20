@@ -2,6 +2,7 @@ import "package:flutter/material.dart";
 import "package:home_manager/core/l10n/app_locale.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/services/app_services.dart";
+import "package:home_manager/core/services/pwa_history.dart";
 import "package:home_manager/core/services/web_theme_color.dart";
 import "package:home_manager/core/state/session_controller.dart";
 import "package:home_manager/core/state/theme_controller.dart";
@@ -92,7 +93,7 @@ Widget _syncWebThemeColor(BuildContext context, Widget? child) {
   return PwaViewportScope(child: child ?? const SizedBox.shrink());
 }
 
-class _AppHome extends StatelessWidget {
+class _AppHome extends StatefulWidget {
   const _AppHome({
     required this.session,
     required this.theme,
@@ -104,7 +105,35 @@ class _AppHome extends StatelessWidget {
   final AppServices services;
 
   @override
+  State<_AppHome> createState() => _AppHomeState();
+}
+
+class _AppHomeState extends State<_AppHome> {
+  @override
+  void initState() {
+    super.initState();
+    installPwaHistoryGuard();
+    widget.session.addListener(_onSessionChange);
+    if (widget.session.user != null) {
+      resetPwaBrowserHistory();
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.session.removeListener(_onSessionChange);
+    super.dispose();
+  }
+
+  void _onSessionChange() {
+    if (widget.session.user != null) {
+      resetPwaBrowserHistory();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final session = widget.session;
     return AnimatedBuilder(
       animation: session,
       builder: (context, _) {
@@ -114,7 +143,11 @@ class _AppHome extends StatelessWidget {
         if (session.user == null) {
           return SignInPage(onGoogle: session.signIn, error: session.error);
         }
-        return AppShell(session: session, theme: theme, services: services);
+        return AppShell(
+          session: session,
+          theme: widget.theme,
+          services: widget.services,
+        );
       },
     );
   }

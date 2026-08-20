@@ -2,8 +2,9 @@ import "dart:math" as math;
 
 import "package:flutter/material.dart";
 import "package:home_manager/core/services/pwa_install_runtime.dart";
+import "package:home_manager/core/theme/app_color_scheme.dart";
 
-/// Keeps interactive Flutter layout inside iOS standalone PWA touch bounds.
+/// Keeps interactive Flutter layout inside iOS WebKit touch bounds.
 class PwaViewportScope extends StatefulWidget {
   const PwaViewportScope({super.key, required this.child});
 
@@ -40,16 +41,33 @@ class _PwaViewportScopeState extends State<PwaViewportScope>
     final mediaQuery = MediaQuery.maybeOf(context);
     if (mediaQuery == null) return widget.child;
 
-    final padding = mediaQuery.padding.copyWith(
-      bottom: math.max(mediaQuery.padding.bottom, gap),
-    );
-    final viewPadding = mediaQuery.viewPadding.copyWith(
-      bottom: math.max(mediaQuery.viewPadding.bottom, gap),
-    );
+    final bottomInset = math.max(mediaQuery.padding.bottom, gap);
+    final padding = mediaQuery.padding.copyWith(bottom: bottomInset);
+    final viewPadding = mediaQuery.viewPadding.copyWith(bottom: bottomInset);
+    final height = math.max(0.0, mediaQuery.size.height - gap);
+    final size = Size(mediaQuery.size.width, height);
+    final colors = Theme.of(context).extension<AppColorScheme>();
 
-    return MediaQuery(
-      data: mediaQuery.copyWith(padding: padding, viewPadding: viewPadding),
-      child: widget.child,
+    return ColoredBox(
+      color: colors?.bgBase ?? Theme.of(context).colorScheme.surface,
+      child: Padding(
+        padding: EdgeInsets.only(bottom: gap),
+        child: MediaQuery(
+          data: mediaQuery.copyWith(
+            padding: padding,
+            viewPadding: viewPadding,
+            size: size,
+          ),
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: SizedBox(
+              width: size.width,
+              height: size.height,
+              child: widget.child,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

@@ -1,0 +1,3 @@
+void installPwaHistoryGuard() {}
+
+void resetPwaBrowserHistory() {}

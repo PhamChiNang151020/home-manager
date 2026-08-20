@@ -50,18 +50,26 @@
       }
 
       function syncStandaloneViewport() {
-        if (!isStandalone()) return;
-        document.documentElement.style.setProperty("--app-height", "100vh");
-        var screenMax = Math.max(screen.width || 0, screen.height || 0);
         var innerHeight = window.innerHeight || 0;
+        var screenMax = Math.max(screen.width || 0, screen.height || 0);
         var gap =
           screenMax > innerHeight && innerHeight > 0
             ? screenMax - innerHeight
             : 0;
+
         document.documentElement.style.setProperty(
           "--standalone-bottom-gap",
           gap + "px",
         );
+
+        if (!isStandalone() && gap <= 0) return;
+
+        document.documentElement.style.setProperty(
+          "--app-height",
+          innerHeight + "px",
+        );
+        document.documentElement.style.height = innerHeight + "px";
+        document.body.style.height = innerHeight + "px";
       }
 
       syncStandaloneViewport();
@@ -88,8 +96,10 @@
     }
     @media (display-mode: standalone) {
       html, body {
-        height: var(--app-height, 100vh);
-        min-height: var(--app-height, 100vh);
+        height: var(--app-height, 100%);
+        min-height: var(--app-height, 100%);
+        max-height: var(--app-height, 100%);
+        overflow: hidden;
       }
     }
     #splash {
@@ -146,11 +156,21 @@
     window.addEventListener('flutter-first-frame', removeSplash);
     setTimeout(removeSplash, 8000);
 
-    // Block iOS Safari edge-swipe back navigation in PWA
-    history.pushState({ guard: true }, '', location.href);
-    window.addEventListener('popstate', () => {
-      history.pushState({ guard: true }, '', location.href);
-    });
+    (function installPwaHistoryGuard() {
+      if (window.__pwaHistoryGuardInstalled) return;
+      window.__pwaHistoryGuardInstalled = true;
+      window.addEventListener('popstate', function () {
+        history.pushState(null, '', location.href);
+      });
+      window.addEventListener('pageshow', function (event) {
+        if (event.persisted) location.reload();
+      });
+    })();
+
+    window.resetPwaBrowserHistory = function () {
+      history.replaceState(null, '', location.href);
+      history.pushState(null, '', location.href);
+    };
 
     // Auto-reload for iOS Simulator Safari when served via local IP (dev only)
     if (/^192\.168\.|^10\.|^172\.(1[6-9]|2\d|3[01])\./.test(location.hostname)) {
