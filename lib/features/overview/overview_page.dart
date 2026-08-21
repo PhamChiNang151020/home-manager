@@ -1,30 +1,31 @@
 import "package:flutter/material.dart";
-import "package:home_manager/core/domain/expense_totals.dart";
-import "package:home_manager/core/domain/month_balance.dart";
-import "package:home_manager/core/domain/month_clamp.dart";
+import "package:home_manager/core/format/vnd_format.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/logging/app_log.dart";
 import "package:home_manager/core/models/home.dart";
 import "package:home_manager/core/navigation/app_page_route.dart";
 import "package:home_manager/core/services/app_services.dart";
 import "package:home_manager/core/services/electricity_service.dart";
+import "package:home_manager/core/services/overview_service.dart";
 import "package:home_manager/core/services/water_service.dart";
+import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_icons.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/features/bank_credit/bank_credit_page.dart";
 import "package:home_manager/features/electricity/electricity_page.dart";
-import "package:home_manager/features/electricity/reminder_banner.dart";
 import "package:home_manager/features/expenses/expense_category_chart.dart";
-import "package:home_manager/features/finance/finance_hub_page.dart";
+import "package:home_manager/features/expenses/expenses_page.dart";
 import "package:home_manager/features/income/income_page.dart";
-import "package:home_manager/features/overview/overview_shortcut_grid.dart";
-import "package:home_manager/features/overview/overview_spend_trend_chart.dart";
-import "package:home_manager/features/overview/overview_summary_card.dart";
+import "package:home_manager/features/overview/overview_income_spend_chart.dart";
+import "package:home_manager/features/personal_debts/personal_debts_page.dart";
+import "package:home_manager/features/savings/savings_page.dart";
 import "package:home_manager/features/shared/animated_entrance.dart";
+import "package:home_manager/features/shared/animated_money_text.dart";
+import "package:home_manager/features/shared/app_asset_icon.dart";
+import "package:home_manager/features/shared/app_card.dart";
 import "package:home_manager/features/shared/app_loading.dart";
 import "package:home_manager/features/shared/feature_page_scaffold.dart";
 import "package:home_manager/features/shared/loading_view.dart";
-import "package:home_manager/features/shared/month_stepper_field.dart";
-import "package:home_manager/features/shared/section_header.dart";
 import "package:home_manager/features/water/water_page.dart";
 
 class OverviewPage extends StatefulWidget {
@@ -44,12 +45,7 @@ class OverviewPage extends StatefulWidget {
 }
 
 class _OverviewPageState extends State<OverviewPage> {
-  late DateTime _month;
-  MonthBalance? _balance;
-  List<MonthBalancePoint> _history = [];
-  double? _spendDeltaPercent;
-  List<CategorySpend> _spend = [];
-  double _financeAmount = 0;
+  OverviewSnapshot? _snapshot;
   bool _loading = true;
 
   Home get home => widget.home;
@@ -58,7 +54,6 @@ class _OverviewPageState extends State<OverviewPage> {
   @override
   void initState() {
     super.initState();
-    _month = currentMonth();
     _load();
   }
 
@@ -73,35 +68,10 @@ class _OverviewPageState extends State<OverviewPage> {
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
-      final incomes = await services.incomes.list(home.id);
-      final electricity = await services.electricity.list(home.id);
-      final water = await services.water.list(home.id);
-      final expenses = await services.expenses.list(home.id);
-      final financeAmount = await _loadFinanceAmount();
+      final snapshot = await OverviewService(services).load(home.id);
       if (!mounted) return;
-      final history = balancesForMonths(
-        endMonth: _month,
-        incomes: incomes,
-        electricity: electricity,
-        water: water,
-        expenses: expenses,
-      );
-      final balance = history.last.balance;
-      final previous =
-          history.length >= 2 ? history[history.length - 2].balance : null;
       setState(() {
-        _history = history;
-        _balance = balance;
-        _spendDeltaPercent =
-            previous == null
-                ? null
-                : monthOverMonthPercent(balance.totalOut, previous.totalOut);
-        _spend = spendByCategory(
-          expenses
-              .where((item) => sameMonth(item.expenseDate, _month))
-              .toList(),
-        );
-        _financeAmount = financeAmount;
+        _snapshot = snapshot;
         _loading = false;
       });
     } catch (e, st) {
@@ -110,39 +80,140 @@ class _OverviewPageState extends State<OverviewPage> {
     }
   }
 
-  /// Savings − credit used − (mình nợ) + (người khác nợ mình).
-  Future<double> _loadFinanceAmount() async {
-    try {
-      final accounts = await services.bankAccounts.listAccounts(home.id);
-      var creditUsed = 0.0;
-      for (final a in accounts) {
-        final period = await services.bankAccounts.latestPeriod(a.id);
-        creditUsed += period?.balanceUsed ?? 0;
-      }
-      final debts = await services.personalDebts.list(home.id);
-      var iOwe = 0.0;
-      var owedToMe = 0.0;
-      for (final d in debts) {
-        if (d.isSettled) continue;
-        if (d.iOwe) {
-          iOwe += d.remainingAmount;
-        } else {
-          owedToMe += d.remainingAmount;
-        }
-      }
-      final savings = await services.savings.list(home.id);
-      final savingsTotal = savings.fold<double>(
-        0,
-        (sum, s) => sum + s.currentAmount,
-      );
-      return savingsTotal - creditUsed - iOwe + owedToMe;
-    } catch (e, st) {
-      AppLog.e("Failed to load finance summary", error: e, stackTrace: st);
-      return 0;
+  @override
+  Widget build(BuildContext context) {
+    if (_loading && _snapshot == null) {
+      return const LoadingView();
     }
+
+    final snap = _snapshot;
+    final colors = context.appColors;
+    final heroStyle = Theme.of(context).textTheme.displaySmall?.copyWith(
+      color: snap != null && snap.netWorth >= 0 ? colors.success : colors.error,
+      fontWeight: FontWeight.w800,
+      height: 1.05,
+    );
+
+    return LoadingOverlay(
+      loading: _loading,
+      child: RefreshIndicator(
+        onRefresh: _load,
+        child: ListView(
+          padding: AppSpacing.shellListPadding,
+          children: [
+            if (snap != null) ...[
+              AnimatedEntrance(
+                index: 0,
+                child: Material(
+                  color: colors.bgElevated,
+                  borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AnimatedMoneyText(
+                          amount: snap.netWorth,
+                          large: true,
+                          style: heroStyle,
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Text(
+                          S.netWorthHomeLabel(home.name),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: colors.textMuted),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              AnimatedEntrance(
+                index: 1,
+                child: OverviewIncomeSpendChart(
+                  points: snap.incomeSpendHistory,
+                ),
+              ),
+              if (snap.categorySpend.isNotEmpty) ...[
+                const SizedBox(height: AppSpacing.md),
+                AnimatedEntrance(
+                  index: 2,
+                  child: ExpenseCategoryChart(spend: snap.categorySpend),
+                ),
+              ],
+              const SizedBox(height: AppSpacing.md),
+              AnimatedEntrance(
+                index: 3,
+                child: GridView.count(
+                  crossAxisCount: 2,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  mainAxisSpacing: AppSpacing.sm,
+                  crossAxisSpacing: AppSpacing.sm,
+                  childAspectRatio: 2.2,
+                  children: [
+                    _QuickCard(
+                      iconPath: AppIcons.electricity,
+                      title: S.electricity,
+                      value:
+                          snap.latestElectricity == null
+                              ? "—"
+                              : VndFormat.compact(
+                                snap.latestElectricity!.amountVnd,
+                              ),
+                      onTap: () => _pushElectricity(context),
+                    ),
+                    _QuickCard(
+                      iconPath: AppIcons.water,
+                      title: S.water,
+                      value:
+                          snap.latestWater == null
+                              ? "—"
+                              : VndFormat.compact(snap.latestWater!.amountVnd),
+                      onTap: () => _pushWater(context),
+                    ),
+                    _QuickCard(
+                      iconPath: AppIcons.expenses,
+                      title: S.expenses,
+                      value: VndFormat.compact(snap.monthExpenses),
+                      onTap: () => _pushExpenses(context),
+                    ),
+                    _QuickCard(
+                      iconPath: AppIcons.income,
+                      title: S.income,
+                      value: VndFormat.compact(snap.monthIncome),
+                      onTap: () => _pushIncome(context),
+                    ),
+                    _QuickCard(
+                      icon: Icons.credit_card_outlined,
+                      title: S.bankCredit,
+                      value: VndFormat.compact(snap.bankUsed),
+                      onTap: () => _pushBank(context),
+                    ),
+                    _QuickCard(
+                      icon: Icons.handshake_outlined,
+                      title: S.personalDebts,
+                      value: VndFormat.compact(snap.debtNet),
+                      onTap: () => _pushDebts(context),
+                    ),
+                    _QuickCard(
+                      icon: Icons.savings_outlined,
+                      title: S.savings,
+                      value: VndFormat.compact(snap.savingsTotal),
+                      onTap: () => _pushSavings(context),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
   }
 
-  void _openElectricity(BuildContext context) {
+  void _pushElectricity(BuildContext context) {
     Navigator.push<void>(
       context,
       AppPageRoute<void>(
@@ -155,14 +226,7 @@ class _OverviewPageState extends State<OverviewPage> {
     );
   }
 
-  void _openIncome(BuildContext context) {
-    Navigator.push<void>(
-      context,
-      AppPageRoute<void>(page: IncomeRoutePage(home: home, services: services)),
-    );
-  }
-
-  void _openWater(BuildContext context) {
+  void _pushWater(BuildContext context) {
     Navigator.push<void>(
       context,
       AppPageRoute<void>(
@@ -175,83 +239,120 @@ class _OverviewPageState extends State<OverviewPage> {
     );
   }
 
-  void _openFinance(BuildContext context) {
+  void _pushExpenses(BuildContext context) {
     Navigator.push<void>(
       context,
       AppPageRoute<void>(
-        page: FinanceHubPage(
+        page: FeaturePageScaffold(
+          title: S.expenses,
+          titleIcon: AppIcons.expenses,
+          body: ExpensesPage(
+            home: home,
+            expenses: services.expenses,
+            homesApi: services.homes,
+            photos: services.photos,
+            currentUserId: widget.currentUserId,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _pushIncome(BuildContext context) {
+    Navigator.push<void>(
+      context,
+      AppPageRoute<void>(page: IncomeRoutePage(home: home, services: services)),
+    );
+  }
+
+  void _pushBank(BuildContext context) {
+    Navigator.push<void>(
+      context,
+      AppPageRoute<void>(
+        page: BankCreditRoutePage(home: home, bank: services.bankAccounts),
+      ),
+    );
+  }
+
+  void _pushDebts(BuildContext context) {
+    Navigator.push<void>(
+      context,
+      AppPageRoute<void>(
+        page: PersonalDebtsRoutePage(
           home: home,
-          services: services,
+          debts: services.personalDebts,
           currentUserId: widget.currentUserId,
         ),
       ),
     );
   }
 
+  void _pushSavings(BuildContext context) {
+    Navigator.push<void>(
+      context,
+      AppPageRoute<void>(
+        page: SavingsRoutePage(home: home, savings: services.savings),
+      ),
+    );
+  }
+}
+
+class _QuickCard extends StatelessWidget {
+  const _QuickCard({
+    required this.title,
+    required this.value,
+    required this.onTap,
+    this.iconPath,
+    this.icon,
+  });
+
+  final String? iconPath;
+  final IconData? icon;
+  final String title;
+  final String value;
+  final VoidCallback onTap;
+
   @override
   Widget build(BuildContext context) {
-    if (_loading && _balance == null) {
-      return const LoadingView();
-    }
-
-    return LoadingOverlay(
-      loading: _loading,
-      child: RefreshIndicator(
-        onRefresh: _load,
-        child: ListView(
-          padding: AppSpacing.shellListPadding,
-          children: [
-            AnimatedEntrance(index: 0, child: ReminderBanner(home: home)),
-            MonthStepperField(
-              month: _month,
-              onChanged: (value) {
-                setState(() => _month = value);
-                _load();
-              },
-            ),
-            if (_balance != null) ...[
-              const SizedBox(height: AppSpacing.sm),
-              AnimatedEntrance(
-                index: 1,
-                child: OverviewSummaryCard(
-                  balance: _balance!,
-                  spendDeltaPercent: _spendDeltaPercent,
+    final colors = context.appColors;
+    return AppCard(
+      onTap: onTap,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
+      child: Row(
+        children: [
+          if (iconPath != null)
+            AppAssetIcon(iconPath!, size: 22)
+          else if (icon != null)
+            Icon(icon, size: 22, color: colors.accent),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: colors.textSecondary,
+                  ),
                 ),
-              ),
-            ],
-            if (_history.length >= 2) ...[
-              const SizedBox(height: AppSpacing.sm),
-              AnimatedEntrance(
-                index: 2,
-                child: OverviewSpendTrendChart(points: _history),
-              ),
-            ],
-            if (_spend.isNotEmpty) ...[
-              const SizedBox(height: AppSpacing.sm),
-              AnimatedEntrance(
-                index: 3,
-                child: ExpenseCategoryChart(spend: _spend),
-              ),
-            ],
-            const AnimatedEntrance(
-              index: 4,
-              child: SectionHeader(title: S.overview),
+                Text(
+                  value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
             ),
-            AnimatedEntrance(
-              index: 5,
-              child: OverviewShortcutGrid(
-                electricityAmount: _balance?.electricity ?? 0,
-                waterAmount: _balance?.water ?? 0,
-                incomeAmount: _balance?.income ?? 0,
-                financeAmount: _financeAmount,
-                onElectricity: () => _openElectricity(context),
-                onWater: () => _openWater(context),
-                onIncome: () => _openIncome(context),
-                onFinance: () => _openFinance(context),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -274,17 +375,12 @@ class ElectricityRoutePage extends StatefulWidget {
 }
 
 class _ElectricityRoutePageState extends State<ElectricityRoutePage> {
-  final _pageKey = GlobalKey<ElectricityPageState>();
-
   @override
   Widget build(BuildContext context) {
     return FeaturePageScaffold(
       title: S.electricity,
       titleIcon: AppIcons.electricity,
-      actionLabel: S.addPeriod,
-      onAction: () => _pageKey.currentState?.openAddForm(),
       body: ElectricityPage(
-        key: _pageKey,
         home: widget.home,
         electricity: widget.electricity,
         photos: widget.photos,
@@ -310,17 +406,12 @@ class WaterRoutePage extends StatefulWidget {
 }
 
 class _WaterRoutePageState extends State<WaterRoutePage> {
-  final _pageKey = GlobalKey<WaterPageState>();
-
   @override
   Widget build(BuildContext context) {
     return FeaturePageScaffold(
       title: S.water,
       titleIcon: AppIcons.water,
-      actionLabel: S.addWaterPeriod,
-      onAction: () => _pageKey.currentState?.openAddForm(),
       body: WaterPage(
-        key: _pageKey,
         home: widget.home,
         water: widget.water,
         photos: widget.photos,

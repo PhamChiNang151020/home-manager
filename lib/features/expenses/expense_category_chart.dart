@@ -5,9 +5,7 @@ import "package:home_manager/core/format/vnd_format.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
-import "package:home_manager/features/expenses/expense_category_style.dart";
 import "package:home_manager/features/shared/app_card.dart";
-import "package:home_manager/features/shared/money_text.dart";
 
 class ExpenseCategoryChart extends StatelessWidget {
   const ExpenseCategoryChart({super.key, required this.spend});
@@ -37,57 +35,63 @@ class ExpenseCategoryChart extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.sm),
           SizedBox(
-            height: 160,
-            child: PieChart(
-              PieChartData(
-                sectionsSpace: 2,
-                centerSpaceRadius: 36,
-                sections: [
-                  for (final item in spend)
-                    PieChartSectionData(
-                      value: item.amountVnd,
-                      color: colors.categoryColor(item.category.colorKey),
-                      radius: 28,
-                      title: "",
-                    ),
-                ],
-              ),
+            height: 140,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                PieChart(
+                  PieChartData(
+                    sectionsSpace: 2,
+                    centerSpaceRadius: 42,
+                    sections: [
+                      for (final item in spend)
+                        PieChartSectionData(
+                          value: item.amountVnd,
+                          color: colors.categoryColor(item.category.colorKey),
+                          radius: 22,
+                          title: "",
+                        ),
+                    ],
+                  ),
+                ),
+                Text(
+                  VndFormat.compact(total),
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: colors.textPrimary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
-          for (final item in spend)
-            Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-              child: Row(
-                children: [
-                  ExpenseCategoryIcon(
-                    iconKey: item.category.iconKey,
-                    size: 18,
-                    color: colors.categoryColor(item.category.colorKey),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(child: Text(item.category.name)),
-                  MoneyText(amount: item.amountVnd),
-                  const SizedBox(width: AppSpacing.xs),
-                  Text(
-                    "${((item.amountVnd / total) * 100).round()}%",
-                    style: TextStyle(color: colors.textMuted, fontSize: 12),
-                  ),
-                ],
-              ),
-            ),
-          const Divider(height: AppSpacing.md),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Wrap(
+            spacing: AppSpacing.md,
+            runSpacing: AppSpacing.xs,
             children: [
-              Text(S.amount, style: TextStyle(color: colors.textSecondary)),
-              MoneyText(amount: total),
+              for (final item in spend)
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: colors.categoryColor(item.category.colorKey),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.xs),
+                    Text(
+                      item.category.name,
+                      style: TextStyle(
+                        color: colors.textSecondary,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
             ],
-          ),
-          const SizedBox(height: 0),
-          Text(
-            VndFormat.compact(total),
-            style: TextStyle(color: colors.textMuted, fontSize: 11),
           ),
         ],
       ),

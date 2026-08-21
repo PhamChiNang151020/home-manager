@@ -39,14 +39,13 @@ class ElectricityPageState extends State<ElectricityPage> {
   List<ElectricityPeriod> _items = [];
   bool _loading = true;
   String? _error;
-  int? _filterYear;
-  int? _filterMonth;
+  DateTime? _filterMonth;
   PeriodSortOrder _sortOrder = PeriodSortOrder.newestFirst;
 
   List<ElectricityPeriod> get _filteredItems => filterPeriodHistory(
     _items,
-    year: _filterYear,
-    month: _filterMonth,
+    year: _filterMonth?.year,
+    month: _filterMonth?.month,
     sortOrder: _sortOrder,
   );
 
@@ -164,21 +163,18 @@ class ElectricityPageState extends State<ElectricityPage> {
                 index: 2,
                 child: ElectricityTrendChart(periods: _items),
               ),
-              const AnimatedEntrance(
-                index: 3,
-                child: SectionHeader(title: S.history),
-              ),
               AnimatedEntrance(
-                index: 4,
-                child: PeriodHistoryFilterBar(
-                  years: distinctPeriodYears(_items),
-                  filterYear: _filterYear,
-                  filterMonth: _filterMonth,
-                  sortOrder: _sortOrder,
-                  onYearChanged: (value) => setState(() => _filterYear = value),
-                  onMonthChanged:
-                      (value) => setState(() => _filterMonth = value),
-                  onSortChanged: (value) => setState(() => _sortOrder = value),
+                index: 3,
+                child: SectionHeader(
+                  title: S.history,
+                  trailing: PeriodHistoryFilterButton(
+                    filterMonth: _filterMonth,
+                    sortOrder: _sortOrder,
+                    onMonthChanged:
+                        (value) => setState(() => _filterMonth = value),
+                    onSortChanged:
+                        (value) => setState(() => _sortOrder = value),
+                  ),
                 ),
               ),
               if (_filteredItems.isEmpty)
@@ -189,7 +185,7 @@ class ElectricityPageState extends State<ElectricityPage> {
               else
                 for (var i = 0; i < _filteredItems.length; i++)
                   AnimatedEntrance(
-                    index: 5 + i,
+                    index: 4 + i,
                     child: PeriodListTile(
                       period: _filteredItems[i],
                       previousPeriod:

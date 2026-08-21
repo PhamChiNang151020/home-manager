@@ -1,6 +1,7 @@
 import "package:flutter/material.dart";
 import "package:home_manager/core/format/vnd_format.dart";
 import "package:home_manager/core/l10n/strings.dart";
+import "package:home_manager/core/logging/app_log.dart";
 import "package:home_manager/core/models/home.dart";
 import "package:home_manager/core/models/tracking_mode.dart";
 import "package:home_manager/core/services/home_service.dart";
@@ -32,6 +33,7 @@ class _SettingsHomePageState extends State<SettingsHomePage> {
   late final TextEditingController _m3Rate;
   String? _error;
   bool _saving = false;
+  bool _deleting = false;
 
   @override
   void initState() {
@@ -77,9 +79,55 @@ class _SettingsHomePageState extends State<SettingsHomePage> {
     }
   }
 
+  Future<void> _deleteHome() async {
+    if (!widget.home.isOwner || _deleting) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text(S.deleteHome),
+            content: const Text(S.deleteHomeConfirm),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text(S.cancel),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: FilledButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                ),
+                child: const Text(S.delete),
+              ),
+            ],
+          ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    setState(() {
+      _deleting = true;
+      _error = null;
+    });
+    try {
+      await widget.homesApi.deleteHome(widget.home.id);
+      widget.onChanged();
+      if (mounted) Navigator.pop(context, true);
+    } catch (e, st) {
+      AppLog.e("Delete home failed", error: e, stackTrace: st);
+      if (mounted) {
+        setState(() {
+          _error = "$e";
+          _deleting = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final owner = widget.home.isOwner;
+    final colors = context.appColors;
+    final busy = _saving || _deleting;
     return Scaffold(
       appBar: AppBar(title: const Text(S.settingsHome)),
       body: MobileViewport(
@@ -89,13 +137,13 @@ class _SettingsHomePageState extends State<SettingsHomePage> {
             LabeledTextField(
               label: S.homeName,
               controller: _name,
-              enabled: owner,
+              enabled: owner && !busy,
             ),
             const SizedBox(height: AppSpacing.formFieldGap),
             Text(
               S.trackingMode,
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: context.appColors.textSecondary,
+                color: colors.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -110,23 +158,23 @@ class _SettingsHomePageState extends State<SettingsHomePage> {
               widget.home.trackingMode == TrackingMode.meter
                   ? S.modeMeterHint
                   : S.modeInvoiceHint,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: context.appColors.textMuted,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: colors.textMuted),
             ),
             if (widget.home.trackingMode == TrackingMode.meter) ...[
               const SizedBox(height: AppSpacing.formFieldGap),
               LabeledMoneyField(
                 label: S.kwhRate,
                 controller: _rate,
-                enabled: owner,
+                enabled: owner && !busy,
                 suffix: "đ/kWh",
               ),
               const SizedBox(height: AppSpacing.formFieldGap),
               LabeledMoneyField(
                 label: S.m3Rate,
                 controller: _m3Rate,
-                enabled: owner,
+                enabled: owner && !busy,
                 suffix: "đ/m³",
               ),
             ],
@@ -140,8 +188,24 @@ class _SettingsHomePageState extends State<SettingsHomePage> {
             if (owner) ...[
               const SizedBox(height: AppSpacing.lg),
               FilledButton(
-                onPressed: _saving ? null : _save,
+                onPressed: busy ? null : _save,
                 child: const Text(S.save),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              Text(
+                S.deleteHomeHint,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: colors.textMuted),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              OutlinedButton(
+                onPressed: busy ? null : _deleteHome,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: colors.error,
+                  side: BorderSide(color: colors.error),
+                ),
+                child: Text(_deleting ? S.deletingHome : S.deleteHome),
               ),
             ],
           ],

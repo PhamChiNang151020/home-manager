@@ -44,4 +44,26 @@ void main() {
   test("lastSelectableMonthEnd is last day of current month", () {
     expect(lastSelectableMonthEnd(now: now), DateTime(2026, 8, 31));
   });
+
+  test("sameDay compares calendar day only", () {
+    expect(
+      sameDay(DateTime(2026, 8, 20, 9), DateTime(2026, 8, 20, 18)),
+      isTrue,
+    );
+    expect(sameDay(DateTime(2026, 8, 20), DateTime(2026, 8, 21)), isFalse);
+  });
+
+  test("canGoNextDay false on today", () {
+    expect(canGoNextDay(DateTime(2026, 8, 20), now: now), isFalse);
+    expect(canGoNextDay(DateTime(2026, 8, 19), now: now), isTrue);
+  });
+
+  test("shiftDay blocks future and allows previous", () {
+    expect(shiftDay(DateTime(2026, 8, 20), 1, now: now), isNull);
+    expect(shiftDay(DateTime(2026, 8, 19), 1, now: now), DateTime(2026, 8, 20));
+    expect(
+      shiftDay(DateTime(2026, 8, 20), -1, now: now),
+      DateTime(2026, 8, 19),
+    );
+  });
 }

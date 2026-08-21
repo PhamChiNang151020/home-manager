@@ -1,5 +1,6 @@
 import "package:home_manager/core/logging/app_log.dart";
 import "package:home_manager/core/models/expense.dart";
+import "package:home_manager/core/models/expense_preset.dart";
 import "package:intl/intl.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
 
@@ -7,6 +8,22 @@ class ExpenseService {
   ExpenseService(this._client);
 
   final SupabaseClient _client;
+
+  Future<List<ExpensePreset>> getFrequentPresets(
+    String homeId, {
+    int limit = 6,
+  }) async {
+    final rows = await _client.rpc(
+      "get_frequent_expense_presets",
+      params: {"p_home_id": homeId, "p_limit": limit},
+    );
+    return (rows as List)
+        .map(
+          (row) =>
+              ExpensePreset.fromJson(Map<String, dynamic>.from(row as Map)),
+        )
+        .toList();
+  }
 
   Future<List<ExpenseCategory>> listCategories(String homeId) async {
     final rows = await _client

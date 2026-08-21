@@ -40,15 +40,14 @@ class WaterPageState extends State<WaterPage> {
   List<WaterPeriod> _items = [];
   bool _loading = true;
   String? _error;
-  int? _filterYear;
-  int? _filterMonth;
+  DateTime? _filterMonth;
   PeriodSortOrder _sortOrder = PeriodSortOrder.newestFirst;
 
   List<WaterPeriod> get _filteredItems => filterByPeriodMonth(
     _items,
     monthOf: (period) => period.periodMonth,
-    year: _filterYear,
-    month: _filterMonth,
+    year: _filterMonth?.year,
+    month: _filterMonth?.month,
     sortOrder: _sortOrder,
   );
 
@@ -207,23 +206,18 @@ class WaterPageState extends State<WaterPage> {
                 index: 2,
                 child: WaterTrendChart(periods: _items),
               ),
-              const AnimatedEntrance(
-                index: 3,
-                child: SectionHeader(title: S.history),
-              ),
               AnimatedEntrance(
-                index: 4,
-                child: PeriodHistoryFilterBar(
-                  years: distinctYearsFromMonths(
-                    _items.map((period) => period.periodMonth),
+                index: 3,
+                child: SectionHeader(
+                  title: S.history,
+                  trailing: PeriodHistoryFilterButton(
+                    filterMonth: _filterMonth,
+                    sortOrder: _sortOrder,
+                    onMonthChanged:
+                        (value) => setState(() => _filterMonth = value),
+                    onSortChanged:
+                        (value) => setState(() => _sortOrder = value),
                   ),
-                  filterYear: _filterYear,
-                  filterMonth: _filterMonth,
-                  sortOrder: _sortOrder,
-                  onYearChanged: (value) => setState(() => _filterYear = value),
-                  onMonthChanged:
-                      (value) => setState(() => _filterMonth = value),
-                  onSortChanged: (value) => setState(() => _sortOrder = value),
                 ),
               ),
               if (_filteredItems.isEmpty)
@@ -234,7 +228,7 @@ class WaterPageState extends State<WaterPage> {
               else
                 for (var i = 0; i < _filteredItems.length; i++)
                   AnimatedEntrance(
-                    index: 5 + i,
+                    index: 4 + i,
                     child: WaterPeriodListTile(
                       period: _filteredItems[i],
                       previousPeriod:

@@ -10,6 +10,8 @@ class LabeledMoneyField extends StatelessWidget {
     required this.controller,
     this.readOnly = false,
     this.enabled = true,
+    this.autofocus = false,
+    this.focusNode,
     this.onChanged,
     this.suffix = "đ",
   });
@@ -18,6 +20,8 @@ class LabeledMoneyField extends StatelessWidget {
   final TextEditingController controller;
   final bool readOnly;
   final bool enabled;
+  final bool autofocus;
+  final FocusNode? focusNode;
   final ValueChanged<String>? onChanged;
   final String suffix;
 
@@ -37,6 +41,8 @@ class LabeledMoneyField extends StatelessWidget {
         const SizedBox(height: AppSpacing.xs),
         TextField(
           controller: controller,
+          focusNode: focusNode,
+          autofocus: autofocus,
           readOnly: readOnly,
           enabled: enabled,
           onChanged: onChanged,

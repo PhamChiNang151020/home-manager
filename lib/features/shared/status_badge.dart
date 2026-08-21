@@ -38,6 +38,12 @@ class StatusBadge extends StatelessWidget {
             : Color.lerp(colors.accent, const Color(0xFF000000), 0.22)!,
       ),
       StatusBadgeVariant.neutral => (colors.bgElevated, colors.textSecondary),
+      StatusBadgeVariant.error => (
+        colors.error.withValues(alpha: isDark ? 0.22 : 0.18),
+        isDark
+            ? colors.error
+            : Color.lerp(colors.error, const Color(0xFF000000), 0.18)!,
+      ),
     };
     return Container(
       padding: EdgeInsets.symmetric(
@@ -60,4 +66,4 @@ class StatusBadge extends StatelessWidget {
   }
 }
 
-enum StatusBadgeVariant { success, warning, accent, neutral }
+enum StatusBadgeVariant { success, warning, accent, neutral, error }

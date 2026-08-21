@@ -79,6 +79,10 @@ class HomeService {
     );
   }
 
+  Future<void> deleteHome(String homeId) {
+    return _client.rpc("delete_home", params: {"p_home_id": homeId});
+  }
+
   Future<List<HomeMember>> listMembers(String homeId) async {
     final rows = await _client
         .from("home_members")

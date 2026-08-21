@@ -61,9 +61,9 @@ class SettingsHubPage extends StatelessWidget {
             title: S.settingsHome,
             subtitle: S.settingsHomeDesc,
             onTap:
-                () => Navigator.push(
+                () => Navigator.push<bool>(
                   context,
-                  AppPageRoute<void>(
+                  AppPageRoute<bool>(
                     page: SettingsHomePage(
                       home: home,
                       homesApi: homesApi,

@@ -31,19 +31,11 @@ class SavingsRoutePage extends StatefulWidget {
 }
 
 class _SavingsRoutePageState extends State<SavingsRoutePage> {
-  final _pageKey = GlobalKey<SavingsPageState>();
-
   @override
   Widget build(BuildContext context) {
     return FeaturePageScaffold(
       title: S.savings,
-      actionLabel: S.addSavings,
-      onAction: () => _pageKey.currentState?.openAddForm(),
-      body: SavingsPage(
-        key: _pageKey,
-        home: widget.home,
-        savings: widget.savings,
-      ),
+      body: SavingsPage(home: widget.home, savings: widget.savings),
     );
   }
 }

@@ -191,15 +191,11 @@ class BankCreditRoutePage extends StatefulWidget {
 }
 
 class _BankCreditRoutePageState extends State<BankCreditRoutePage> {
-  final _pageKey = GlobalKey<BankCreditPageState>();
-
   @override
   Widget build(BuildContext context) {
     return FeaturePageScaffold(
       title: S.bankCredit,
-      actionLabel: S.addBankAccount,
-      onAction: () => _pageKey.currentState?.openAddAccount(),
-      body: BankCreditPage(key: _pageKey, home: widget.home, bank: widget.bank),
+      body: BankCreditPage(home: widget.home, bank: widget.bank),
     );
   }
 }

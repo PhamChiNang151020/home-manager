@@ -4,22 +4,21 @@ import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/services/app_services.dart";
 import "package:home_manager/core/services/pwa_runtime.dart";
 import "package:home_manager/core/state/lock_controller.dart";
+import "package:home_manager/core/state/reminder_controller.dart";
 import "package:home_manager/core/state/session_controller.dart";
 import "package:home_manager/core/state/theme_controller.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
-import "package:home_manager/core/theme/app_icons.dart";
-import "package:home_manager/core/theme/app_motion.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/core/theme/mobile_viewport.dart";
-import "package:home_manager/features/expenses/expenses_page.dart";
 import "package:home_manager/features/homes/create_home_dialog.dart";
+import "package:home_manager/features/notifications/notifications_page.dart";
 import "package:home_manager/features/overview/overview_page.dart";
+import "package:home_manager/features/personal/personal_hub_page.dart";
 import "package:home_manager/features/pwa/install_home_screen_banner.dart";
-import "package:home_manager/features/settings/settings_hub_page.dart";
-import "package:home_manager/features/shared/app_asset_icon.dart";
 import "package:home_manager/features/shared/app_loading.dart";
-import "package:home_manager/features/shared/sticky_primary_bar.dart";
-import "package:home_manager/features/shell/home_picker_sheet.dart";
+import "package:home_manager/features/shell/app_bottom_nav.dart";
+import "package:home_manager/features/shell/quick_add_picker_sheet.dart";
+import "package:home_manager/features/transactions/transactions_hub_page.dart";
 
 class AppShell extends StatefulWidget {
   const AppShell({
@@ -41,7 +40,46 @@ class AppShell extends StatefulWidget {
 
 class _AppShellState extends State<AppShell> {
   int _tab = 0;
-  final _expensesKey = GlobalKey<ExpensesPageState>();
+  late final ReminderController _reminders;
+
+  @override
+  void initState() {
+    super.initState();
+    _reminders = ReminderController(widget.services);
+    final home = widget.session.selected;
+    if (home != null) {
+      _reminders.refresh(home);
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant AppShell oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final home = widget.session.selected;
+    if (home?.id != _reminders.homeId) {
+      _reminders.refresh(home);
+    }
+  }
+
+  @override
+  void dispose() {
+    _reminders.dispose();
+    super.dispose();
+  }
+
+  Future<void> _openQuickAdd() async {
+    final home = widget.session.selected;
+    if (home == null) return;
+    await showQuickAddPickerSheet(
+      context: context,
+      home: home,
+      services: widget.services,
+      currentUserId: widget.session.user?.id ?? "",
+      onSaved: () {
+        _reminders.refresh(home);
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,37 +95,16 @@ class _AppShellState extends State<AppShell> {
         appBar: AppBar(
           backgroundColor: colors.bgBase,
           surfaceTintColor: Colors.transparent,
-          title:
-              home == null
-                  ? const Text(S.appName)
-                  : InkWell(
-                    onTap:
-                        () => showHomePickerSheet(
-                          context: context,
-                          homes: session.homes,
-                          selected: home,
-                          onSelected: session.selectHome,
-                          onAddHome:
-                              () => showCreateHomeDialog(
-                                context: context,
-                                homesApi: services.homes,
-                                onCreated: session.refreshHomes,
-                              ),
-                        ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            home.name,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.xs),
-                        const Icon(Icons.expand_more, size: 20),
-                      ],
-                    ),
-                  ),
+          title: Text(
+            home == null
+                ? S.appName
+                : switch (_tab) {
+                  0 => S.overview,
+                  1 => S.transactions,
+                  2 => S.notifications,
+                  _ => S.personal,
+                },
+          ),
         ),
         body: MobileViewport(
           child: Column(
@@ -116,48 +133,51 @@ class _AppShellState extends State<AppShell> {
                               ],
                             ),
                           )
-                          : AnimatedSwitcher(
-                            duration: AppMotion.normal,
-                            switchInCurve: AppCurves.enter,
-                            switchOutCurve: AppCurves.exit,
-                            transitionBuilder: (child, animation) {
-                              return FadeTransition(
-                                opacity: animation,
-                                child: SlideTransition(
-                                  position: Tween<Offset>(
-                                    begin: const Offset(0, 0.02),
-                                    end: Offset.zero,
-                                  ).animate(animation),
-                                  child: child,
-                                ),
-                              );
-                            },
-                            child: switch (_tab) {
-                              0 => OverviewPage(
+                          : IndexedStack(
+                            index: _tab,
+                            children: [
+                              OverviewPage(
                                 key: ValueKey("overview-${home.id}"),
                                 home: home,
                                 services: services,
                                 currentUserId: session.user?.id ?? "",
                               ),
-                              1 => ExpensesPage(
-                                key: _expensesKey,
+                              TransactionsHubPage(
+                                key: ValueKey("tx-${home.id}"),
                                 home: home,
-                                expenses: services.expenses,
-                                homesApi: services.homes,
-                                photos: services.photos,
+                                services: services,
                                 currentUserId: session.user?.id ?? "",
                               ),
-                              _ => SettingsHubPage(
-                                key: ValueKey("settings-${home.id}"),
+                              NotificationsPage(
+                                key: ValueKey("notif-${home.id}"),
                                 home: home,
+                                services: services,
+                                reminders: _reminders,
+                                currentUserId: session.user?.id ?? "",
+                              ),
+                              PersonalHubPage(
+                                key: ValueKey("personal-${home.id}"),
+                                home: home,
+                                homes: session.homes,
                                 homesApi: services.homes,
                                 invites: services.invites,
                                 theme: widget.theme,
                                 lock: widget.lock,
+                                user: session.user,
                                 onChanged: session.refreshHomes,
+                                onSelectHome: (h) {
+                                  session.selectHome(h);
+                                  _reminders.refresh(h);
+                                },
+                                onAddHome:
+                                    () => showCreateHomeDialog(
+                                      context: context,
+                                      homesApi: services.homes,
+                                      onCreated: session.refreshHomes,
+                                    ),
                                 onSignOut: session.signOut,
                               ),
-                            },
+                            ],
                           ),
                 ),
               ),
@@ -170,47 +190,16 @@ class _AppShellState extends State<AppShell> {
                 : SafeArea(
                   top: false,
                   bottom: !(kIsWeb && pwaIosHomeScreenShell()),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (_tab == 1)
-                        StickyPrimaryBar(
-                          label: S.addExpense,
-                          onPressed:
-                              () => _expensesKey.currentState?.openAddForm(),
-                        ),
-                      NavigationBar(
-                        selectedIndex: _tab,
-                        onDestinationSelected:
-                            (index) => setState(() => _tab = index),
-                        destinations: const [
-                          NavigationDestination(
-                            icon: AppAssetIcon(AppIcons.dashboard, size: 24),
-                            selectedIcon: AppAssetIcon(
-                              AppIcons.dashboard,
-                              size: 26,
-                            ),
-                            label: S.overview,
-                          ),
-                          NavigationDestination(
-                            icon: AppAssetIcon(AppIcons.expenses, size: 24),
-                            selectedIcon: AppAssetIcon(
-                              AppIcons.expenses,
-                              size: 26,
-                            ),
-                            label: S.expenses,
-                          ),
-                          NavigationDestination(
-                            icon: AppAssetIcon(AppIcons.settings, size: 24),
-                            selectedIcon: AppAssetIcon(
-                              AppIcons.settings,
-                              size: 26,
-                            ),
-                            label: S.settings,
-                          ),
-                        ],
-                      ),
-                    ],
+                  child: AnimatedBuilder(
+                    animation: _reminders,
+                    builder: (context, _) {
+                      return AppBottomNav(
+                        tabIndex: _tab,
+                        notificationBadge: _reminders.badgeCount,
+                        onTabSelected: (index) => setState(() => _tab = index),
+                        onQuickAdd: _openQuickAdd,
+                      );
+                    },
                   ),
                 ),
       ),

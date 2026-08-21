@@ -13,15 +13,15 @@ import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/expenses/expense_category_chart.dart";
 import "package:home_manager/features/expenses/expense_category_style.dart";
 import "package:home_manager/features/expenses/expense_form.dart";
+import "package:home_manager/features/expenses/quick_add_sheet.dart";
 import "package:home_manager/features/shared/animated_entrance.dart";
 import "package:home_manager/features/shared/app_card.dart";
 import "package:home_manager/features/shared/app_loading.dart";
+import "package:home_manager/features/shared/day_stepper_field.dart";
 import "package:home_manager/features/shared/empty_state_view.dart";
 import "package:home_manager/features/shared/error_view.dart";
 import "package:home_manager/features/shared/loading_view.dart";
-import "package:home_manager/features/shared/labeled_text_field.dart";
 import "package:home_manager/features/shared/money_text.dart";
-import "package:home_manager/features/shared/month_stepper_field.dart";
 import "package:home_manager/features/shared/section_header.dart";
 import "package:intl/intl.dart";
 
@@ -46,19 +46,20 @@ class ExpensesPage extends StatefulWidget {
 }
 
 class ExpensesPageState extends State<ExpensesPage> {
-  List<Expense> _items = [];
+  List<Expense> _monthItems = [];
   List<ExpenseCategory> _categories = [];
   List<HomeMember> _members = [];
   bool _loading = true;
   String? _error;
-  late DateTime _month;
-  String? _filterCategoryId;
-  String? _filterPaidBy;
+  late DateTime _day;
+
+  List<Expense> get _dayItems =>
+      _monthItems.where((e) => sameDay(e.expenseDate, _day)).toList();
 
   @override
   void initState() {
     super.initState();
-    _month = currentMonth();
+    _day = today();
     _load();
   }
 
@@ -80,15 +81,13 @@ class ExpensesPageState extends State<ExpensesPage> {
       final members = await widget.homesApi.listMembers(widget.home.id);
       final items = await widget.expenses.list(
         widget.home.id,
-        month: _month,
-        categoryId: _filterCategoryId,
-        paidBy: _filterPaidBy,
+        month: monthStart(_day),
       );
       if (!mounted) return;
       setState(() {
         _categories = categories;
         _members = members;
-        _items = items;
+        _monthItems = items;
         _loading = false;
       });
     } catch (e, st) {
@@ -102,7 +101,33 @@ class ExpensesPageState extends State<ExpensesPage> {
     }
   }
 
-  void openAddForm() => _openForm();
+  void _onDayChanged(DateTime value) {
+    final previousMonth = monthStart(_day);
+    final next = today(value);
+    setState(() => _day = next);
+    if (!sameMonth(previousMonth, monthStart(next))) {
+      _load();
+    }
+  }
+
+  void openAddForm() => _openQuickAdd();
+
+  Future<void> _openQuickAdd() async {
+    if (_categories.isEmpty) return;
+    final openFull = await showQuickAddSheet(
+      context: context,
+      home: widget.home,
+      expenses: widget.expenses,
+      photos: widget.photos,
+      categories: _categories,
+      members: _members,
+      currentUserId: widget.currentUserId,
+      onSaved: _load,
+    );
+    if (openFull && mounted) {
+      await _openForm();
+    }
+  }
 
   Future<void> _openForm({Expense? existing}) async {
     if (_categories.isEmpty) return;
@@ -157,12 +182,13 @@ class ExpensesPageState extends State<ExpensesPage> {
     if (_error != null) {
       return ErrorView(message: _error!, onRetry: _load);
     }
-    if (_loading && _items.isEmpty && _categories.isEmpty) {
+    if (_loading && _monthItems.isEmpty && _categories.isEmpty) {
       return const LoadingView();
     }
 
     final colors = context.appColors;
-    final spend = spendByCategory(_items);
+    final items = _dayItems;
+    final spend = spendByCategory(items);
 
     return LoadingOverlay(
       loading: _loading,
@@ -173,69 +199,10 @@ class ExpensesPageState extends State<ExpensesPage> {
           children: [
             AnimatedEntrance(
               index: 0,
-              child: MonthStepperField(
-                month: _month,
-                onChanged: (value) {
-                  setState(() => _month = value);
-                  _load();
-                },
-              ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Row(
-              children: [
-                Expanded(
-                  child: LabeledDropdownField<String?>(
-                    label: S.category,
-                    value: _filterCategoryId,
-                    items: [
-                      SelectOption(
-                        value: null,
-                        builder: (_) => const Text(S.filterAll),
-                      ),
-                      for (final category in _categories)
-                        SelectOption(
-                          value: category.id,
-                          builder: (_) => Text(category.name),
-                        ),
-                    ],
-                    onChanged: (value) {
-                      setState(() => _filterCategoryId = value);
-                      _load();
-                    },
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: LabeledDropdownField<String?>(
-                    label: S.paidBy,
-                    value: _filterPaidBy,
-                    items: [
-                      SelectOption(
-                        value: null,
-                        builder: (_) => const Text(S.filterAll),
-                      ),
-                      for (final member in _members)
-                        SelectOption(
-                          value: member.userId,
-                          builder:
-                              (_) => Text(
-                                member.displayName ??
-                                    member.email ??
-                                    member.userId,
-                              ),
-                        ),
-                    ],
-                    onChanged: (value) {
-                      setState(() => _filterPaidBy = value);
-                      _load();
-                    },
-                  ),
-                ),
-              ],
+              child: DayStepperField(day: _day, onChanged: _onDayChanged),
             ),
             const SizedBox(height: AppSpacing.md),
-            if (_items.isEmpty)
+            if (items.isEmpty)
               const EmptyStateView(message: S.noExpenses)
             else ...[
               AnimatedEntrance(
@@ -246,14 +213,14 @@ class ExpensesPageState extends State<ExpensesPage> {
                 index: 2,
                 child: SectionHeader(title: S.history),
               ),
-              for (var i = 0; i < _items.length; i++)
+              for (var i = 0; i < items.length; i++)
                 AnimatedEntrance(
                   index: 3 + i,
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: AppSpacing.xs),
                     child: Builder(
                       builder: (context) {
-                        final expense = _items[i];
+                        final expense = items[i];
                         final categoryColor = colors.categoryColor(
                           expense.category?.colorKey ?? "other",
                         );
@@ -279,8 +246,8 @@ class ExpensesPageState extends State<ExpensesPage> {
                           confirmDismiss: (_) => _confirmDelete(expense),
                           onDismissed: (_) {
                             setState(() {
-                              _items =
-                                  _items
+                              _monthItems =
+                                  _monthItems
                                       .where((e) => e.id != expense.id)
                                       .toList();
                             });

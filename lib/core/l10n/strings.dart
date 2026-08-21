@@ -9,6 +9,29 @@ abstract final class S {
   static const electricity = "Điện";
   static const water = "Nước";
   static const overview = "Tổng quan";
+  static const transactions = "Sổ giao dịch";
+  static const notifications = "Thông báo";
+  static const personal = "Cá nhân";
+  static const personalInfo = "Thông tin";
+  static const personalShare = "Chia sẻ";
+  static const personalSettings = "Cài đặt";
+  static const netWorth = "Tài sản ròng";
+  static String netWorthHomeLabel(String homeName) =>
+      "Tài sản ròng · Nhà $homeName";
+  static const incomeSpendTrend = "Thu/Chi 6 tháng gần nhất";
+  static const managedHome = "Nhà đang quản lý";
+  static const quickAddPickTitle = "Thêm nhanh";
+  static const tabUtilities = "Điện · Nước";
+  static const tabDaily = "Hàng ngày";
+  static const tabCreditDebt = "Tín dụng · Nợ";
+  static const tabSavings = "Tiết kiệm";
+  static const filterOverdue = "Quá hạn";
+  static const filterUpcoming = "Sắp đến hạn";
+  static const filterDone = "Đã xử lý";
+  static const noNotifications = "Không có thông báo";
+  static const reminderOverdue = "Quá hạn";
+  static const reminderUpcoming = "Sắp đến";
+  static const reminderDone = "Đã xử lý";
   static const income = "Thu nhập";
   static const addIncome = "Lưu lương tháng";
   static const noIncome = "Chưa nhập lương tháng này";
@@ -29,6 +52,15 @@ abstract final class S {
   static const receiptPhoto = "Ảnh hoá đơn";
   static const spendByCategory = "Chi theo danh mục";
   static const invalidExpenseAmount = "Nhập số tiền chi hợp lệ.";
+  static const quickAddExpense = "Thêm nhanh";
+  static const quickAddMoreDetails = "Thêm chi tiết hơn";
+  static const quickAddExpand = "Thêm ghi chú / ngày";
+  static const expenseAddedUndo = "Đã thêm";
+  static const undo = "Hoàn tác";
+  static const readingReceiptAmount = "Đang đọc số tiền...";
+  static const receiptAmountHint = "Đã tự đọc, kiểm tra lại trước khi lưu";
+  static const receiptAmountFailed =
+      "Không đọc được số tiền, nhập tay giúp mình nhé";
   static const settings = "Cài đặt";
   static const signOut = "Đăng xuất";
   static const homes = "Nhà";
@@ -54,9 +86,13 @@ abstract final class S {
   static const consumption = "Tiêu thụ";
   static const amount = "Số tiền (đ)";
   static const month = "Tháng";
+  static const day = "Ngày";
   static const selectMonth = "Chọn tháng";
+  static const selectDay = "Chọn ngày";
   static const previousMonth = "Tháng trước";
   static const nextMonth = "Tháng sau";
+  static const previousDay = "Ngày trước";
+  static const nextDay = "Ngày sau";
   static const spendTrend = "Tổng chi 6 tháng";
   static const ok = "OK";
   static const done = "Xong";
@@ -113,6 +149,11 @@ abstract final class S {
   static const noPhoto = "Chưa ảnh";
   static const retry = "Thử lại";
   static const settingsHome = "Nhà";
+  static const deleteHome = "Xóa nhà";
+  static const deleteHomeConfirm =
+      "Xóa nhà này và toàn bộ dữ liệu (điện, nước, chi tiêu, …)? Không thể hoàn tác.";
+  static const deleteHomeHint = "Chỉ chủ nhà mới được xóa.";
+  static const deletingHome = "Đang xóa…";
   static const settingsSchedule = "Lịch nhắc";
   static const settingsMembers = "Thành viên";
   static const settingsAccount = "Tài khoản";
@@ -158,6 +199,7 @@ abstract final class S {
   static const themeModeDark = "Tối";
   static const themeAccent = "Màu nhấn";
   static const history = "Lịch sử";
+  static const filterHistory = "Lọc lịch sử";
   static const filterAll = "Tất cả";
   static const filterYear = "Năm";
   static const filterMonth = "Tháng";

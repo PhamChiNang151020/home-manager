@@ -34,16 +34,11 @@ class PersonalDebtsRoutePage extends StatefulWidget {
 }
 
 class _PersonalDebtsRoutePageState extends State<PersonalDebtsRoutePage> {
-  final _pageKey = GlobalKey<PersonalDebtsPageState>();
-
   @override
   Widget build(BuildContext context) {
     return FeaturePageScaffold(
       title: S.personalDebts,
-      actionLabel: S.addDebt,
-      onAction: () => _pageKey.currentState?.openAddForm(),
       body: PersonalDebtsPage(
-        key: _pageKey,
         home: widget.home,
         debts: widget.debts,
         currentUserId: widget.currentUserId,
