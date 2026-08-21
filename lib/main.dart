@@ -5,6 +5,7 @@ import "package:home_manager/core/logging/app_log.dart";
 import "package:home_manager/core/services/app_services.dart";
 import "package:home_manager/core/services/auth_service.dart";
 import "package:home_manager/core/services/home_service.dart";
+import "package:home_manager/core/state/lock_controller.dart";
 import "package:home_manager/core/state/session_controller.dart";
 import "package:home_manager/core/state/theme_controller.dart";
 import "package:intl/date_symbol_data_local.dart";
@@ -17,6 +18,7 @@ Future<void> main() async {
   Intl.defaultLocale = "vi";
   AppLog.i("Starting home_manager");
   final theme = await ThemeController.load();
+  final lock = await LockController.load();
   if (!AppConfig.isConfigured) {
     AppLog.w("Supabase not configured");
     runApp(MissingConfigApp(theme: theme));
@@ -33,5 +35,12 @@ Future<void> main() async {
     homesApi: HomeService(client),
   );
   await session.start();
-  runApp(HomeManagerApp(session: session, theme: theme, services: services));
+  runApp(
+    HomeManagerApp(
+      session: session,
+      theme: theme,
+      lock: lock,
+      services: services,
+    ),
+  );
 }

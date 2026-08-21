@@ -6,12 +6,14 @@ Consult this file before grepping the repo. Update when adding modules under `li
 
 | Item | Path |
 |------|------|
-| Process entry | `lib/main.dart` (Supabase init + `AppServices` + session) |
+| Process entry | `lib/main.dart` (Supabase init + `AppServices` + session + lock) |
 | Root widget | `lib/app.dart` → `HomeManagerApp` / `MissingConfigApp` |
 | Auth gate | `lib/app.dart` + `lib/features/auth/sign_in_page.dart` |
+| PIN gate | `lib/app.dart` + `lib/features/lock/lock_screen.dart` (after Google auth) |
 | Main shell | `lib/features/shell/app_shell.dart` (Tổng quan / Chi tiêu / Cài đặt) |
 | Home picker sheet | `lib/features/shell/home_picker_sheet.dart` |
 | Session | `lib/core/state/session_controller.dart` (persists `selected_home_id`) |
+| Lock | `lib/core/state/lock_controller.dart` + `lib/core/services/lock_service.dart` (local SHA-256 PIN) |
 | Services locator | `lib/core/services/app_services.dart` |
 
 ## Feature screens
@@ -25,7 +27,12 @@ Consult this file before grepping the repo. Update when adding modules under `li
 | Water | `lib/features/water/` (mirror of electricity) |
 | Expenses | `lib/features/expenses/` (list, form, category chart) |
 | Income | `lib/features/income/income_page.dart` |
-| Settings | `settings_hub_page.dart`, `settings_home_page.dart`, `settings_schedule_page.dart`, `settings_members_page.dart`, `settings_account_page.dart`, `settings_appearance_page.dart` |
+| Finance hub | `lib/features/finance/finance_hub_page.dart` (list → FeaturePageScaffold miniapps) |
+| Bank credit | `lib/features/bank_credit/` |
+| Personal debts | `lib/features/personal_debts/` |
+| Savings | `lib/features/savings/` |
+| App lock | `lib/features/lock/` (lock screen, setup PIN) |
+| Settings | `settings_hub_page.dart`, `settings_home_page.dart`, `settings_schedule_page.dart`, `settings_members_page.dart`, `settings_account_page.dart`, `settings_appearance_page.dart`, `settings_security_page.dart` |
 | PWA install | `lib/features/pwa/install_home_screen_banner.dart`, `install_home_screen_page.dart` |
 | iOS Web Clip | `web/install-ios.html`, `web/to-am.mobileconfig`, `tool/generate_ios_webclip_profile.dart` |
 
@@ -35,7 +42,7 @@ Consult this file before grepping the repo. Update when adding modules under `li
 |------|------|
 | Card, money, badges | `lib/features/shared/app_card.dart`, `money_text.dart`, `status_badge.dart`, `trend_chip.dart` |
 | Period detail | `lib/features/shared/period_detail_view.dart` (điện / nước view-only) |
-| Fields | `labeled_text_field.dart` (`LabeledDropdownField` → select sheet), `labeled_money_field.dart`, `month_picker.dart`, `month_stepper_field.dart`, `select_sheet.dart` |
+| Fields | `labeled_text_field.dart` (`LabeledDropdownField` → select sheet), `labeled_money_field.dart`, `month_picker.dart`, `cupertino_date_sheet.dart`, `month_stepper_field.dart`, `select_sheet.dart` |
 | Loading / error / empty | `app_loading.dart` (logo + spinning ring), `loading_view.dart`, `error_view.dart`, `empty_state_view.dart` |
 | Sticky CTA / feature scaffold | `sticky_primary_bar.dart`, `feature_page_scaffold.dart` |
 | Brand logo | `lib/features/shared/app_brand_logo.dart` (`assets/brand/logo.png`) |
@@ -50,9 +57,9 @@ Consult this file before grepping the repo. Update when adding modules under `li
 | Copy (VI) | `lib/core/l10n/strings.dart` |
 | Theme | `lib/core/theme/app_theme.dart` (Nunito), `app_color_scheme.dart` (incl. category colors), `app_spacing.dart` |
 | Fonts | `assets/fonts/Nunito/static/` (Regular 400 · Medium 500 · SemiBold 600 · Bold 700) |
-| Domain | `electricity_validation.dart`, `water_validation.dart`, `meter_math.dart`, `month_balance.dart`, `month_clamp.dart`, `expense_totals.dart`, `selected_home.dart`, `period_history_filter.dart`, `pwa_install.dart` |
-| Models | `home.dart`, `electricity_period.dart`, `water_period.dart`, `expense.dart`, `income.dart`, `tracking_mode.dart` |
-| Services | `home_service.dart`, `invite_service.dart`, `electricity_service.dart` (`BillPhotoService`), `water_service.dart`, `expense_service.dart`, `income_service.dart` |
+| Domain | `electricity_validation.dart`, `water_validation.dart`, `meter_math.dart`, `month_balance.dart`, `month_clamp.dart`, `expense_totals.dart`, `selected_home.dart`, `period_history_filter.dart`, `pwa_install.dart`, `bank_brand.dart` |
+| Models | `home.dart`, `electricity_period.dart`, `water_period.dart`, `expense.dart`, `income.dart`, `tracking_mode.dart`, `lock_settings.dart`, `bank_account.dart`, `personal_debt.dart`, `savings.dart` |
+| Services | `home_service.dart`, `invite_service.dart`, `electricity_service.dart` (`BillPhotoService`), `water_service.dart`, `expense_service.dart`, `income_service.dart`, `lock_service.dart`, `bank_account_service.dart`, `personal_debt_service.dart`, `savings_service.dart` |
 
 ## Supabase
 
@@ -64,6 +71,11 @@ Consult this file before grepping the repo. Update when adding modules under `li
 | Water | `20260820100000_water_periods.sql` |
 | Expenses | `20260820110000_expenses.sql` |
 | Income | `20260820120000_incomes.sql` |
+| Bank credit | `20260821090000_bank_credit.sql` |
+| Personal debts + RPC | `20260821090100_personal_debts.sql` (`add_personal_debt_payment`) |
+| Savings + RPC | `20260821090200_savings.sql` (`add_savings_contribution`) |
+| Seed (elec/water/expense/income) | `supabase/seeds/seed_home_testing.sql` |
+| Seed (finance) | `supabase/seeds/seed_finance_testing.sql` |
 
 ## QA & Tests
 
@@ -82,6 +94,11 @@ Consult this file before grepping the repo. Update when adding modules under `li
 - `lib/features/water/`
 - `lib/features/expenses/`
 - `lib/features/income/`
+- `lib/features/finance/`
+- `lib/features/bank_credit/`
+- `lib/features/personal_debts/`
+- `lib/features/savings/`
+- `lib/features/lock/`
 - `lib/features/homes/`
 - `lib/features/settings/`
 - `lib/features/pwa/`

@@ -17,13 +17,26 @@ class StatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final (bg, fg) = switch (variant) {
       StatusBadgeVariant.success => (
-        colors.success.withValues(alpha: 0.15),
-        colors.success,
+        colors.success.withValues(alpha: isDark ? 0.22 : 0.18),
+        isDark
+            ? colors.success
+            : Color.lerp(colors.success, const Color(0xFF000000), 0.18)!,
       ),
-      StatusBadgeVariant.warning => (colors.warningMuted(), colors.warning),
-      StatusBadgeVariant.accent => (colors.accentMuted(), colors.accent),
+      StatusBadgeVariant.warning => (
+        colors.warning.withValues(alpha: isDark ? 0.32 : 0.26),
+        isDark
+            ? Color.lerp(colors.warning, const Color(0xFFFFFFFF), 0.12)!
+            : Color.lerp(colors.warning, const Color(0xFF000000), 0.28)!,
+      ),
+      StatusBadgeVariant.accent => (
+        colors.accent.withValues(alpha: isDark ? 0.28 : 0.22),
+        isDark
+            ? colors.accent
+            : Color.lerp(colors.accent, const Color(0xFF000000), 0.22)!,
+      ),
       StatusBadgeVariant.neutral => (colors.bgElevated, colors.textSecondary),
     };
     return Container(

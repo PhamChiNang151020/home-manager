@@ -5,6 +5,7 @@ import "package:home_manager/core/models/home.dart";
 import "package:home_manager/core/navigation/app_page_route.dart";
 import "package:home_manager/core/services/home_service.dart";
 import "package:home_manager/core/services/invite_service.dart";
+import "package:home_manager/core/state/lock_controller.dart";
 import "package:home_manager/core/state/theme_controller.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_icons.dart";
@@ -15,6 +16,7 @@ import "package:home_manager/features/settings/settings_appearance_page.dart";
 import "package:home_manager/features/settings/settings_home_page.dart";
 import "package:home_manager/features/settings/settings_members_page.dart";
 import "package:home_manager/features/settings/settings_schedule_page.dart";
+import "package:home_manager/features/settings/settings_security_page.dart";
 import "package:home_manager/features/shared/animated_entrance.dart";
 import "package:home_manager/features/shared/app_asset_icon.dart";
 import "package:home_manager/features/shared/app_card.dart";
@@ -26,6 +28,7 @@ class SettingsHubPage extends StatelessWidget {
     required this.homesApi,
     required this.invites,
     required this.theme,
+    required this.lock,
     required this.onChanged,
     required this.onSignOut,
   });
@@ -34,6 +37,7 @@ class SettingsHubPage extends StatelessWidget {
   final HomeService homesApi;
   final InviteService invites;
   final ThemeController theme;
+  final LockController lock;
   final VoidCallback onChanged;
   final VoidCallback onSignOut;
 
@@ -131,6 +135,20 @@ class SettingsHubPage extends StatelessWidget {
         AnimatedEntrance(
           index: 4,
           child: _SettingsTile(
+            leading: Icon(Icons.lock_outline, color: context.appColors.accent),
+            title: S.settingsSecurity,
+            subtitle:
+                lock.hasPinSet ? S.settingsSecurityDesc : S.appLockNotEnabled,
+            onTap:
+                () => Navigator.push(
+                  context,
+                  AppPageRoute<void>(page: SettingsSecurityPage(lock: lock)),
+                ),
+          ),
+        ),
+        AnimatedEntrance(
+          index: 5,
+          child: _SettingsTile(
             leading: Icon(
               Icons.add_to_home_screen,
               color: context.appColors.accent,
@@ -145,7 +163,7 @@ class SettingsHubPage extends StatelessWidget {
           ),
         ),
         AnimatedEntrance(
-          index: 5,
+          index: 6,
           child: _SettingsTile(
             leading: Icon(
               Icons.person_outline,
@@ -163,7 +181,7 @@ class SettingsHubPage extends StatelessWidget {
           ),
         ),
         AnimatedEntrance(
-          index: 6,
+          index: 7,
           child: Padding(
             padding: const EdgeInsets.only(top: AppSpacing.lg),
             child: Center(

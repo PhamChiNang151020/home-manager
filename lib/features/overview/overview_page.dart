@@ -14,6 +14,7 @@ import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/electricity/electricity_page.dart";
 import "package:home_manager/features/electricity/reminder_banner.dart";
 import "package:home_manager/features/expenses/expense_category_chart.dart";
+import "package:home_manager/features/finance/finance_hub_page.dart";
 import "package:home_manager/features/income/income_page.dart";
 import "package:home_manager/features/overview/overview_shortcut_grid.dart";
 import "package:home_manager/features/overview/overview_spend_trend_chart.dart";
@@ -27,10 +28,16 @@ import "package:home_manager/features/shared/section_header.dart";
 import "package:home_manager/features/water/water_page.dart";
 
 class OverviewPage extends StatefulWidget {
-  const OverviewPage({super.key, required this.home, required this.services});
+  const OverviewPage({
+    super.key,
+    required this.home,
+    required this.services,
+    required this.currentUserId,
+  });
 
   final Home home;
   final AppServices services;
+  final String currentUserId;
 
   @override
   State<OverviewPage> createState() => _OverviewPageState();
@@ -42,6 +49,7 @@ class _OverviewPageState extends State<OverviewPage> {
   List<MonthBalancePoint> _history = [];
   double? _spendDeltaPercent;
   List<CategorySpend> _spend = [];
+  double _financeAmount = 0;
   bool _loading = true;
 
   Home get home => widget.home;
@@ -69,6 +77,7 @@ class _OverviewPageState extends State<OverviewPage> {
       final electricity = await services.electricity.list(home.id);
       final water = await services.water.list(home.id);
       final expenses = await services.expenses.list(home.id);
+      final financeAmount = await _loadFinanceAmount();
       if (!mounted) return;
       final history = balancesForMonths(
         endMonth: _month,
@@ -92,11 +101,44 @@ class _OverviewPageState extends State<OverviewPage> {
               .where((item) => sameMonth(item.expenseDate, _month))
               .toList(),
         );
+        _financeAmount = financeAmount;
         _loading = false;
       });
     } catch (e, st) {
       AppLog.e("Failed to load overview", error: e, stackTrace: st);
       if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  /// Savings − credit used − (mình nợ) + (người khác nợ mình).
+  Future<double> _loadFinanceAmount() async {
+    try {
+      final accounts = await services.bankAccounts.listAccounts(home.id);
+      var creditUsed = 0.0;
+      for (final a in accounts) {
+        final period = await services.bankAccounts.latestPeriod(a.id);
+        creditUsed += period?.balanceUsed ?? 0;
+      }
+      final debts = await services.personalDebts.list(home.id);
+      var iOwe = 0.0;
+      var owedToMe = 0.0;
+      for (final d in debts) {
+        if (d.isSettled) continue;
+        if (d.iOwe) {
+          iOwe += d.remainingAmount;
+        } else {
+          owedToMe += d.remainingAmount;
+        }
+      }
+      final savings = await services.savings.list(home.id);
+      final savingsTotal = savings.fold<double>(
+        0,
+        (sum, s) => sum + s.currentAmount,
+      );
+      return savingsTotal - creditUsed - iOwe + owedToMe;
+    } catch (e, st) {
+      AppLog.e("Failed to load finance summary", error: e, stackTrace: st);
+      return 0;
     }
   }
 
@@ -128,6 +170,19 @@ class _OverviewPageState extends State<OverviewPage> {
           home: home,
           water: services.water,
           photos: services.photos,
+        ),
+      ),
+    );
+  }
+
+  void _openFinance(BuildContext context) {
+    Navigator.push<void>(
+      context,
+      AppPageRoute<void>(
+        page: FinanceHubPage(
+          home: home,
+          services: services,
+          currentUserId: widget.currentUserId,
         ),
       ),
     );
@@ -188,9 +243,11 @@ class _OverviewPageState extends State<OverviewPage> {
                 electricityAmount: _balance?.electricity ?? 0,
                 waterAmount: _balance?.water ?? 0,
                 incomeAmount: _balance?.income ?? 0,
+                financeAmount: _financeAmount,
                 onElectricity: () => _openElectricity(context),
                 onWater: () => _openWater(context),
                 onIncome: () => _openIncome(context),
+                onFinance: () => _openFinance(context),
               ),
             ),
           ],

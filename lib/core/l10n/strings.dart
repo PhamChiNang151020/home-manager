@@ -117,12 +117,14 @@ abstract final class S {
   static const settingsMembers = "Thành viên";
   static const settingsAccount = "Tài khoản";
   static const settingsAppearance = "Giao diện";
+  static const settingsSecurity = "Bảo mật";
   static const settingsInstall = "Thêm ra Màn hình chính";
   static const settingsHomeDesc = "Tên nhà, đơn giá điện / nước";
   static const settingsScheduleDesc = "Ngày chụp, lương, nhắc · xuất .ics";
   static const settingsMembersDesc = "Thành viên và lời mời";
   static const settingsAccountDesc = "Đăng xuất";
   static const settingsAppearanceDesc = "Sáng / tối, màu nhấn";
+  static const settingsSecurityDesc = "Khoá ứng dụng bằng PIN";
   static const settingsInstallDesc = "iPhone: cài nhanh · QR gửi người nhà";
   static const installBannerTitle = "Thêm Tổ Ấm ra Màn hình chính";
   static const installBannerIosSafari =
@@ -178,4 +180,86 @@ abstract final class S {
   static const markPaid = "Đánh dấu đã thanh toán";
   static const markUnpaid = "Bỏ đánh dấu";
   static const appVersion = "Phiên bản";
+
+  // Lock / PIN
+  static const lockTitle = "Nhập PIN";
+  static const lockWrongPin = "PIN không đúng";
+  static const setupPinTitle = "Tạo mã PIN";
+  static const setupPinConfirmTitle = "Xác nhận PIN";
+  static const setupPinMismatch = "Hai lần nhập không khớp";
+  static const setupPinTooShort = "PIN cần đủ 6 số";
+  static const changePin = "Đổi PIN";
+  static const enableAppLock = "Khoá ứng dụng";
+  static const appLockNotEnabled = "Chưa bật khoá ứng dụng";
+  static const autoLockLabel = "Tự khoá khi tạm ẩn app";
+  static const autoLockImmediate = "Ngay lập tức";
+  static const autoLockOneMinute = "Sau 1 phút";
+  static const autoLockFiveMinutes = "Sau 5 phút";
+  static const disableAppLock = "Tắt khoá ứng dụng";
+
+  // Finance hub
+  static const finance = "Tài chính";
+  static const bankCredit = "Tín dụng NH";
+  static const personalDebts = "Nợ vay mượn";
+  static const savings = "Tiết kiệm";
+  static const bankCreditDesc = "Thẻ tín dụng, hạn mức, sao kê";
+  static const personalDebtsDesc = "Mình nợ / người khác nợ mình";
+  static const savingsDesc = "Gửi kỳ hạn và mục tiêu tiết kiệm";
+  static const addBankAccount = "Thêm thẻ / hạn mức";
+  static const editBankAccount = "Sửa thẻ / hạn mức";
+  static const bankName = "Ngân hàng";
+  static const bankPickHint = "Chọn ngân hàng";
+  static const bankOther = "Khác / tự nhập";
+  static const creditLimit = "Hạn mức (đ)";
+  static const statementDay = "Ngày chốt sao kê";
+  static const dueDay = "Ngày đến hạn";
+  static const balanceUsed = "Đã sử dụng (đ)";
+  static const paymentDue = "Số phải trả (đ)";
+  static const paymentMade = "Đã trả (đ)";
+  static const remainingCredit = "Còn lại";
+  static const addBankPeriod = "Thêm kỳ sao kê";
+  static const editBankPeriod = "Sửa kỳ sao kê";
+  static const noBankAccounts = "Chưa có thẻ tín dụng nào";
+  static const deleteBankAccount = "Xóa thẻ";
+  static const deleteBankAccountConfirm =
+      "Xóa thẻ và mọi kỳ sao kê? Không thể hoàn tác.";
+  static const invalidDay = "Ngày phải từ 1 đến 31";
+
+  // Personal debts
+  static const iOwe = "Mình nợ";
+  static const owedToMe = "Nợ mình";
+  static const addDebt = "Thêm khoản nợ";
+  static const editDebt = "Sửa khoản nợ";
+  static const counterparty = "Người liên quan";
+  static const principalAmount = "Số gốc (đ)";
+  static const remainingAmount = "Còn lại (đ)";
+  static const dueDate = "Hạn trả";
+  static const interestRate = "Lãi suất (%/năm)";
+  static const settled = "Đã tất toán";
+  static const openDebt = "Đang mở";
+  static const addPayment = "Ghi nhận trả";
+  static const paymentHistory = "Lịch sử trả";
+  static const noDebts = "Chưa có khoản nợ nào";
+  static const debtDirection = "Chiều nợ";
+  static const deleteDebt = "Xóa khoản nợ";
+  static const deleteDebtConfirm = "Xóa khoản nợ này? Không thể hoàn tác.";
+
+  // Savings
+  static const termDeposit = "Sổ tiết kiệm ngân hàng";
+  static const savingsGoal = "Tiết kiệm mục tiêu";
+  static const addSavings = "Thêm tiết kiệm";
+  static const editSavings = "Sửa tiết kiệm";
+  static const savingsType = "Loại";
+  static const savingsName = "Tên";
+  static const termMonths = "Kỳ hạn (tháng)";
+  static const maturityDate = "Ngày đáo hạn";
+  static const targetAmount = "Mục tiêu (đ)";
+  static const currentAmount = "Số dư hiện tại (đ)";
+  static const addContribution = "Nạp thêm";
+  static const noSavings = "Chưa có khoản tiết kiệm nào";
+  static const daysToMaturity = "Còn {days} ngày đến đáo hạn";
+  static const matured = "Đã đến hạn";
+  static const deleteSavings = "Xóa tiết kiệm";
+  static const deleteSavingsConfirm =
+      "Xóa khoản tiết kiệm này? Không thể hoàn tác.";
 }

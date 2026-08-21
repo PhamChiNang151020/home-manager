@@ -3,6 +3,7 @@ import "package:flutter/material.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/services/app_services.dart";
 import "package:home_manager/core/services/pwa_runtime.dart";
+import "package:home_manager/core/state/lock_controller.dart";
 import "package:home_manager/core/state/session_controller.dart";
 import "package:home_manager/core/state/theme_controller.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
@@ -25,11 +26,13 @@ class AppShell extends StatefulWidget {
     super.key,
     required this.session,
     required this.theme,
+    required this.lock,
     required this.services,
   });
 
   final SessionController session;
   final ThemeController theme;
+  final LockController lock;
   final AppServices services;
 
   @override
@@ -134,6 +137,7 @@ class _AppShellState extends State<AppShell> {
                                 key: ValueKey("overview-${home.id}"),
                                 home: home,
                                 services: services,
+                                currentUserId: session.user?.id ?? "",
                               ),
                               1 => ExpensesPage(
                                 key: _expensesKey,
@@ -149,6 +153,7 @@ class _AppShellState extends State<AppShell> {
                                 homesApi: services.homes,
                                 invites: services.invites,
                                 theme: widget.theme,
+                                lock: widget.lock,
                                 onChanged: session.refreshHomes,
                                 onSignOut: session.signOut,
                               ),

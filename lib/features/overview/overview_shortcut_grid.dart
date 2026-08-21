@@ -13,47 +13,68 @@ class OverviewShortcutGrid extends StatelessWidget {
     required this.electricityAmount,
     required this.waterAmount,
     required this.incomeAmount,
+    required this.financeAmount,
     required this.onElectricity,
     required this.onWater,
     required this.onIncome,
+    required this.onFinance,
   });
 
   final double electricityAmount;
   final double waterAmount;
   final double incomeAmount;
+  final double financeAmount;
   final VoidCallback onElectricity;
   final VoidCallback onWater;
   final VoidCallback onIncome;
+  final VoidCallback onFinance;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Column(
       children: [
-        Expanded(
-          child: _MiniTile(
-            icon: AppIcons.electricity,
-            label: S.electricity,
-            amount: electricityAmount,
-            onTap: onElectricity,
-          ),
+        Row(
+          children: [
+            Expanded(
+              child: _MiniTile(
+                assetIcon: AppIcons.electricity,
+                label: S.electricity,
+                amount: electricityAmount,
+                onTap: onElectricity,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: _MiniTile(
+                assetIcon: AppIcons.water,
+                label: S.water,
+                amount: waterAmount,
+                onTap: onWater,
+              ),
+            ),
+          ],
         ),
-        const SizedBox(width: AppSpacing.sm),
-        Expanded(
-          child: _MiniTile(
-            icon: AppIcons.water,
-            label: S.water,
-            amount: waterAmount,
-            onTap: onWater,
-          ),
-        ),
-        const SizedBox(width: AppSpacing.sm),
-        Expanded(
-          child: _MiniTile(
-            icon: AppIcons.income,
-            label: S.income,
-            amount: incomeAmount,
-            onTap: onIncome,
-          ),
+        const SizedBox(height: AppSpacing.sm),
+        Row(
+          children: [
+            Expanded(
+              child: _MiniTile(
+                assetIcon: AppIcons.income,
+                label: S.income,
+                amount: incomeAmount,
+                onTap: onIncome,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: _MiniTile(
+                materialIcon: Icons.account_balance_wallet_outlined,
+                label: S.finance,
+                amount: financeAmount,
+                onTap: onFinance,
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -62,13 +83,15 @@ class OverviewShortcutGrid extends StatelessWidget {
 
 class _MiniTile extends StatelessWidget {
   const _MiniTile({
-    required this.icon,
+    this.assetIcon,
+    this.materialIcon,
     required this.label,
     required this.amount,
     required this.onTap,
-  });
+  }) : assert(assetIcon != null || materialIcon != null);
 
-  final String icon;
+  final String? assetIcon;
+  final IconData? materialIcon;
   final String label;
   final double amount;
   final VoidCallback onTap;
@@ -84,7 +107,10 @@ class _MiniTile extends StatelessWidget {
       ),
       child: Column(
         children: [
-          AppAssetIcon(icon, size: 28),
+          if (assetIcon != null)
+            AppAssetIcon(assetIcon!, size: 28)
+          else
+            Icon(materialIcon, size: 28, color: colors.accent),
           const SizedBox(height: AppSpacing.xs),
           Text(
             label,

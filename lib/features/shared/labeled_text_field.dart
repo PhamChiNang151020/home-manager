@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:flutter/services.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/shared/select_sheet.dart";
@@ -12,21 +13,27 @@ class LabeledTextField extends StatelessWidget {
     required this.label,
     required this.controller,
     this.keyboardType,
+    this.inputFormatters,
+    this.maxLength,
     this.readOnly = false,
     this.enabled = true,
     this.onChanged,
     this.hint,
     this.helperText,
+    this.prefix,
   });
 
   final String label;
   final TextEditingController controller;
   final TextInputType? keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
+  final int? maxLength;
   final bool readOnly;
   final bool enabled;
   final ValueChanged<String>? onChanged;
   final String? hint;
   final String? helperText;
+  final Widget? prefix;
 
   @override
   Widget build(BuildContext context) {
@@ -45,10 +52,24 @@ class LabeledTextField extends StatelessWidget {
         TextField(
           controller: controller,
           keyboardType: keyboardType,
+          inputFormatters: inputFormatters,
+          maxLength: maxLength,
           readOnly: readOnly,
           enabled: enabled,
           onChanged: onChanged,
-          decoration: InputDecoration(hintText: hint, helperText: helperText),
+          decoration: InputDecoration(
+            hintText: hint,
+            helperText: helperText,
+            counterText: maxLength == null ? null : "",
+            prefixIcon:
+                prefix == null
+                    ? null
+                    : Padding(padding: const EdgeInsets.all(10), child: prefix),
+            prefixIconConstraints: const BoxConstraints(
+              minWidth: 40,
+              minHeight: 40,
+            ),
+          ),
         ),
       ],
     );
