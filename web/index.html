@@ -18,7 +18,7 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="description" content="Tổ Ấm — Giữ ấm tổ ấm, giữ vững chi tiêu">
   <meta name="theme-color" content="#0B0D10">
 
@@ -37,70 +37,51 @@
   <title>Tổ Ấm</title>
   <link rel="manifest" href="manifest.json">
   <script>
-    // iOS home-screen shell (PWA / Web Clip): Flutter reads clientHeight, which can
-    // exceed the touch box. Keep DOM hosts aligned to visualViewport / innerHeight.
+    // iOS home-screen: paint + hit-test must share one box. Flutter is embedded
+    // in #flutter-host (see flutter_bootstrap.js). Size that host to the
+    // interactive viewport; do not reposition flutter-view after Flutter owns it.
     (function () {
       function isIos() {
         return /iPhone|iPad|iPod/i.test(navigator.userAgent);
       }
-      if (!isIos()) return;
 
       function isHomeScreenShell() {
+        if (!isIos()) return false;
         if (navigator.standalone) return true;
         try {
           if (window.matchMedia("(display-mode: standalone)").matches) return true;
           if (window.matchMedia("(display-mode: fullscreen)").matches) return true;
         } catch (_) {}
-        // Safari browser shows large outer-inner delta; icon / Web Clip does not.
+        // Web Clip / profile icon: little or no Safari chrome.
         return Math.abs(window.outerHeight - window.innerHeight) <= 50;
       }
 
-      function shellMetrics() {
+      function interactiveSize() {
         var vv = window.visualViewport;
         var height =
           vv && vv.height > 0 ? vv.height : window.innerHeight || 0;
-        var width = vv && vv.width > 0 ? vv.width : window.innerWidth || 0;
-        var top = vv ? vv.offsetTop : 0;
-        return { height: height, width: width, top: top };
-      }
-
-      function layoutMetrics() {
-        if (isHomeScreenShell()) return shellMetrics();
-        var vv = window.visualViewport;
+        var width =
+          vv && vv.width > 0 ? vv.width : window.innerWidth || 0;
+        var top = vv ? vv.offsetTop || 0 : 0;
         return {
-          height: vv && vv.height > 0 ? vv.height : window.innerHeight,
-          width: vv && vv.width > 0 ? vv.width : window.innerWidth,
-          top: vv ? vv.offsetTop : 0,
+          height: Math.max(0, Math.round(height)),
+          width: Math.max(0, Math.round(width)),
+          top: Math.max(0, Math.round(top)),
         };
       }
 
-      function round(n) {
-        return Math.max(0, Math.round(n || 0));
-      }
-
       function defineClientMetrics() {
+        if (!isIos()) return;
         try {
           Object.defineProperty(document.documentElement, "clientHeight", {
             get: function () {
-              return round(layoutMetrics().height);
+              return interactiveSize().height;
             },
             configurable: true,
           });
           Object.defineProperty(document.documentElement, "clientWidth", {
             get: function () {
-              return round(layoutMetrics().width);
-            },
-            configurable: true,
-          });
-          Object.defineProperty(document.body, "clientHeight", {
-            get: function () {
-              return round(layoutMetrics().height);
-            },
-            configurable: true,
-          });
-          Object.defineProperty(document.body, "clientWidth", {
-            get: function () {
-              return round(layoutMetrics().width);
+              return interactiveSize().width;
             },
             configurable: true,
           });
@@ -108,85 +89,48 @@
       }
       defineClientMetrics();
 
-      function flutterHosts() {
-        return document.querySelectorAll(
-          "flutter-view, flt-glass-pane, flt-scene-host"
+      function syncFlutterHost() {
+        var host = document.getElementById("flutter-host");
+        if (!host) return;
+
+        var size = interactiveSize();
+        if (!size.height) return;
+
+        document.documentElement.style.setProperty(
+          "--app-height",
+          size.height + "px"
         );
-      }
-
-      function clearHomeScreenShell() {
-        document.documentElement.style.position = "";
-        document.documentElement.style.top = "";
-        document.documentElement.style.left = "";
-        document.documentElement.style.right = "";
-        document.documentElement.style.height = "";
-        document.documentElement.style.removeProperty("--app-height");
-        document.documentElement.style.removeProperty("--app-offset-top");
-        document.documentElement.removeAttribute("data-ios-home-screen");
-        document.body.style.position = "";
-        document.body.style.top = "";
-        document.body.style.left = "";
-        document.body.style.right = "";
-        document.body.style.height = "";
-        document.body.style.maxHeight = "";
-        flutterHosts().forEach(function (el) {
-          el.style.position = "";
-          el.style.top = "";
-          el.style.left = "";
-          el.style.right = "";
-          el.style.height = "";
-          el.style.maxHeight = "";
-        });
-      }
-
-      function applyHostBox(el, m) {
-        el.style.position = "fixed";
-        el.style.top = m.top + "px";
-        el.style.left = "0";
-        el.style.right = "0";
-        el.style.width = "100%";
-        el.style.height = m.height + "px";
-        el.style.maxHeight = m.height + "px";
-      }
-
-      function syncHomeScreenShell() {
-        if (!isHomeScreenShell()) {
-          clearHomeScreenShell();
-          return;
-        }
-        var m = shellMetrics();
-        if (!m.height) return;
-
-        document.documentElement.style.setProperty("--app-height", m.height + "px");
+        document.documentElement.style.setProperty(
+          "--app-width",
+          size.width + "px"
+        );
         document.documentElement.style.setProperty(
           "--app-offset-top",
-          m.top + "px"
+          size.top + "px"
         );
-        document.documentElement.setAttribute("data-ios-home-screen", "true");
-        document.documentElement.style.position = "fixed";
-        document.documentElement.style.top = "0";
-        document.documentElement.style.left = "0";
-        document.documentElement.style.right = "0";
-        document.documentElement.style.height = m.height + "px";
-        document.documentElement.style.maxHeight = m.height + "px";
-        document.documentElement.style.overflow = "hidden";
 
-        applyHostBox(document.body, m);
-        flutterHosts().forEach(function (el) {
-          applyHostBox(el, m);
-        });
+        if (isHomeScreenShell()) {
+          document.documentElement.setAttribute("data-ios-home-screen", "true");
+        } else {
+          document.documentElement.removeAttribute("data-ios-home-screen");
+        }
+
+        host.style.top = size.top + "px";
+        host.style.height = size.height + "px";
+        host.style.width = size.width + "px";
+        host.style.maxHeight = size.height + "px";
       }
 
       var timer;
       function scheduleSync() {
         clearTimeout(timer);
         timer = setTimeout(function () {
-          syncHomeScreenShell();
+          syncFlutterHost();
           window.dispatchEvent(new Event("resize"));
         }, 50);
       }
 
-      syncHomeScreenShell();
+      syncFlutterHost();
       window.addEventListener("resize", scheduleSync);
       window.addEventListener("orientationchange", scheduleSync);
       window.addEventListener("flutter-first-frame", scheduleSync);
@@ -195,19 +139,6 @@
         window.visualViewport.addEventListener("resize", scheduleSync);
         window.visualViewport.addEventListener("scroll", scheduleSync);
       }
-
-      var observer = new MutationObserver(scheduleSync);
-      observer.observe(document.documentElement, {
-        childList: true,
-        subtree: true,
-      });
-
-      var polls = 0;
-      var pollId = window.setInterval(function () {
-        scheduleSync();
-        polls += 1;
-        if (polls >= 24) window.clearInterval(pollId);
-      }, 125);
     })();
   </script>
   <style>
@@ -218,27 +149,22 @@
       background-color: #0B0D10;
       overflow: hidden;
       overscroll-behavior: none;
+      touch-action: none;
     }
-    html[data-ios-home-screen="true"] {
+    #flutter-host {
       position: fixed;
-      inset: 0 auto auto 0;
-      width: 100%;
+      top: var(--app-offset-top, 0);
+      left: 0;
+      width: var(--app-width, 100%);
       height: var(--app-height, 100%);
       max-height: var(--app-height, 100%);
       overflow: hidden;
+      background-color: #0B0D10;
     }
-    html[data-ios-home-screen="true"] body {
-      height: var(--app-height, 100%);
-      min-height: var(--app-height, 100%);
-      max-height: var(--app-height, 100%);
-    }
-    html[data-ios-home-screen="true"] flutter-view,
-    html[data-ios-home-screen="true"] flt-glass-pane,
-    html[data-ios-home-screen="true"] flt-scene-host {
-      top: var(--app-offset-top, 0) !important;
-      height: var(--app-height, 100%) !important;
-      max-height: var(--app-height, 100%) !important;
+    #flutter-host > flutter-view,
+    #flutter-host > flt-glass-pane {
       width: 100% !important;
+      height: 100% !important;
     }
     #splash {
       position: fixed;
@@ -283,6 +209,7 @@
     <p class="splash-name">Tổ Ấm</p>
     <p class="splash-tagline">Giữ ấm tổ ấm, giữ vững chi tiêu</p>
   </div>
+  <div id="flutter-host"></div>
   <script src="flutter_bootstrap.js" async></script>
   <script>
     function removeSplash() {

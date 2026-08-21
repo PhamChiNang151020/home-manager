@@ -2,11 +2,11 @@ import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 import "package:home_manager/core/services/pwa_runtime.dart";
 
-/// Aligns Flutter [MediaQuery] with the iOS home-screen touch layer.
+/// Keeps Flutter [MediaQuery] in sync with the iOS home-screen host box.
 ///
-/// JS in [web/index.html] overrides `clientHeight` and sizes host elements.
-/// Flutter web can still apply incorrect bottom safe-area insets in standalone
-/// / Web Clip mode, which shifts painted widgets without moving hit targets.
+/// Flutter is embedded in `#flutter-host` (see [web/index.html]). On that
+/// shell, bottom safe-area insets from the engine are often wrong and shift
+/// painted controls away from hit targets — zero the bottom inset only.
 class PwaViewportScope extends StatelessWidget {
   const PwaViewportScope({super.key, required this.child});
 
