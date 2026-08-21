@@ -59,6 +59,7 @@ abstract final class S {
   static const nextMonth = "Tháng sau";
   static const spendTrend = "Tổng chi 6 tháng";
   static const ok = "OK";
+  static const done = "Xong";
   static const note = "Ghi chú";
   static const photo = "Ảnh hoá đơn";
   static const pickPhoto = "Chụp hoặc chọn ảnh";

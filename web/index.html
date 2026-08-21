@@ -224,18 +224,39 @@
     (function installPwaHistoryGuard() {
       if (window.__pwaHistoryGuardInstalled) return;
       window.__pwaHistoryGuardInstalled = true;
-      window.addEventListener('popstate', function () {
-        history.pushState(null, '', location.href);
+
+      // Flutter Web stores serial metadata on history.state. Never replace with
+      // null — that triggers "unexpected null history state" on hot restart.
+      function flutterSafeHistoryState() {
+        var state = history.state;
+        return state !== null && typeof state === "object" ? state : {};
+      }
+
+      function isStandaloneShell() {
+        if (navigator.standalone) return true;
+        try {
+          if (window.matchMedia("(display-mode: standalone)").matches) return true;
+          if (window.matchMedia("(display-mode: fullscreen)").matches) return true;
+        } catch (_) {}
+        return false;
+      }
+
+      window.addEventListener("popstate", function () {
+        if (!isStandaloneShell()) return;
+        history.pushState(flutterSafeHistoryState(), "", location.href);
       });
-      window.addEventListener('pageshow', function (event) {
+      window.addEventListener("pageshow", function (event) {
         if (event.persisted) location.reload();
       });
-    })();
 
-    window.resetPwaBrowserHistory = function () {
-      history.replaceState(null, '', location.href);
-      history.pushState(null, '', location.href);
-    };
+      window.resetPwaBrowserHistory = function () {
+        // Only trap back on installed PWA / home-screen; skip browser debug.
+        if (!isStandaloneShell()) return;
+        var state = flutterSafeHistoryState();
+        history.replaceState(state, "", location.href);
+        history.pushState(state, "", location.href);
+      };
+    })();
 
     // Auto-reload for iOS Simulator Safari when served via local IP (dev only)
     if (/^192\.168\.|^10\.|^172\.(1[6-9]|2\d|3[01])\./.test(location.hostname)) {

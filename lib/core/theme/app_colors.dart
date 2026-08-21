@@ -3,7 +3,7 @@ import "package:flutter/material.dart";
 abstract final class AppColors {
   static const bgBase = Color(0xFF0B0D10);
   static const bgSurface = Color(0xFF151A21);
-  static const bgElevated = Color(0xFF1C2430);
+  static const bgElevated = Color(0xFF1A1E24);
   static const border = Color(0xFF273140);
   static const textPrimary = Color(0xFFE9EEF5);
   static const textSecondary = Color(0xFF94A3B8);

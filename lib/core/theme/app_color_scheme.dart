@@ -59,7 +59,7 @@ class AppColorScheme extends ThemeExtension<AppColorScheme> {
     return AppColorScheme(
       bgBase: const Color(0xFF0B0D10),
       bgSurface: const Color(0xFF151A21),
-      bgElevated: const Color(0xFF1C2430),
+      bgElevated: const Color(0xFF1A1E24),
       border: const Color(0xFF273140),
       textPrimary: const Color(0xFFE9EEF5),
       textSecondary: const Color(0xFF94A3B8),

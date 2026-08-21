@@ -30,10 +30,13 @@ class StickyPrimaryBar extends StatelessWidget {
       ),
       child: SafeArea(
         top: false,
-        child: FilledButton.icon(
-          onPressed: onPressed,
-          icon: Icon(icon),
-          label: Text(label),
+        child: SizedBox(
+          width: double.infinity,
+          child: FilledButton.icon(
+            onPressed: onPressed,
+            icon: Icon(icon),
+            label: Text(label),
+          ),
         ),
       ),
     );

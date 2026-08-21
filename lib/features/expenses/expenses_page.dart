@@ -119,7 +119,7 @@ class ExpensesPageState extends State<ExpensesPage> {
     );
   }
 
-  Future<void> _delete(Expense expense) async {
+  Future<bool> _confirmDelete(Expense expense) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder:
@@ -138,16 +138,17 @@ class ExpensesPageState extends State<ExpensesPage> {
             ],
           ),
     );
-    if (confirmed != true || !mounted) return;
+    if (confirmed != true || !mounted) return false;
     try {
       final path = expense.receiptPhotoPath;
       if (path != null && path.isNotEmpty) {
         await widget.photos.remove(path);
       }
       await widget.expenses.delete(expense.id);
-      _load();
+      return true;
     } catch (e) {
       AppLog.e("Delete expense failed", error: e);
+      return false;
     }
   }
 
@@ -250,51 +251,83 @@ class ExpensesPageState extends State<ExpensesPage> {
                   index: 3 + i,
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-                    child: AppCard(
-                      onTap: () => _openForm(existing: _items[i]),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.md,
-                        vertical: AppSpacing.sm,
-                      ),
-                      child: Row(
-                        children: [
-                          ExpenseCategoryIcon(
-                            iconKey:
-                                _items[i].category?.iconKey ?? "more_horiz",
-                            color: colors.categoryColor(
-                              _items[i].category?.colorKey ?? "other",
+                    child: Builder(
+                      builder: (context) {
+                        final expense = _items[i];
+                        final categoryColor = colors.categoryColor(
+                          expense.category?.colorKey ?? "other",
+                        );
+                        return Dismissible(
+                          key: ValueKey(expense.id),
+                          direction: DismissDirection.endToStart,
+                          background: Container(
+                            alignment: Alignment.centerRight,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.md,
                             ),
-                          ),
-                          const SizedBox(width: AppSpacing.sm),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  _items[i].category?.name ?? S.category,
-                                  style: Theme.of(context).textTheme.titleSmall,
-                                ),
-                                Text(
-                                  "${DateFormat("dd/MM").format(_items[i].expenseDate)}"
-                                  "${_items[i].paidByName == null ? "" : " · ${_items[i].paidByName}"}",
-                                  style: TextStyle(
-                                    color: colors.textMuted,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
+                            decoration: BoxDecoration(
+                              color: colors.error.withValues(alpha: 0.18),
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.cardRadius,
+                              ),
                             ),
-                          ),
-                          MoneyText(amount: _items[i].amountVnd),
-                          IconButton(
-                            onPressed: () => _delete(_items[i]),
-                            icon: Icon(
+                            child: Icon(
                               Icons.delete_outline,
                               color: colors.error,
                             ),
                           ),
-                        ],
-                      ),
+                          confirmDismiss: (_) => _confirmDelete(expense),
+                          onDismissed: (_) {
+                            setState(() {
+                              _items =
+                                  _items
+                                      .where((e) => e.id != expense.id)
+                                      .toList();
+                            });
+                          },
+                          child: AppCard(
+                            onTap: () => _openForm(existing: expense),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.md,
+                              vertical: AppSpacing.sm,
+                            ),
+                            child: Row(
+                              children: [
+                                ExpenseCategoryIcon(
+                                  iconKey:
+                                      expense.category?.iconKey ?? "more_horiz",
+                                  color: categoryColor,
+                                ),
+                                const SizedBox(width: AppSpacing.sm),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        expense.category?.name ?? S.category,
+                                        style:
+                                            Theme.of(
+                                              context,
+                                            ).textTheme.titleSmall,
+                                      ),
+                                      Text(
+                                        "${DateFormat("dd/MM").format(expense.expenseDate)}"
+                                        "${expense.paidByName == null ? "" : " · ${expense.paidByName}"}",
+                                        style: TextStyle(
+                                          color: colors.textMuted,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                MoneyText(amount: expense.amountVnd),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),

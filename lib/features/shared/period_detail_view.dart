@@ -138,20 +138,20 @@ class PeriodDetailInfoRow extends StatelessWidget {
           style: TextStyle(
             color: valueColor ?? colors.textPrimary,
             fontWeight: valueBold ? FontWeight.w700 : FontWeight.w600,
-            fontSize: 17,
+            fontSize: 15,
           ),
         );
 
     final row = Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Icon(icon, size: 20, color: colors.textSecondary),
+        Icon(icon, size: 18, color: colors.textSecondary),
         const SizedBox(width: AppSpacing.sm),
         Text(
           label,
           style: TextStyle(
             color: colors.textSecondary,
-            fontSize: 16,
+            fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
         ),

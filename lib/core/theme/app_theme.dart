@@ -30,6 +30,8 @@ abstract final class AppTheme {
       error: colors.error,
       onError: onPrimary,
       outline: colors.border,
+      // Prevent M3 elevation overlays from tinting sheets/dialogs.
+      surfaceTint: Colors.transparent,
     );
 
     final material = ThemeData(brightness: brightness, useMaterial3: true);
@@ -65,6 +67,23 @@ abstract final class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           side: BorderSide(color: colors.border),
+        ),
+      ),
+      dialogTheme: DialogTheme(
+        backgroundColor: colors.bgSurface,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+          side: BorderSide(color: colors.border),
+        ),
+      ),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: colors.bgSurface,
+        surfaceTintColor: Colors.transparent,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(AppSpacing.cardRadius),
+          ),
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
@@ -111,10 +130,12 @@ abstract final class AppTheme {
         style: FilledButton.styleFrom(
           backgroundColor: colors.accent,
           foregroundColor: onPrimary,
-          textStyle: textTheme.labelLarge?.copyWith(
+          textStyle: textTheme.labelMedium?.copyWith(
             fontWeight: FontWeight.w600,
+            fontSize: 14,
           ),
-          minimumSize: const Size.fromHeight(AppSpacing.touchMin),
+          // Finite width — Size.fromHeight(∞) stacks AlertDialog actions.
+          minimumSize: const Size(64, AppSpacing.touchMin),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
           ),
@@ -123,11 +144,12 @@ abstract final class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: colors.textPrimary,
-          textStyle: textTheme.labelLarge?.copyWith(
+          textStyle: textTheme.labelMedium?.copyWith(
             fontWeight: FontWeight.w600,
+            fontSize: 14,
           ),
           side: BorderSide(color: colors.border),
-          minimumSize: const Size.fromHeight(AppSpacing.touchMin),
+          minimumSize: const Size(64, AppSpacing.touchMin),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
           ),
@@ -136,10 +158,13 @@ abstract final class AppTheme {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: colors.accent,
-          textStyle: textTheme.labelLarge?.copyWith(
+          textStyle: textTheme.labelMedium?.copyWith(
             fontWeight: FontWeight.w600,
+            fontSize: 14,
           ),
-          minimumSize: const Size.fromHeight(AppSpacing.touchMin),
+          // Finite width — Size.fromHeight(∞) breaks TextButton inside Row.
+          minimumSize: const Size(0, AppSpacing.touchMin),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
       ),
       dividerTheme: DividerThemeData(color: colors.border, thickness: 1),
