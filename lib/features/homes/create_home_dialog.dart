@@ -4,6 +4,7 @@ import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/models/tracking_mode.dart";
 import "package:home_manager/core/services/home_service.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/features/shared/app_toast.dart";
 import "package:home_manager/features/shared/form_title.dart";
 import "package:home_manager/features/shared/labeled_money_field.dart";
 import "package:home_manager/features/shared/labeled_text_field.dart";
@@ -83,9 +84,14 @@ Future<void> showCreateHomeDialog({
                     kwhRate: VndFormat.parse(rate.text) ?? 3500,
                   );
                   if (context.mounted) {
-                    Navigator.pop(context);
+                    popWithAppToast(
+                      context,
+                      S.toastHomeCreated,
+                      then: onCreated,
+                    );
+                  } else {
+                    onCreated();
                   }
-                  onCreated();
                 },
                 child: const Text(S.save),
               ),

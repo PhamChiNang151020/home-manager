@@ -13,6 +13,7 @@ import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/electricity/bill_photo_viewer.dart";
 import "package:home_manager/features/electricity/period_month_conflict.dart";
+import "package:home_manager/features/shared/app_toast.dart";
 import "package:home_manager/features/shared/datetime_picker.dart";
 import "package:home_manager/features/shared/form_title.dart";
 import "package:home_manager/features/shared/labeled_money_field.dart";
@@ -228,8 +229,7 @@ class _ElectricityAddSheetState extends State<_ElectricityAddSheet> {
         recordedAt: _recordedAt,
       );
       if (!mounted) return;
-      Navigator.pop(context);
-      widget.onSaved();
+      popWithAppToast(context, S.toastElectricityAdded, then: widget.onSaved);
     } catch (e) {
       setState(() => _error = "$e");
     }
@@ -515,8 +515,7 @@ class _ElectricityPeriodDialogState extends State<_ElectricityPeriodDialog> {
         recordedAt: _recordedAt,
       );
       if (!mounted) return;
-      Navigator.pop(context);
-      widget.onSaved();
+      popWithAppToast(context, S.toastElectricitySaved, then: widget.onSaved);
     } catch (e) {
       setState(() => _error = "$e");
     } finally {
@@ -578,8 +577,12 @@ class _ElectricityPeriodDialogState extends State<_ElectricityPeriodDialog> {
       }
       await widget.electricity.delete(widget.existing.id);
       if (!mounted) return;
-      Navigator.pop(context);
-      widget.onSaved();
+      popWithAppToast(
+        context,
+        S.toastElectricityDeleted,
+        then: widget.onSaved,
+        kind: AppToastKind.destructive,
+      );
     } catch (e) {
       setState(() => _error = "$e");
     }

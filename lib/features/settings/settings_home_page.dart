@@ -8,6 +8,7 @@ import "package:home_manager/core/services/home_service.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/core/theme/mobile_viewport.dart";
+import "package:home_manager/features/shared/app_toast.dart";
 import "package:home_manager/features/shared/labeled_money_field.dart";
 import "package:home_manager/features/shared/labeled_text_field.dart";
 
@@ -71,7 +72,9 @@ class _SettingsHomePageState extends State<SettingsHomePage> {
                 : null,
       );
       widget.onChanged();
-      if (mounted) Navigator.pop(context);
+      if (mounted) {
+        popWithAppToast(context, S.toastHomeSaved);
+      }
     } catch (e) {
       setState(() => _error = "$e");
     } finally {
@@ -111,7 +114,14 @@ class _SettingsHomePageState extends State<SettingsHomePage> {
     try {
       await widget.homesApi.deleteHome(widget.home.id);
       widget.onChanged();
-      if (mounted) Navigator.pop(context, true);
+      if (mounted) {
+        popWithAppToast(
+          context,
+          S.toastHomeDeleted,
+          result: true,
+          kind: AppToastKind.destructive,
+        );
+      }
     } catch (e, st) {
       AppLog.e("Delete home failed", error: e, stackTrace: st);
       if (mounted) {

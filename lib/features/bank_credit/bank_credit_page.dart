@@ -8,6 +8,7 @@ import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/bank_credit/bank_credit_card.dart";
 import "package:home_manager/features/bank_credit/bank_credit_form.dart";
+import "package:home_manager/features/shared/app_toast.dart";
 import "package:home_manager/features/shared/empty_state_view.dart";
 import "package:home_manager/features/shared/error_view.dart";
 import "package:home_manager/features/shared/feature_page_scaffold.dart";
@@ -148,6 +149,11 @@ class BankCreditPageState extends State<BankCreditPage> {
                 _accounts = _accounts.where((a) => a.id != account.id).toList();
                 _latest.remove(account.id);
               });
+              showAppToast(
+                context,
+                S.toastBankAccountDeleted,
+                kind: AppToastKind.destructive,
+              );
             },
             child: BankCreditCard(
               account: account,

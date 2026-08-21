@@ -7,6 +7,7 @@ import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/core/theme/mobile_viewport.dart";
 import "package:home_manager/features/shared/app_loading.dart";
+import "package:home_manager/features/shared/app_toast.dart";
 import "package:home_manager/features/shared/labeled_text_field.dart";
 import "package:home_manager/features/shared/section_header.dart";
 
@@ -75,6 +76,7 @@ class _SettingsMembersPageState extends State<SettingsMembersPage> {
       await widget.invites.invite(homeId: widget.home.id, email: email);
       _inviteEmail.clear();
       await _load();
+      if (mounted) showAppToast(context, S.toastInviteSent);
     } catch (e) {
       if (mounted) setState(() => _error = "$e");
     } finally {
@@ -108,6 +110,13 @@ class _SettingsMembersPageState extends State<SettingsMembersPage> {
     try {
       await widget.invites.cancel(invite.id);
       await _load();
+      if (mounted) {
+        showAppToast(
+          context,
+          S.toastInviteCancelled,
+          kind: AppToastKind.destructive,
+        );
+      }
     } catch (e) {
       if (mounted) setState(() => _error = "$e");
     }

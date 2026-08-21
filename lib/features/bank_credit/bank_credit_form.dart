@@ -7,6 +7,7 @@ import "package:home_manager/core/models/bank_account.dart";
 import "package:home_manager/core/services/bank_account_service.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/features/shared/app_toast.dart";
 import "package:home_manager/features/shared/bank_logo.dart";
 import "package:home_manager/features/shared/form_title.dart";
 import "package:home_manager/features/shared/labeled_money_field.dart";
@@ -157,8 +158,13 @@ class _BankAccountFormSheetState extends State<_BankAccountFormSheet> {
         editingId: widget.existing?.id,
       );
       if (!mounted) return;
-      Navigator.pop(context);
-      widget.onSaved();
+      popWithAppToast(
+        context,
+        widget.existing == null
+            ? S.toastBankAccountAdded
+            : S.toastBankAccountSaved,
+        then: widget.onSaved,
+      );
     } catch (e) {
       setState(() {
         _error = "$e";
@@ -456,8 +462,7 @@ class _BankPeriodFormSheetState extends State<_BankPeriodFormSheet> {
         editingOriginalMonth: widget.existing?.periodMonth,
       );
       if (!mounted) return;
-      Navigator.pop(context);
-      widget.onSaved();
+      popWithAppToast(context, S.toastBankPeriodSaved, then: widget.onSaved);
     } catch (e) {
       setState(() {
         _error = "$e";

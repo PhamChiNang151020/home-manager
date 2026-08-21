@@ -36,7 +36,9 @@ class QuickAddPresetChips extends StatelessWidget {
       height: AppSpacing.touchMin,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenHorizontal),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.screenHorizontal,
+        ),
         itemCount: presets.length,
         separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.sm),
         itemBuilder: (context, index) {
@@ -55,10 +57,7 @@ class QuickAddPresetChips extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    ExpenseCategoryIcon(
-                      iconKey: _iconKeyFor(preset),
-                      size: 20,
-                    ),
+                    ExpenseCategoryIcon(iconKey: _iconKeyFor(preset), size: 20),
                     const SizedBox(width: AppSpacing.sm),
                     Text(
                       "${VndFormat.input(preset.roundedAmount)}đ",

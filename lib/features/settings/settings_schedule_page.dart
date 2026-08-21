@@ -6,6 +6,7 @@ import "package:home_manager/core/services/ics_export_service.dart";
 import "package:home_manager/core/services/web_file_saver.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/core/theme/mobile_viewport.dart";
+import "package:home_manager/features/shared/app_toast.dart";
 import "package:home_manager/features/shared/labeled_text_field.dart";
 
 class SettingsSchedulePage extends StatefulWidget {
@@ -75,7 +76,9 @@ class _SettingsSchedulePageState extends State<SettingsSchedulePage> {
         remindDay: _day(_remind),
       );
       widget.onChanged();
-      if (mounted) Navigator.pop(context);
+      if (mounted) {
+        popWithAppToast(context, S.toastScheduleSaved);
+      }
     } catch (e) {
       setState(() => _error = "$e");
     } finally {

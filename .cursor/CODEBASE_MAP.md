@@ -46,7 +46,7 @@ Consult this file before grepping the repo. Update when adding modules under `li
 
 | Item | Path |
 |------|------|
-| Card, money, badges | `lib/features/shared/app_card.dart`, `money_text.dart`, `animated_money_text.dart`, `status_badge.dart` (`success\|warning\|accent\|neutral\|error`), `trend_chip.dart` |
+| Card, money, badges | `lib/features/shared/app_card.dart`, `money_text.dart`, `animated_money_text.dart`, `status_badge.dart` (`success\|warning\|accent\|neutral\|error`), `trend_chip.dart`, `app_toast.dart` (`showAppToast` / `popWithAppToast`) |
 | Period detail | `lib/features/shared/period_detail_view.dart` (điện / nước view-only) |
 | Fields | `labeled_text_field.dart` (`LabeledDropdownField` → select sheet), `labeled_money_field.dart`, `month_picker.dart`, `cupertino_date_sheet.dart`, `month_stepper_field.dart`, `day_stepper_field.dart`, `select_sheet.dart` |
 | Loading / error / empty | `app_loading.dart` (logo + spinning ring), `loading_view.dart`, `error_view.dart`, `empty_state_view.dart` |

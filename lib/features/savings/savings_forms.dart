@@ -5,6 +5,7 @@ import "package:home_manager/core/models/savings.dart";
 import "package:home_manager/core/services/savings_service.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/features/shared/app_toast.dart";
 import "package:home_manager/features/shared/datetime_picker.dart";
 import "package:home_manager/features/shared/form_title.dart";
 import "package:home_manager/features/shared/labeled_money_field.dart";
@@ -135,8 +136,11 @@ class _SavingsFormSheetState extends State<_SavingsFormSheet> {
         editingId: widget.existing?.id,
       );
       if (!mounted) return;
-      Navigator.pop(context);
-      widget.onSaved();
+      popWithAppToast(
+        context,
+        widget.existing == null ? S.toastSavingsAdded : S.toastSavingsSaved,
+        then: widget.onSaved,
+      );
     } catch (e) {
       setState(() {
         _error = "$e";
@@ -319,8 +323,7 @@ class _ContributionFormSheetState extends State<_ContributionFormSheet> {
         note: _note.text.trim().isEmpty ? null : _note.text.trim(),
       );
       if (!mounted) return;
-      Navigator.pop(context);
-      widget.onSaved();
+      popWithAppToast(context, S.toastContributionAdded, then: widget.onSaved);
     } catch (e) {
       setState(() {
         _error = "$e";

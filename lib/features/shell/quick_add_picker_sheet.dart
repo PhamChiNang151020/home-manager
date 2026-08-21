@@ -7,6 +7,7 @@ import "package:home_manager/core/theme/app_icons.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/bank_credit/bank_credit_form.dart";
 import "package:home_manager/features/electricity/electricity_form.dart";
+import "package:home_manager/features/expenses/expense_form.dart";
 import "package:home_manager/features/expenses/quick_add_sheet.dart";
 import "package:home_manager/features/personal_debts/personal_debt_forms.dart";
 import "package:home_manager/features/savings/savings_forms.dart";
@@ -29,7 +30,13 @@ Future<void> showQuickAddPickerSheet({
         top: Radius.circular(AppSpacing.cardRadius),
       ),
     ),
-    builder: (context) {
+    builder: (sheetContext) {
+      // Use the caller [context] after pop — [sheetContext] is disposed.
+      Future<void> openAfterPop(Future<void> Function() open) async {
+        Navigator.pop(sheetContext);
+        await open();
+      }
+
       return SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.md),
@@ -40,112 +47,129 @@ Future<void> showQuickAddPickerSheet({
               children: [
                 Text(
                   S.quickAddPickTitle,
-                  style: Theme.of(context).textTheme.titleMedium,
+                  style: Theme.of(sheetContext).textTheme.titleMedium,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: AppSpacing.md),
                 _PickTile(
                   iconPath: AppIcons.expenses,
                   label: S.expenses,
-                  onTap: () async {
-                    Navigator.pop(context);
-                    final categories = await services.expenses.listCategories(
-                      home.id,
-                    );
-                    final members = await services.homes.listMembers(home.id);
-                    if (!context.mounted) return;
-                    await showQuickAddSheet(
-                      context: context,
-                      home: home,
-                      expenses: services.expenses,
-                      photos: services.photos,
-                      categories: categories,
-                      members: members,
-                      currentUserId: currentUserId,
-                      onSaved: onSaved ?? () {},
-                    );
-                  },
+                  onTap:
+                      () => openAfterPop(() async {
+                        final categories = await services.expenses
+                            .listCategories(home.id);
+                        final members = await services.homes.listMembers(
+                          home.id,
+                        );
+                        if (!context.mounted) return;
+                        if (categories.isEmpty) return;
+                        final openFull = await showQuickAddSheet(
+                          context: context,
+                          home: home,
+                          expenses: services.expenses,
+                          photos: services.photos,
+                          categories: categories,
+                          members: members,
+                          currentUserId: currentUserId,
+                          onSaved: onSaved ?? () {},
+                        );
+                        if (openFull && context.mounted) {
+                          await showExpenseForm(
+                            context: context,
+                            home: home,
+                            expenses: services.expenses,
+                            photos: services.photos,
+                            categories: categories,
+                            members: members,
+                            currentUserId: currentUserId,
+                            onSaved: onSaved ?? () {},
+                          );
+                        }
+                      }),
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 _PickTile(
                   iconPath: AppIcons.electricity,
                   label: S.electricity,
-                  onTap: () async {
-                    Navigator.pop(context);
-                    final items = await services.electricity.list(home.id);
-                    if (!context.mounted) return;
-                    await showElectricityAddForm(
-                      context: context,
-                      home: home,
-                      electricity: services.electricity,
-                      photos: services.photos,
-                      previousPeriod: items.isEmpty ? null : items.first,
-                      existingPeriods: items,
-                      onSaved: onSaved ?? () {},
-                    );
-                  },
+                  onTap:
+                      () => openAfterPop(() async {
+                        final items = await services.electricity.list(home.id);
+                        if (!context.mounted) return;
+                        await showElectricityAddForm(
+                          context: context,
+                          home: home,
+                          electricity: services.electricity,
+                          photos: services.photos,
+                          previousPeriod: items.isEmpty ? null : items.first,
+                          existingPeriods: items,
+                          onSaved: onSaved ?? () {},
+                        );
+                      }),
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 _PickTile(
                   iconPath: AppIcons.water,
                   label: S.water,
-                  onTap: () async {
-                    Navigator.pop(context);
-                    final items = await services.water.list(home.id);
-                    if (!context.mounted) return;
-                    await showWaterAddForm(
-                      context: context,
-                      home: home,
-                      water: services.water,
-                      photos: services.photos,
-                      previousPeriod: items.isEmpty ? null : items.first,
-                      existingPeriods: items,
-                      onSaved: onSaved ?? () {},
-                    );
-                  },
+                  onTap:
+                      () => openAfterPop(() async {
+                        final items = await services.water.list(home.id);
+                        if (!context.mounted) return;
+                        await showWaterAddForm(
+                          context: context,
+                          home: home,
+                          water: services.water,
+                          photos: services.photos,
+                          previousPeriod: items.isEmpty ? null : items.first,
+                          existingPeriods: items,
+                          onSaved: onSaved ?? () {},
+                        );
+                      }),
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 _PickTile(
                   icon: Icons.credit_card_outlined,
                   label: S.addBankAccount,
-                  onTap: () async {
-                    Navigator.pop(context);
-                    await showBankAccountForm(
-                      context: context,
-                      homeId: home.id,
-                      bank: services.bankAccounts,
-                      onSaved: onSaved ?? () {},
-                    );
-                  },
+                  onTap:
+                      () => openAfterPop(() async {
+                        if (!context.mounted) return;
+                        await showBankAccountForm(
+                          context: context,
+                          homeId: home.id,
+                          bank: services.bankAccounts,
+                          onSaved: onSaved ?? () {},
+                        );
+                      }),
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 _PickTile(
                   icon: Icons.handshake_outlined,
                   label: S.addDebt,
-                  onTap: () async {
-                    Navigator.pop(context);
-                    await showPersonalDebtForm(
-                      context: context,
-                      homeId: home.id,
-                      debts: services.personalDebts,
-                      currentUserId: currentUserId,
-                      onSaved: onSaved ?? () {},
-                    );
-                  },
+                  onTap:
+                      () => openAfterPop(() async {
+                        if (!context.mounted) return;
+                        await showPersonalDebtForm(
+                          context: context,
+                          homeId: home.id,
+                          debts: services.personalDebts,
+                          currentUserId: currentUserId,
+                          onSaved: onSaved ?? () {},
+                        );
+                      }),
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 _PickTile(
                   icon: Icons.savings_outlined,
                   label: S.addSavings,
-                  onTap: () async {
-                    Navigator.pop(context);
-                    await showSavingsForm(
-                      context: context,
-                      homeId: home.id,
-                      savings: services.savings,
-                      onSaved: onSaved ?? () {},
-                    );
-                  },
+                  onTap:
+                      () => openAfterPop(() async {
+                        if (!context.mounted) return;
+                        await showSavingsForm(
+                          context: context,
+                          homeId: home.id,
+                          savings: services.savings,
+                          onSaved: onSaved ?? () {},
+                        );
+                      }),
                 ),
                 const SizedBox(height: AppSpacing.sm),
               ],

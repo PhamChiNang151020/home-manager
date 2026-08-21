@@ -12,6 +12,7 @@ import "package:home_manager/core/theme/app_icons.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/shared/app_card.dart";
 import "package:home_manager/features/shared/app_loading.dart";
+import "package:home_manager/features/shared/app_toast.dart";
 import "package:home_manager/features/shared/error_view.dart";
 import "package:home_manager/features/shared/feature_page_scaffold.dart";
 import "package:home_manager/features/shared/labeled_money_field.dart";
@@ -166,6 +167,7 @@ class _IncomePageState extends State<IncomePage> {
         );
       }
       await _load();
+      if (mounted) showAppToast(context, S.toastIncomeSaved);
     } catch (e) {
       if (mounted) setState(() => _error = "$e");
     } finally {

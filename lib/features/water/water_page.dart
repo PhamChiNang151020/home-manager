@@ -18,6 +18,7 @@ import "package:home_manager/features/shared/error_view.dart";
 import "package:home_manager/features/shared/animated_entrance.dart";
 import "package:home_manager/features/water/water_page_skeleton.dart";
 import "package:home_manager/features/shared/app_loading.dart";
+import "package:home_manager/features/shared/app_toast.dart";
 import "package:home_manager/features/shared/section_header.dart";
 
 class WaterPage extends StatefulWidget {
@@ -123,6 +124,12 @@ class WaterPageState extends State<WaterPage> {
         await widget.photos.remove(path);
       }
       await widget.water.delete(period.id);
+      if (!mounted) return;
+      showAppToast(
+        context,
+        S.toastWaterDeleted,
+        kind: AppToastKind.destructive,
+      );
       _load();
     } catch (e) {
       AppLog.e("Delete period failed", error: e);
@@ -131,7 +138,10 @@ class WaterPageState extends State<WaterPage> {
 
   Future<void> _togglePaid(WaterPeriod period) async {
     try {
-      await widget.water.setPaid(period.id, isPaid: !period.isPaid);
+      final nextPaid = !period.isPaid;
+      await widget.water.setPaid(period.id, isPaid: nextPaid);
+      if (!mounted) return;
+      showAppToast(context, nextPaid ? S.toastMarkedPaid : S.toastMarkedUnpaid);
       _load();
     } catch (e) {
       AppLog.e("Toggle paid failed", error: e);

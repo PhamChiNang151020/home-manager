@@ -6,11 +6,7 @@ import "package:home_manager/core/theme/mobile_viewport.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
 
 class SettingsAccountPage extends StatelessWidget {
-  const SettingsAccountPage({
-    super.key,
-    required this.onSignOut,
-    this.user,
-  });
+  const SettingsAccountPage({super.key, required this.onSignOut, this.user});
 
   final VoidCallback onSignOut;
   final User? user;
@@ -65,9 +61,9 @@ class SettingsAccountPage extends StatelessWidget {
                 Text(
                   email,
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: colors.textSecondary,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: colors.textSecondary),
                 ),
               ],
               const Spacer(),

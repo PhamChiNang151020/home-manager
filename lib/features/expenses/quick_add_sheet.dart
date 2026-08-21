@@ -13,6 +13,7 @@ import "package:home_manager/core/services/ocr_service.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/expenses/expense_category_style.dart";
+import "package:home_manager/features/shared/app_toast.dart";
 import "package:home_manager/features/shared/datetime_picker.dart";
 import "package:home_manager/features/shared/form_title.dart";
 import "package:home_manager/features/shared/labeled_money_field.dart";
@@ -126,9 +127,7 @@ class _QuickAddSheetState extends State<_QuickAddSheet> {
       final parsed = parseReceiptAmount(text);
       if (!mounted) return;
       if (parsed == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(S.receiptAmountFailed)),
-        );
+        showAppToast(context, S.receiptAmountFailed, kind: AppToastKind.info);
         setState(() {
           _ocrBusy = false;
           _ocrFilled = false;
@@ -143,9 +142,7 @@ class _QuickAddSheetState extends State<_QuickAddSheet> {
     } catch (e, st) {
       AppLog.e("Receipt OCR failed", error: e, stackTrace: st);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(S.receiptAmountFailed)),
-      );
+      showAppToast(context, S.receiptAmountFailed, kind: AppToastKind.info);
       setState(() => _ocrBusy = false);
     }
   }
@@ -191,8 +188,7 @@ class _QuickAddSheetState extends State<_QuickAddSheet> {
       }
 
       if (!mounted) return;
-      Navigator.pop(context);
-      widget.onSaved();
+      popWithAppToast(context, S.toastExpenseAdded, then: widget.onSaved);
     } catch (e) {
       if (mounted) setState(() => _error = "$e");
     } finally {
@@ -285,9 +281,9 @@ class _QuickAddSheetState extends State<_QuickAddSheet> {
                 padding: const EdgeInsets.only(top: AppSpacing.xs),
                 child: Text(
                   S.receiptAmountHint,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: colors.textMuted,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: colors.textMuted),
                 ),
               ),
             if (_expanded) ...[

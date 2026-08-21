@@ -5,6 +5,7 @@ import "package:home_manager/core/models/personal_debt.dart";
 import "package:home_manager/core/services/personal_debt_service.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/features/shared/app_toast.dart";
 import "package:home_manager/features/shared/datetime_picker.dart";
 import "package:home_manager/features/shared/form_title.dart";
 import "package:home_manager/features/shared/labeled_money_field.dart";
@@ -129,8 +130,11 @@ class _DebtFormSheetState extends State<_DebtFormSheet> {
         );
       }
       if (!mounted) return;
-      Navigator.pop(context);
-      widget.onSaved();
+      popWithAppToast(
+        context,
+        widget.existing == null ? S.toastDebtAdded : S.toastDebtSaved,
+        then: widget.onSaved,
+      );
     } catch (e) {
       setState(() {
         _error = "$e";
@@ -419,8 +423,7 @@ class _PaymentFormSheetState extends State<_PaymentFormSheet> {
         note: _note.text.trim().isEmpty ? null : _note.text.trim(),
       );
       if (!mounted) return;
-      Navigator.pop(context);
-      widget.onSaved();
+      popWithAppToast(context, S.toastDebtPaymentAdded, then: widget.onSaved);
     } catch (e) {
       setState(() {
         _error = "$e";

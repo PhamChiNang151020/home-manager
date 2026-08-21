@@ -17,6 +17,7 @@ import "package:home_manager/features/expenses/quick_add_sheet.dart";
 import "package:home_manager/features/shared/animated_entrance.dart";
 import "package:home_manager/features/shared/app_card.dart";
 import "package:home_manager/features/shared/app_loading.dart";
+import "package:home_manager/features/shared/app_toast.dart";
 import "package:home_manager/features/shared/day_stepper_field.dart";
 import "package:home_manager/features/shared/empty_state_view.dart";
 import "package:home_manager/features/shared/error_view.dart";
@@ -251,6 +252,11 @@ class ExpensesPageState extends State<ExpensesPage> {
                                       .where((e) => e.id != expense.id)
                                       .toList();
                             });
+                            showAppToast(
+                              context,
+                              S.toastExpenseDeleted,
+                              kind: AppToastKind.destructive,
+                            );
                           },
                           child: AppCard(
                             onTap: () => _openForm(existing: expense),

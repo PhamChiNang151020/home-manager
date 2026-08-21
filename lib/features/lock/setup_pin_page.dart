@@ -5,6 +5,7 @@ import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/core/theme/mobile_viewport.dart";
 import "package:home_manager/features/lock/lock_screen.dart";
+import "package:home_manager/features/shared/app_toast.dart";
 
 class SetupPinPage extends StatefulWidget {
   const SetupPinPage({
@@ -65,7 +66,9 @@ class _SetupPinPageState extends State<SetupPinPage> {
     } else {
       await widget.lock.enableWithPin(pin);
     }
-    if (mounted) Navigator.pop(context, true);
+    if (mounted) {
+      popWithAppToast(context, S.toastPinSaved, result: true);
+    }
   }
 
   void _onBackspace() {
