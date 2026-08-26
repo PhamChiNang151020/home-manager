@@ -17,6 +17,7 @@ import "package:home_manager/features/expenses/quick_add_sheet.dart";
 import "package:home_manager/features/shared/animated_entrance.dart";
 import "package:home_manager/features/shared/app_card.dart";
 import "package:home_manager/features/shared/app_loading.dart";
+import "package:home_manager/features/shared/app_refresh_indicator.dart";
 import "package:home_manager/features/shared/app_toast.dart";
 import "package:home_manager/features/shared/day_stepper_field.dart";
 import "package:home_manager/features/shared/empty_state_view.dart";
@@ -72,18 +73,25 @@ class ExpensesPageState extends State<ExpensesPage> {
     }
   }
 
-  Future<void> _load() async {
+  /// Pull-to-refresh has its own spinner, so it skips the full-page overlay —
+  /// otherwise one gesture puts two indicators on screen and veils the data
+  /// the user is looking at.
+  Future<void> _refresh() => _load(showOverlay: false);
+
+  Future<void> _load({bool showOverlay = true}) async {
     setState(() {
-      _loading = true;
+      if (showOverlay) _loading = true;
       _error = null;
     });
     try {
-      final categories = await widget.expenses.listCategories(widget.home.id);
-      final members = await widget.homesApi.listMembers(widget.home.id);
-      final items = await widget.expenses.list(
-        widget.home.id,
-        month: monthStart(_day),
-      );
+      // One round trip instead of three — none of the three depends on
+      // another.
+      final (categories, members, items) =
+          await (
+            widget.expenses.listCategories(widget.home.id),
+            widget.homesApi.listMembers(widget.home.id),
+            widget.expenses.list(widget.home.id, month: monthStart(_day)),
+          ).wait;
       if (!mounted) return;
       setState(() {
         _categories = categories;
@@ -193,8 +201,8 @@ class ExpensesPageState extends State<ExpensesPage> {
 
     return LoadingOverlay(
       loading: _loading,
-      child: RefreshIndicator(
-        onRefresh: _load,
+      child: AppRefreshIndicator(
+        onRefresh: _refresh,
         child: ListView(
           padding: AppSpacing.shellListPadding,
           children: [
@@ -204,7 +212,11 @@ class ExpensesPageState extends State<ExpensesPage> {
             ),
             const SizedBox(height: AppSpacing.md),
             if (items.isEmpty)
-              const EmptyStateView(message: S.noExpenses)
+              const EmptyStateView(
+                message: S.noExpenses,
+                icon: Icons.shopping_bag_outlined,
+                description: S.noExpensesHint,
+              )
             else ...[
               AnimatedEntrance(
                 index: 1,

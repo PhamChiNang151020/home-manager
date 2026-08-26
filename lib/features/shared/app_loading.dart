@@ -114,6 +114,38 @@ class _ArcSpinnerPainter extends CustomPainter {
   }
 }
 
+/// Full-page dim + branded loader. Used by [LoadingOverlay] (first load /
+/// restart) and [AppRefreshIndicator] (pull-to-refresh) so both look the same.
+class AppLoadingScrim extends StatelessWidget {
+  const AppLoadingScrim({super.key, this.message});
+
+  final String? message;
+
+  static const loaderSize = 88.0;
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: context.appColors.bgBase.withValues(alpha: 0.72),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const AppLoader(size: loaderSize),
+            if (message != null) ...[
+              const SizedBox(height: 16),
+              Text(
+                message!,
+                style: TextStyle(color: context.appColors.textSecondary),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class LoadingOverlay extends StatelessWidget {
   const LoadingOverlay({
     super.key,
@@ -132,29 +164,7 @@ class LoadingOverlay extends StatelessWidget {
       fit: StackFit.expand,
       children: [
         child,
-        if (loading)
-          Positioned.fill(
-            child: ColoredBox(
-              color: context.appColors.bgBase.withValues(alpha: 0.72),
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const AppLoader(size: 88),
-                    if (message != null) ...[
-                      const SizedBox(height: 16),
-                      Text(
-                        message!,
-                        style: TextStyle(
-                          color: context.appColors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            ),
-          ),
+        if (loading) Positioned.fill(child: AppLoadingScrim(message: message)),
       ],
     );
   }

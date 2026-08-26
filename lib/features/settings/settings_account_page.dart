@@ -66,9 +66,29 @@ class SettingsAccountPage extends StatelessWidget {
                   ).textTheme.bodyMedium?.copyWith(color: colors.textSecondary),
                 ),
               ],
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                S.linkedGoogleAccount,
+                textAlign: TextAlign.center,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: colors.textSecondary),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                S.accountEmailManagedHint,
+                textAlign: TextAlign.center,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: colors.textMuted),
+              ),
               const Spacer(),
               OutlinedButton(
                 onPressed: onSignOut,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: colors.error,
+                  side: BorderSide(color: colors.error),
+                ),
                 child: const Text(S.signOut),
               ),
               const SizedBox(height: AppSpacing.lg),

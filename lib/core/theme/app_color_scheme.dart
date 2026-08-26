@@ -63,7 +63,7 @@ class AppColorScheme extends ThemeExtension<AppColorScheme> {
       border: const Color(0xFF273140),
       textPrimary: const Color(0xFFE9EEF5),
       textSecondary: const Color(0xFF94A3B8),
-      textMuted: const Color(0xFF64748B),
+      textMuted: const Color(0xFF7A8799),
       accent: accent,
       success: const Color(0xFF4ADE80),
       warning: const Color(0xFFFBBF24),
@@ -76,6 +76,8 @@ class AppColorScheme extends ThemeExtension<AppColorScheme> {
     );
   }
 
+  /// Pass [AppAccent.colorOnLight], not [AppAccent.color] — the bright brand
+  /// tone is not legible on these backgrounds.
   static AppColorScheme light(Color accent) {
     return AppColorScheme(
       bgBase: const Color(0xFFF5F6F8),
@@ -83,12 +85,12 @@ class AppColorScheme extends ThemeExtension<AppColorScheme> {
       bgElevated: const Color(0xFFEEF1F5),
       border: const Color(0xFFD1D9E6),
       textPrimary: const Color(0xFF0F172A),
-      textSecondary: const Color(0xFF64748B),
-      textMuted: const Color(0xFF94A3B8),
+      textSecondary: const Color(0xFF475569),
+      textMuted: const Color(0xFF5B6B7F),
       accent: accent,
-      success: const Color(0xFF16A34A),
-      warning: const Color(0xFFD97706),
-      error: const Color(0xFFDC2626),
+      success: const Color(0xFF147038),
+      warning: const Color(0xFF8F5606),
+      error: const Color(0xFFC81E1E),
       catFood: const Color(0xFFEA580C),
       catLoan: const Color(0xFF0284C7),
       catHealth: const Color(0xFF059669),

@@ -12,6 +12,7 @@ import "package:home_manager/features/electricity/electricity_trend_chart.dart";
 import "package:home_manager/features/electricity/period_history_filter_bar.dart";
 import "package:home_manager/features/electricity/period_list_tile.dart";
 import "package:home_manager/features/electricity/reminder_banner.dart";
+import "package:home_manager/features/shared/app_refresh_indicator.dart";
 import "package:home_manager/features/shared/empty_state_view.dart";
 import "package:home_manager/features/shared/error_view.dart";
 import "package:home_manager/features/shared/animated_entrance.dart";
@@ -63,10 +64,15 @@ class ElectricityPageState extends State<ElectricityPage> {
     }
   }
 
-  Future<void> _load() async {
+  /// Pull-to-refresh has its own spinner, so it skips the full-page overlay —
+  /// otherwise one gesture puts two indicators on screen and veils the data
+  /// the user is looking at.
+  Future<void> _refresh() => _load(showOverlay: false);
+
+  Future<void> _load({bool showOverlay = true}) async {
     AppLog.d("Loading electricity periods for ${widget.home.id}");
     setState(() {
-      _loading = true;
+      if (showOverlay) _loading = true;
       _error = null;
     });
     try {
@@ -135,9 +141,8 @@ class ElectricityPageState extends State<ElectricityPage> {
 
     return LoadingOverlay(
       loading: _loading,
-      child: RefreshIndicator(
-        onRefresh: _load,
-        color: Theme.of(context).colorScheme.primary,
+      child: AppRefreshIndicator(
+        onRefresh: _refresh,
         child: ListView(
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
           children: [
@@ -146,9 +151,15 @@ class ElectricityPageState extends State<ElectricityPage> {
               child: ReminderBanner(home: widget.home),
             ),
             if (_items.isEmpty) ...[
-              const AnimatedEntrance(
+              AnimatedEntrance(
                 index: 1,
-                child: EmptyStateView(message: S.noPeriods),
+                child: EmptyStateView(
+                  message: S.noPeriods,
+                  icon: Icons.electric_meter_outlined,
+                  description: S.noPeriodsHint,
+                  actionLabel: S.addPeriod,
+                  onAction: _openAddForm,
+                ),
               ),
             ] else ...[
               AnimatedEntrance(
@@ -178,9 +189,19 @@ class ElectricityPageState extends State<ElectricityPage> {
                 ),
               ),
               if (_filteredItems.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.only(bottom: AppSpacing.md),
-                  child: EmptyStateView(message: S.noHistoryMatch),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                  child: EmptyStateView(
+                    message: S.noHistoryMatch,
+                    icon: Icons.filter_alt_off_outlined,
+                    description: S.noHistoryMatchHint,
+                    actionLabel: S.filterAll,
+                    onAction:
+                        () => setState(() {
+                          _filterMonth = null;
+                          _sortOrder = PeriodSortOrder.newestFirst;
+                        }),
+                  ),
                 )
               else
                 for (var i = 0; i < _filteredItems.length; i++)

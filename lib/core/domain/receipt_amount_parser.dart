@@ -11,9 +11,7 @@ double? parseReceiptAmount(String rawText) {
   return amounts.map((a) => a.value).reduce((a, b) => a > b ? a : b);
 }
 
-final _amountPattern = RegExp(
-  r"(?<!\d)(\d{1,3}(?:[.,]\d{3})+|\d{4,})(?!\d)",
-);
+final _amountPattern = RegExp(r"(?<!\d)(\d{1,3}(?:[.,]\d{3})+|\d{4,})(?!\d)");
 
 final _keywordPattern = RegExp(
   r"(tổng\s*cộng|thành\s*tiền|tổng|total)",
@@ -21,7 +19,11 @@ final _keywordPattern = RegExp(
 );
 
 class _AmountMatch {
-  const _AmountMatch({required this.value, required this.start, required this.end});
+  const _AmountMatch({
+    required this.value,
+    required this.start,
+    required this.end,
+  });
 
   final double value;
   final int start;
@@ -37,9 +39,7 @@ List<_AmountMatch> _findAmounts(String text) {
     if (value == null || value <= 0) continue;
     // Ignore tiny numbers that are likely dates / qty / VAT %.
     if (value < 1000) continue;
-    results.add(
-      _AmountMatch(value: value, start: match.start, end: match.end),
-    );
+    results.add(_AmountMatch(value: value, start: match.start, end: match.end));
   }
   return results;
 }
@@ -59,9 +59,7 @@ double? _amountNearKeyword(String text, List<_AmountMatch> amounts) {
       // Prefer amounts that appear after the keyword on the same line-ish window.
       final after = amount.start >= keyword.end;
       final distance =
-          after
-              ? amount.start - keyword.end
-              : keyword.start - amount.end;
+          after ? amount.start - keyword.end : keyword.start - amount.end;
       if (distance < 0 || distance > 80) continue;
       final score = after ? distance : distance + 40;
       if (score < bestDistance) {

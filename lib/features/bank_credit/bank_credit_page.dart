@@ -125,7 +125,10 @@ class BankCreditPageState extends State<BankCreditPage> {
       itemCount: _accounts.isEmpty ? 1 : _accounts.length,
       itemBuilder: (context, i) {
         if (_accounts.isEmpty) {
-          return const EmptyStateView(message: S.noBankAccounts);
+          return const EmptyStateView(
+            message: S.noBankAccounts,
+            icon: Icons.credit_card_outlined,
+          );
         }
         final account = _accounts[i];
         final period = _latest[account.id];

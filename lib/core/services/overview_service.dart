@@ -96,12 +96,10 @@ class OverviewService {
     final allWater = await _services.water.list(homeId);
     final allExpenses = await _services.expenses.list(homeId);
     final allIncomes = await _services.incomes.list(homeId);
-    final monthExpenses = allExpenses
-        .where((e) => sameMonth(e.expenseDate, m))
-        .toList();
-    final monthIncomes = allIncomes
-        .where((i) => sameMonth(i.incomeMonth, m))
-        .toList();
+    final monthExpenses =
+        allExpenses.where((e) => sameMonth(e.expenseDate, m)).toList();
+    final monthIncomes =
+        allIncomes.where((i) => sameMonth(i.incomeMonth, m)).toList();
     final accounts = await _services.bankAccounts.listAccounts(homeId);
     final debts = await _services.personalDebts.list(homeId);
     final savingsList = await _services.savings.list(homeId);

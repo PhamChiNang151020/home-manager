@@ -49,7 +49,10 @@ Consult this file before grepping the repo. Update when adding modules under `li
 | Card, money, badges | `lib/features/shared/app_card.dart`, `money_text.dart`, `animated_money_text.dart`, `status_badge.dart` (`success\|warning\|accent\|neutral\|error`), `trend_chip.dart`, `app_toast.dart` (`showAppToast` / `popWithAppToast`) |
 | Period detail | `lib/features/shared/period_detail_view.dart` (điện / nước view-only) |
 | Fields | `labeled_text_field.dart` (`LabeledDropdownField` → select sheet), `labeled_money_field.dart`, `month_picker.dart`, `cupertino_date_sheet.dart`, `month_stepper_field.dart`, `day_stepper_field.dart`, `select_sheet.dart` |
-| Loading / error / empty | `app_loading.dart` (logo + spinning ring), `loading_view.dart`, `error_view.dart`, `empty_state_view.dart` |
+| Loading / error / empty | `app_loading.dart` (logo + spinning ring), `loading_view.dart`, `error_view.dart`, `empty_state_view.dart` (icon + mô tả + CTA) |
+| Bill photo picker | `lib/features/shared/bill_photo_pick_field.dart` (preview + bỏ ảnh + giới hạn file) |
+| Bottom sheet | `lib/features/shared/app_sheet.dart` — `showAppSheet` là lối vào duy nhất (safe area + drag handle) |
+| Pull-to-refresh | `lib/features/shared/app_refresh_indicator.dart` — kéo xuống hiện cùng overlay `AppLoadingScrim` với lần tải đầu |
 | Sticky CTA / feature scaffold | `sticky_primary_bar.dart`, `feature_page_scaffold.dart` |
 | Brand logo | `lib/features/shared/app_brand_logo.dart` (`assets/brand/logo.png`) |
 | Feature / category icons | `lib/core/theme/app_icons.dart` + `app_asset_icon.dart` (`assets/*.png`) |
@@ -63,7 +66,7 @@ Consult this file before grepping the repo. Update when adding modules under `li
 | Copy (VI) | `lib/core/l10n/strings.dart` |
 | Theme | `lib/core/theme/app_theme.dart` (Nunito), `app_color_scheme.dart` (incl. category colors), `app_spacing.dart`, `safe_bottom_padding.dart` |
 | Fonts | `assets/fonts/Nunito/static/` (Regular 400 · Medium 500 · SemiBold 600 · Bold 700) |
-| Domain | `electricity_validation.dart`, `water_validation.dart`, `meter_math.dart`, `month_balance.dart`, `month_clamp.dart`, `expense_totals.dart`, `net_worth.dart`, `reminder_aggregator.dart`, `receipt_amount_parser.dart`, `selected_home.dart`, `period_history_filter.dart`, `pwa_install.dart`, `bank_brand.dart`, `join_link.dart`, `oauth_launch.dart`, `safe_bottom_inset.dart` |
+| Domain | `electricity_validation.dart`, `water_validation.dart`, `meter_math.dart`, `month_balance.dart`, `month_clamp.dart`, `expense_totals.dart`, `net_worth.dart`, `reminder_aggregator.dart`, `receipt_amount_parser.dart`, `selected_home.dart`, `period_history_filter.dart`, `pwa_install.dart`, `bank_brand.dart`, `join_link.dart`, `oauth_launch.dart`, `safe_bottom_inset.dart`, `form_dirty.dart` |
 | Models | `home.dart`, `electricity_period.dart`, `water_period.dart`, `expense.dart`, `expense_preset.dart`, `income.dart`, `tracking_mode.dart`, `lock_settings.dart`, `bank_account.dart`, `personal_debt.dart`, `savings.dart`, `reminder_item.dart` |
 | Services | `home_service.dart`, `invite_service.dart`, `join_link_store.dart`, `electricity_service.dart` (`BillPhotoService`), `water_service.dart`, `expense_service.dart`, `income_service.dart`, `overview_service.dart`, `ocr_service.dart`, `lock_service.dart`, `bank_account_service.dart`, `personal_debt_service.dart`, `savings_service.dart` |
 

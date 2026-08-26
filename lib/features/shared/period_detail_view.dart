@@ -82,7 +82,7 @@ class PeriodDetailView extends StatelessWidget {
         const Divider(height: AppSpacing.lg),
         PeriodDetailInfoRow(
           icon: Icons.check_circle_outline,
-          label: S.paid,
+          label: S.paymentStatus,
           value: isPaid ? S.paid : S.unpaid,
           valueWidget: StatusBadge(
             label: isPaid ? S.paid : S.unpaid,

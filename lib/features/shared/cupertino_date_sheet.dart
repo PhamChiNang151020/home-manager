@@ -5,6 +5,7 @@ import "package:home_manager/core/l10n/app_locale.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/features/shared/app_sheet.dart";
 
 Future<DateTime?> showCupertinoDateSheet({
   required BuildContext context,
@@ -14,15 +15,9 @@ Future<DateTime?> showCupertinoDateSheet({
   DateTime? maximumDate,
   String? title,
 }) {
-  final colors = context.appColors;
-  return showModalBottomSheet<DateTime>(
+  return showAppSheet<DateTime>(
     context: context,
-    backgroundColor: colors.bgSurface,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(AppSpacing.cardRadius),
-      ),
-    ),
+    isScrollControlled: false,
     builder: (context) {
       return _CupertinoDateSheetBody(
         initialDateTime: initialDateTime,

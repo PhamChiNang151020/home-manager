@@ -202,6 +202,27 @@
       text-align: center;
       max-width: 280px;
     }
+    /* Appears only if init runs long enough for the wait to feel like a stall. */
+    .splash-spinner {
+      width: 22px;
+      height: 22px;
+      margin-top: 20px;
+      border: 2px solid rgba(148, 163, 184, 0.28);
+      border-top-color: #94A3B8;
+      border-radius: 50%;
+      opacity: 0;
+      animation: splash-spin 700ms linear infinite,
+        splash-fade-in 200ms ease-out 900ms forwards;
+    }
+    @keyframes splash-spin {
+      to { transform: rotate(360deg); }
+    }
+    @keyframes splash-fade-in {
+      to { opacity: 1; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .splash-spinner { animation: splash-fade-in 200ms ease-out 900ms forwards; }
+    }
   </style>
 </head>
 <body>
@@ -209,6 +230,7 @@
     <img src="icons/Icon-192.png" alt="Tổ Ấm" width="96" height="96" />
     <p class="splash-name">Tổ Ấm</p>
     <p class="splash-tagline">Giữ ấm tổ ấm, giữ vững chi tiêu</p>
+    <div class="splash-spinner" role="progressbar" aria-label="Đang tải"></div>
   </div>
   <div id="flutter-host"></div>
   <script src="flutter_bootstrap.js" async></script>

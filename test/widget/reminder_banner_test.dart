@@ -108,4 +108,41 @@ void main() {
       containsAllInOrder([S.bannerPhoto, S.bannerPayday, S.bannerRemind]),
     );
   });
+
+  testWidgets("the banner can be acted on when given an action", (
+    tester,
+  ) async {
+    var taps = 0;
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.build(
+          brightness: Brightness.light,
+          accent: AppAccent.amber,
+        ),
+        home: Scaffold(
+          body: ReminderBanner(
+            home: _homeWithPhotoDueToday(),
+            onAction: () => taps++,
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text(S.quickAddPickTitle));
+    expect(taps, 1);
+  });
+
+  testWidgets("the banner stays passive without an action", (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.build(
+          brightness: Brightness.light,
+          accent: AppAccent.amber,
+        ),
+        home: Scaffold(body: ReminderBanner(home: _homeWithPhotoDueToday())),
+      ),
+    );
+
+    expect(find.byType(TextButton), findsNothing);
+  });
 }

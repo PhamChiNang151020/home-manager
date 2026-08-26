@@ -1,10 +1,4 @@
-enum ReminderDomain {
-  electricity,
-  water,
-  bankCredit,
-  personalDebt,
-  savings,
-}
+enum ReminderDomain { electricity, water, bankCredit, personalDebt, savings }
 
 enum ReminderStatus { overdue, upcoming, done }
 

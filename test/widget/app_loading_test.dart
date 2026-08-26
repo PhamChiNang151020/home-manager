@@ -25,6 +25,7 @@ void main() {
     expect(find.text("content"), findsOneWidget);
     expect(find.byType(AppLoader), findsOneWidget);
     expect(find.byType(AppBrandLogo), findsOneWidget);
+    expect(find.byType(AppLoadingScrim), findsOneWidget);
     expect(tester.widget<AppLoader>(find.byType(AppLoader)).size, 88);
   });
 

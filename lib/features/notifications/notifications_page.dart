@@ -11,8 +11,10 @@ import "package:home_manager/features/bank_credit/bank_credit_page.dart";
 import "package:home_manager/features/overview/overview_page.dart";
 import "package:home_manager/features/personal_debts/personal_debts_page.dart";
 import "package:home_manager/features/savings/savings_page.dart";
+import "package:home_manager/features/settings/settings_schedule_page.dart";
 import "package:home_manager/features/shared/animated_entrance.dart";
 import "package:home_manager/features/shared/app_card.dart";
+import "package:home_manager/features/shared/app_refresh_indicator.dart";
 import "package:home_manager/features/shared/empty_state_view.dart";
 import "package:home_manager/features/shared/loading_view.dart";
 import "package:home_manager/features/shared/status_badge.dart";
@@ -68,6 +70,19 @@ class _NotificationsPageState extends State<NotificationsPage> {
     };
   }
 
+  Future<void> _openSchedule() async {
+    await Navigator.push<void>(
+      context,
+      AppPageRoute<void>(
+        page: SettingsSchedulePage(
+          home: widget.home,
+          homesApi: widget.services.homes,
+          onChanged: () => widget.reminders.refresh(widget.home),
+        ),
+      ),
+    );
+  }
+
   void _openItem(ReminderItem item) {
     final home = widget.home;
     final services = widget.services;
@@ -95,10 +110,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
         Navigator.push<void>(
           context,
           AppPageRoute<void>(
-            page: BankCreditRoutePage(
-              home: home,
-              bank: services.bankAccounts,
-            ),
+            page: BankCreditRoutePage(home: home, bank: services.bankAccounts),
           ),
         );
       case ReminderDomain.personalDebt:
@@ -133,41 +145,76 @@ class _NotificationsPageState extends State<NotificationsPage> {
         final items = _filtered;
         return Column(
           children: [
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.md,
-                vertical: AppSpacing.sm,
-              ),
-              child: Row(
-                children: [
-                  for (final f in _NotifFilter.values) ...[
-                    Padding(
-                      padding: const EdgeInsets.only(right: AppSpacing.sm),
-                      child: FilterChip(
-                        label: Text(switch (f) {
-                          _NotifFilter.all => S.filterAll,
-                          _NotifFilter.overdue => S.filterOverdue,
-                          _NotifFilter.upcoming => S.filterUpcoming,
-                          _NotifFilter.done => S.filterDone,
-                        }),
-                        selected: _filter == f,
-                        onSelected: (_) => setState(() => _filter = f),
-                      ),
+            Row(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppSpacing.sm,
                     ),
-                  ],
-                ],
-              ),
+                    child: Row(
+                      spacing: AppSpacing.sm,
+                      children: [
+                        for (final f in _NotifFilter.values)
+                          FilterChip(
+                            label: Text(switch (f) {
+                              _NotifFilter.all => S.filterAll,
+                              _NotifFilter.overdue => S.filterOverdue,
+                              _NotifFilter.upcoming => S.filterUpcoming,
+                              _NotifFilter.done => S.filterDone,
+                            }),
+                            selected: _filter == f,
+                            onSelected: (_) => setState(() => _filter = f),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+                // Keeps the last chip from sliding under the button as the
+                // row scrolls.
+                Container(
+                  width: 1,
+                  height: AppSpacing.lg,
+                  color: context.appColors.border,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: AppSpacing.sm),
+                  child: IconButton(
+                    onPressed: _openSchedule,
+                    icon: const Icon(Icons.tune),
+                    tooltip: S.notificationScheduleShortcut,
+                  ),
+                ),
+              ],
             ),
             Expanded(
-              child: RefreshIndicator(
+              child: AppRefreshIndicator(
                 onRefresh: () => widget.reminders.refresh(widget.home),
                 child:
                     items.isEmpty
                         ? ListView(
-                          children: const [
-                            SizedBox(height: 80),
-                            EmptyStateView(message: S.noNotifications),
+                          children: [
+                            const SizedBox(height: 80),
+                            if (_filter == _NotifFilter.all)
+                              EmptyStateView(
+                                message: S.noNotifications,
+                                icon: Icons.notifications_none_outlined,
+                                description: S.noNotificationsHint,
+                                actionLabel: S.notificationScheduleShortcut,
+                                onAction: _openSchedule,
+                              )
+                            else
+                              EmptyStateView(
+                                message: S.noNotificationsMatch,
+                                icon: Icons.filter_alt_off_outlined,
+                                description: S.noNotificationsMatchHint,
+                                actionLabel: S.filterAll,
+                                onAction:
+                                    () => setState(
+                                      () => _filter = _NotifFilter.all,
+                                    ),
+                              ),
                           ],
                         )
                         : ListView.builder(
@@ -218,9 +265,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                               ).format(item.dueDate),
                                               style: TextStyle(
                                                 color:
-                                                    context
-                                                        .appColors
-                                                        .textMuted,
+                                                    context.appColors.textMuted,
                                                 fontSize: 12,
                                               ),
                                             ),

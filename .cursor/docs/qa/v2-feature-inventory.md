@@ -25,6 +25,13 @@ See also [v1-feature-inventory.md](v1-feature-inventory.md) for electricity/auth
 | PWA-01 | PWA | Install surface + share URL | `pwa_install.dart` | x | | | [x] |
 | PWA-02 | PWA | Install banner + QR page | `install_home_screen_banner.dart` | | x | | [x] |
 | INV-04 | Invites | Join QR token | `join_link.dart` | x | x | x | [x] |
+| UI-04 | Shared | Empty state: mô tả + CTA + icon theo ngữ cảnh | `empty_state_view.dart` | | x | | [x] |
+| UI-05 | Shell | Haptic khi đổi tab | `app_bottom_nav.dart` | | x | | [x] |
+| UI-06 | Shared | Ảnh hoá đơn: preview, giới hạn file, bỏ ảnh | `bill_photo_pick_field.dart` | | x | | [x] |
+| SET-03 | Settings | Nút Lưu chỉ bật khi có thay đổi | `form_dirty.dart` | x | | | [x] |
+| A11Y-01 | Theme | Màu nhấn có biến thể riêng cho chế độ sáng | `app_accent.dart` | x | | | [x] |
+| A11Y-02 | Theme | Bậc chữ và màu trạng thái đạt 4.5:1 | `app_color_scheme.dart` | x | | | [x] |
+| FMT-02 | Format | Rút gọn số âm | `vnd_format.dart` | x | | | [x] |
 
 ## Update rule
 

@@ -56,6 +56,18 @@ Cập nhật khi thêm test file. Agent dùng bảng này để phát hiện gap
 | INV-04 | persist pending join token | `test/unit/join_link_store_test.dart` | done |
 | INV-04 | owner join QR actions | `test/widget/settings_members_page_test.dart` | done |
 | INV-04 | create / accept / revoke join RPCs | `test/integration/invite_service_test.dart` | done |
+| UI-04 | empty state description + primary action | `test/widget/empty_state_view_test.dart` | done |
+| UI-05 | tab change fires haptic, same tab does not | `test/widget/app_bottom_nav_test.dart` | done |
+| UI-06 | bill photo preview, constraint hint, remove | `test/widget/bill_photo_pick_field_test.dart` | done |
+| SET-03 | isFormDirty gates the save button | `test/unit/form_dirty_test.dart` | done |
+| A11Y-01 | text ramp clears 4.5:1 on every surface, both themes, all 4 accents | `test/unit/color_contrast_test.dart` | done |
+| A11Y-02 | status colours and accent fills clear 4.5:1 | `test/unit/color_contrast_test.dart` | done |
+| A11Y-03 | selected tab is never fainter than an unselected one | `test/unit/color_contrast_test.dart` | done |
+| FMT-02 | compact shortens negative amounts | `test/unit/vnd_format_test.dart` | done |
+| UI-07 | cards and plain surfaces share one horizontal inset | `test/widget/horizontal_alignment_test.dart` | done |
+| UI-08 | a full-height sheet header stays clear of the status bar | `test/widget/app_sheet_test.dart` | done |
+| UI-09 | no sheet bypasses `showAppSheet` (double handle / safe area) | `test/widget/app_sheet_test.dart` | done |
+| UI-10 | pull-to-refresh shows the branded overlay, not Material's disc | `test/widget/app_refresh_indicator_test.dart` | done |
 
 ## Test layout
 

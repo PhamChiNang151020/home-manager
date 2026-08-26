@@ -8,9 +8,13 @@ import "package:home_manager/features/shared/app_asset_icon.dart";
 import "package:home_manager/features/shared/app_card.dart";
 
 class ReminderBanner extends StatelessWidget {
-  const ReminderBanner({super.key, required this.home});
+  const ReminderBanner({super.key, required this.home, this.onAction});
 
   final Home home;
+
+  /// Opens the quick-add picker, so the banner can be acted on where it is
+  /// read instead of only pointing at work to do elsewhere.
+  final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) {
@@ -35,10 +39,34 @@ class ReminderBanner extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Text(
+                    S.bannerToday,
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                  const SizedBox(height: 2),
                   for (final line in messages)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 2),
-                      child: Text(line),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text("· "),
+                          Expanded(child: Text(line)),
+                        ],
+                      ),
+                    ),
+                  if (onAction != null)
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextButton(
+                        onPressed: onAction,
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          minimumSize: const Size(0, 36),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: const Text(S.quickAddPickTitle),
+                      ),
                     ),
                 ],
               ),

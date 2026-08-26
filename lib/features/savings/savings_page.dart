@@ -115,7 +115,10 @@ class SavingsPageState extends State<SavingsPage> {
       padding: AppSpacing.shellListPadding,
       children: [
         if (_items.isEmpty)
-          const EmptyStateView(message: S.noSavings)
+          const EmptyStateView(
+            message: S.noSavings,
+            icon: Icons.savings_outlined,
+          )
         else ...[
           const SectionHeader(title: S.termDeposit),
           if (deposits.isEmpty)

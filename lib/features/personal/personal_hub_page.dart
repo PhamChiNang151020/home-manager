@@ -10,6 +10,7 @@ import "package:home_manager/core/state/theme_controller.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_icons.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/core/theme/mobile_viewport.dart";
 import "package:home_manager/features/pwa/install_home_screen_page.dart";
 import "package:home_manager/features/settings/settings_account_page.dart";
 import "package:home_manager/features/settings/settings_appearance_page.dart";
@@ -120,7 +121,7 @@ class PersonalHubPage extends StatelessWidget {
               color: context.appColors.accent,
             ),
             title: S.personalSettings,
-            subtitle: S.settings,
+            subtitle: S.personalSettingsDesc,
             onTap:
                 () => Navigator.push(
                   context,
@@ -142,6 +143,10 @@ class PersonalHubPage extends StatelessWidget {
             padding: const EdgeInsets.only(top: AppSpacing.md),
             child: OutlinedButton(
               onPressed: onSignOut,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: context.appColors.error,
+                side: BorderSide(color: context.appColors.error),
+              ),
               child: const Text(S.signOut),
             ),
           ),
@@ -197,93 +202,101 @@ class PersonalSettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text(S.personalSettings)),
-      body: ListView(
-        padding: AppSpacing.shellListPadding,
-        children: [
-          if (!home.isOwner)
-            Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.md),
-              child: Text(
-                S.roleOwnerOnly,
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
-              ),
-            ),
-          _HubTile(
-            leading: Icon(Icons.home_outlined, color: context.appColors.accent),
-            title: S.settingsHome,
-            subtitle: S.settingsHomeDesc,
-            onTap: () async {
-              final deleted = await Navigator.push<bool>(
-                context,
-                AppPageRoute<bool>(
-                  page: SettingsHomePage(
-                    home: home,
-                    homesApi: homesApi,
-                    onChanged: onChanged,
-                  ),
+      body: MobileViewport(
+        child: ListView(
+          padding: AppSpacing.shellListPadding,
+          children: [
+            if (!home.isOwner)
+              Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                child: Text(
+                  S.roleOwnerOnly,
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
-              );
-              if (deleted == true && context.mounted) {
-                Navigator.pop(context);
-              }
-            },
-          ),
-          _HubTile(
-            leading: const AppAssetIcon(AppIcons.reminder, size: 28),
-            title: S.settingsSchedule,
-            subtitle: S.settingsScheduleDesc,
-            onTap:
-                () => Navigator.push(
+              ),
+            _HubTile(
+              leading: Icon(
+                Icons.home_outlined,
+                color: context.appColors.accent,
+              ),
+              title: S.settingsHome,
+              subtitle: S.settingsHomeDesc,
+              onTap: () async {
+                final deleted = await Navigator.push<bool>(
                   context,
-                  AppPageRoute<void>(
-                    page: SettingsSchedulePage(
+                  AppPageRoute<bool>(
+                    page: SettingsHomePage(
                       home: home,
                       homesApi: homesApi,
                       onChanged: onChanged,
                     ),
                   ),
-                ),
-          ),
-          _HubTile(
-            leading: Icon(
-              Icons.palette_outlined,
-              color: context.appColors.accent,
+                );
+                if (deleted == true && context.mounted) {
+                  Navigator.pop(context);
+                }
+              },
             ),
-            title: S.settingsAppearance,
-            subtitle: S.settingsAppearanceDesc,
-            onTap:
-                () => Navigator.push(
-                  context,
-                  AppPageRoute<void>(
-                    page: SettingsAppearancePage(theme: theme),
+            _HubTile(
+              leading: const AppAssetIcon(AppIcons.reminder, size: 28),
+              title: S.settingsSchedule,
+              subtitle: S.settingsScheduleDesc,
+              onTap:
+                  () => Navigator.push(
+                    context,
+                    AppPageRoute<void>(
+                      page: SettingsSchedulePage(
+                        home: home,
+                        homesApi: homesApi,
+                        onChanged: onChanged,
+                      ),
+                    ),
                   ),
-                ),
-          ),
-          _HubTile(
-            leading: Icon(Icons.lock_outline, color: context.appColors.accent),
-            title: S.settingsSecurity,
-            subtitle:
-                lock.hasPinSet ? S.settingsSecurityDesc : S.appLockNotEnabled,
-            onTap:
-                () => Navigator.push(
-                  context,
-                  AppPageRoute<void>(page: SettingsSecurityPage(lock: lock)),
-                ),
-          ),
-          _HubTile(
-            leading: Icon(
-              Icons.add_to_home_screen,
-              color: context.appColors.accent,
             ),
-            title: S.settingsInstall,
-            subtitle: S.settingsInstallDesc,
-            onTap:
-                () => Navigator.push(
-                  context,
-                  AppPageRoute<void>(page: const InstallHomeScreenPage()),
-                ),
-          ),
-        ],
+            _HubTile(
+              leading: Icon(
+                Icons.palette_outlined,
+                color: context.appColors.accent,
+              ),
+              title: S.settingsAppearance,
+              subtitle: S.settingsAppearanceDesc,
+              onTap:
+                  () => Navigator.push(
+                    context,
+                    AppPageRoute<void>(
+                      page: SettingsAppearancePage(theme: theme),
+                    ),
+                  ),
+            ),
+            _HubTile(
+              leading: Icon(
+                Icons.lock_outline,
+                color: context.appColors.accent,
+              ),
+              title: S.settingsSecurity,
+              subtitle:
+                  lock.hasPinSet ? S.settingsSecurityDesc : S.appLockNotEnabled,
+              onTap:
+                  () => Navigator.push(
+                    context,
+                    AppPageRoute<void>(page: SettingsSecurityPage(lock: lock)),
+                  ),
+            ),
+            _HubTile(
+              leading: Icon(
+                Icons.add_to_home_screen,
+                color: context.appColors.accent,
+              ),
+              title: S.settingsInstall,
+              subtitle: S.settingsInstallDesc,
+              onTap:
+                  () => Navigator.push(
+                    context,
+                    AppPageRoute<void>(page: const InstallHomeScreenPage()),
+                  ),
+            ),
+          ],
+        ),
       ),
     );
   }

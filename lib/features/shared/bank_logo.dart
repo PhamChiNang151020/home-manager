@@ -17,21 +17,23 @@ class BankLogo extends StatelessWidget {
     if (url == null) {
       return _Fallback(size: size, color: colors.accent);
     }
+    // The CDN marks are drawn for a light backing, so on the dark theme they
+    // all but disappear without one.
     return ClipRRect(
       borderRadius: radius,
-      child: Image.network(
-        url,
+      child: Container(
         width: size,
         height: size,
-        fit: BoxFit.contain,
-        errorBuilder:
-            (_, __, ___) => _Fallback(size: size, color: colors.accent),
-        loadingBuilder: (context, child, progress) {
-          if (progress == null) return child;
-          return SizedBox(
-            width: size,
-            height: size,
-            child: Center(
+        color: Colors.white,
+        padding: EdgeInsets.all(size * 0.08),
+        child: Image.network(
+          url,
+          fit: BoxFit.contain,
+          errorBuilder:
+              (_, __, ___) => _Fallback(size: size, color: colors.accent),
+          loadingBuilder: (context, child, progress) {
+            if (progress == null) return child;
+            return Center(
               child: SizedBox(
                 width: size * 0.45,
                 height: size * 0.45,
@@ -40,9 +42,9 @@ class BankLogo extends StatelessWidget {
                   color: colors.accent,
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:flutter/services.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_icons.dart";
@@ -24,6 +25,16 @@ class AppBottomNav extends StatelessWidget {
 
   static const _barHeight = AppSpacing.touchMin + AppSpacing.md; // 64
 
+  void _selectTab(int index) {
+    if (index != tabIndex) HapticFeedback.selectionClick();
+    onTabSelected(index);
+  }
+
+  void _quickAdd() {
+    HapticFeedback.selectionClick();
+    onQuickAdd();
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
@@ -42,7 +53,7 @@ class AppBottomNav extends StatelessWidget {
                   iconPath: AppIcons.dashboard,
                   label: S.overview,
                   selected: tabIndex == 0,
-                  onTap: () => onTabSelected(0),
+                  onTap: () => _selectTab(0),
                 ),
               ),
               Expanded(
@@ -50,16 +61,16 @@ class AppBottomNav extends StatelessWidget {
                   iconPath: AppIcons.expenses,
                   label: S.transactions,
                   selected: tabIndex == 1,
-                  onTap: () => onTabSelected(1),
+                  onTap: () => _selectTab(1),
                 ),
               ),
-              Expanded(child: _QuickAddButton(onTap: onQuickAdd)),
+              Expanded(child: _QuickAddButton(onTap: _quickAdd)),
               Expanded(
                 child: _NavItem(
                   iconPath: AppIcons.reminder,
                   label: S.notifications,
                   selected: tabIndex == 2,
-                  onTap: () => onTabSelected(2),
+                  onTap: () => _selectTab(2),
                   badgeCount: notificationBadge,
                 ),
               ),
@@ -68,7 +79,7 @@ class AppBottomNav extends StatelessWidget {
                   iconPath: AppIcons.settings,
                   label: S.personal,
                   selected: tabIndex == 3,
-                  onTap: () => onTabSelected(3),
+                  onTap: () => _selectTab(3),
                 ),
               ),
             ],

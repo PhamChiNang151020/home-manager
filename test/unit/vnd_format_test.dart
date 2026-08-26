@@ -14,6 +14,17 @@ void main() {
     expect(VndFormat.compact(1200000), "1,2 tr");
   });
 
+  test("VndFormat compact shortens negative amounts the same way", () {
+    expect(VndFormat.compact(-539000), "-539 k");
+    expect(VndFormat.compact(-1200000), "-1,2 tr");
+    expect(VndFormat.compact(-3500000), "-3,5 tr");
+  });
+
+  test("VndFormat compact leaves amounts under a thousand alone", () {
+    expect(VndFormat.compact(0), "0");
+    expect(VndFormat.compact(-999), "-999");
+  });
+
   test("VndFormat parse empty returns null", () {
     expect(VndFormat.parse(""), isNull);
     expect(VndFormat.parse("   "), isNull);

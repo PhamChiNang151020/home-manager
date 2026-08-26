@@ -5,6 +5,7 @@ import "package:home_manager/core/models/personal_debt.dart";
 import "package:home_manager/core/services/personal_debt_service.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/features/shared/app_sheet.dart";
 import "package:home_manager/features/shared/app_toast.dart";
 import "package:home_manager/features/shared/datetime_picker.dart";
 import "package:home_manager/features/shared/form_title.dart";
@@ -22,15 +23,8 @@ Future<void> showPersonalDebtForm({
   PersonalDebt? existing,
   required VoidCallback onSaved,
 }) {
-  return showModalBottomSheet<void>(
+  return showAppSheet<void>(
     context: context,
-    isScrollControlled: true,
-    backgroundColor: context.appColors.bgSurface,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(AppSpacing.cardRadius),
-      ),
-    ),
     builder:
         (context) => _DebtFormSheet(
           homeId: homeId,
@@ -227,15 +221,8 @@ Future<void> showPersonalDebtDetail({
   required PersonalDebtService debts,
   required VoidCallback onChanged,
 }) {
-  return showModalBottomSheet<void>(
+  return showAppSheet<void>(
     context: context,
-    isScrollControlled: true,
-    backgroundColor: context.appColors.bgSurface,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(AppSpacing.cardRadius),
-      ),
-    ),
     builder:
         (context) =>
             _DebtDetailSheet(debt: debt, debts: debts, onChanged: onChanged),
@@ -355,15 +342,8 @@ Future<void> showAddPaymentForm({
   required PersonalDebtService debts,
   required VoidCallback onSaved,
 }) {
-  return showModalBottomSheet<void>(
+  return showAppSheet<void>(
     context: context,
-    isScrollControlled: true,
-    backgroundColor: context.appColors.bgSurface,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(AppSpacing.cardRadius),
-      ),
-    ),
     builder:
         (context) =>
             _PaymentFormSheet(debt: debt, debts: debts, onSaved: onSaved),

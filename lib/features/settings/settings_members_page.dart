@@ -222,6 +222,15 @@ class _SettingsMembersPageState extends State<SettingsMembersPage> {
                   ),
                 ),
               const SectionHeader(title: S.invite),
+              Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                child: Text(
+                  S.inviteScopeHint,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: colors.textSecondary),
+                ),
+              ),
               LabeledTextField(
                 label: S.inviteEmail,
                 controller: _inviteEmail,

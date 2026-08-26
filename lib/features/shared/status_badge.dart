@@ -18,31 +18,33 @@ class StatusBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // The tinted background pulls the label toward the surface, so the label
+    // has to move the other way to stay above 4.5:1 against that blend.
+    Color onTint(Color base) =>
+        Color.lerp(
+          base,
+          isDark ? const Color(0xFFFFFFFF) : const Color(0xFF000000),
+          isDark ? 0.12 : 0.25,
+        )!;
+
     final (bg, fg) = switch (variant) {
       StatusBadgeVariant.success => (
         colors.success.withValues(alpha: isDark ? 0.22 : 0.18),
-        isDark
-            ? colors.success
-            : Color.lerp(colors.success, const Color(0xFF000000), 0.18)!,
+        onTint(colors.success),
       ),
       StatusBadgeVariant.warning => (
         colors.warning.withValues(alpha: isDark ? 0.32 : 0.26),
-        isDark
-            ? Color.lerp(colors.warning, const Color(0xFFFFFFFF), 0.12)!
-            : Color.lerp(colors.warning, const Color(0xFF000000), 0.28)!,
+        onTint(colors.warning),
       ),
       StatusBadgeVariant.accent => (
         colors.accent.withValues(alpha: isDark ? 0.28 : 0.22),
-        isDark
-            ? colors.accent
-            : Color.lerp(colors.accent, const Color(0xFF000000), 0.22)!,
+        onTint(colors.accent),
       ),
       StatusBadgeVariant.neutral => (colors.bgElevated, colors.textSecondary),
       StatusBadgeVariant.error => (
         colors.error.withValues(alpha: isDark ? 0.22 : 0.18),
-        isDark
-            ? colors.error
-            : Color.lerp(colors.error, const Color(0xFF000000), 0.18)!,
+        onTint(colors.error),
       ),
     };
     return Container(

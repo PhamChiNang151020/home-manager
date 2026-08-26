@@ -232,9 +232,9 @@ class _LegendDot extends StatelessWidget {
         const SizedBox(width: AppSpacing.xs),
         Text(
           label,
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            color: context.appColors.textMuted,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.labelSmall?.copyWith(color: context.appColors.textMuted),
         ),
       ],
     );

@@ -1,5 +1,6 @@
 import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
+import "package:flutter/services.dart";
 import "package:flutter_test/flutter_test.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/theme/app_accent.dart";
@@ -44,5 +45,49 @@ void main() {
     } finally {
       debugDefaultTargetPlatformOverride = null;
     }
+  });
+
+  testWidgets("taps on another tab give haptic feedback, the current one does "
+      "not", (tester) async {
+    final hapticCalls = <String>[];
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      (call) async {
+        if (call.method == "HapticFeedback.vibrate") {
+          hapticCalls.add("${call.arguments}");
+        }
+        return null;
+      },
+    );
+    addTearDown(
+      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        null,
+      ),
+    );
+
+    var selected = 0;
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.build(
+          brightness: Brightness.dark,
+          accent: AppAccent.amber,
+        ),
+        home: Scaffold(
+          bottomNavigationBar: AppBottomNav(
+            tabIndex: 0,
+            onTabSelected: (index) => selected = index,
+            onQuickAdd: () {},
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text(S.overview));
+    expect(hapticCalls, isEmpty);
+
+    await tester.tap(find.text(S.personal));
+    expect(selected, 3);
+    expect(hapticCalls, hasLength(1));
   });
 }

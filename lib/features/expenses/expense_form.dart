@@ -11,6 +11,7 @@ import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/electricity/bill_photo_viewer.dart";
 import "package:home_manager/features/expenses/expense_category_style.dart";
+import "package:home_manager/features/shared/app_sheet.dart";
 import "package:home_manager/features/shared/app_toast.dart";
 import "package:home_manager/features/shared/datetime_picker.dart";
 import "package:home_manager/features/shared/form_title.dart";
@@ -30,15 +31,8 @@ Future<void> showExpenseForm({
   Expense? existing,
   required VoidCallback onSaved,
 }) {
-  return showModalBottomSheet<void>(
+  return showAppSheet<void>(
     context: context,
-    isScrollControlled: true,
-    backgroundColor: context.appColors.bgSurface,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(AppSpacing.cardRadius),
-      ),
-    ),
     builder: (context) {
       return _ExpenseFormSheet(
         home: home,
@@ -196,17 +190,6 @@ class _ExpenseFormSheetState extends State<_ExpenseFormSheet> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                margin: const EdgeInsets.only(bottom: AppSpacing.md),
-                decoration: BoxDecoration(
-                  color: colors.border,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
             FormTitle(title: existing == null ? S.addExpense : S.editExpense),
             LabeledMoneyField(label: S.amount, controller: _amount),
             const SizedBox(height: AppSpacing.formFieldGap),
@@ -285,9 +268,9 @@ class _ExpenseFormSheetState extends State<_ExpenseFormSheet> {
                         setState(() => _photoBytes = bytes);
                       }
                     },
-                    icon: const Icon(Icons.photo_camera_outlined),
+                    icon: const Icon(Icons.photo_library_outlined),
                     label: Text(
-                      _photoBytes != null ? "${S.photo} ✓" : S.pickPhoto,
+                      _photoBytes != null ? S.photoSelected : S.pickPhoto,
                     ),
                   ),
                 ),

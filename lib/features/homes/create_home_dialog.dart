@@ -17,6 +17,7 @@ Future<void> showCreateHomeDialog({
   final name = TextEditingController();
   var mode = TrackingMode.meter;
   final rate = TextEditingController(text: VndFormat.input(3500));
+  String? error;
 
   await showDialog<void>(
     context: context,
@@ -35,7 +36,25 @@ Future<void> showCreateHomeDialog({
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  LabeledTextField(label: S.homeName, controller: name),
+                  LabeledTextField(
+                    label: S.homeName,
+                    controller: name,
+                    onChanged: (_) {
+                      if (error != null) setState(() => error = null);
+                    },
+                  ),
+                  if (error != null) ...[
+                    const SizedBox(height: AppSpacing.xs),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        error!,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: AppSpacing.formFieldGap),
                   LabeledDropdownField<TrackingMode>(
                     label: S.trackingMode,
@@ -76,6 +95,7 @@ Future<void> showCreateHomeDialog({
                 onPressed: () async {
                   final trimmed = name.text.trim();
                   if (trimmed.isEmpty) {
+                    setState(() => error = S.emptyHomeName);
                     return;
                   }
                   await homesApi.createHome(

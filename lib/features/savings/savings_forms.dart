@@ -5,6 +5,7 @@ import "package:home_manager/core/models/savings.dart";
 import "package:home_manager/core/services/savings_service.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/features/shared/app_sheet.dart";
 import "package:home_manager/features/shared/app_toast.dart";
 import "package:home_manager/features/shared/datetime_picker.dart";
 import "package:home_manager/features/shared/form_title.dart";
@@ -19,15 +20,8 @@ Future<void> showSavingsForm({
   Savings? existing,
   required VoidCallback onSaved,
 }) {
-  return showModalBottomSheet<void>(
+  return showAppSheet<void>(
     context: context,
-    isScrollControlled: true,
-    backgroundColor: context.appColors.bgSurface,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(AppSpacing.cardRadius),
-      ),
-    ),
     builder:
         (context) => _SavingsFormSheet(
           homeId: homeId,
@@ -173,10 +167,10 @@ class _SavingsFormSheetState extends State<_SavingsFormSheet> {
             const SizedBox(height: AppSpacing.xs),
             SegmentedButton<String>(
               segments: const [
-                ButtonSegment(value: "goal", label: Text(S.savingsGoal)),
+                ButtonSegment(value: "goal", label: Text(S.savingsGoalShort)),
                 ButtonSegment(
                   value: "term_deposit",
-                  label: Text(S.termDeposit),
+                  label: Text(S.termDepositShort),
                 ),
               ],
               selected: {_type},
@@ -252,15 +246,8 @@ Future<void> showContributionForm({
   required SavingsService savings,
   required VoidCallback onSaved,
 }) {
-  return showModalBottomSheet<void>(
+  return showAppSheet<void>(
     context: context,
-    isScrollControlled: true,
-    backgroundColor: context.appColors.bgSurface,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(AppSpacing.cardRadius),
-      ),
-    ),
     builder:
         (context) => _ContributionFormSheet(
           item: item,

@@ -15,6 +15,8 @@ abstract final class S {
   static const personalInfo = "Thông tin";
   static const personalShare = "Chia sẻ";
   static const personalSettings = "Cài đặt";
+  static const personalSettingsDesc =
+      "Nhà, lịch nhắc, giao diện, bảo mật · cài ra Màn hình chính";
   static const netWorth = "Tài sản ròng";
   static String netWorthHomeLabel(String homeName) =>
       "Tài sản ròng · Nhà $homeName";
@@ -29,6 +31,12 @@ abstract final class S {
   static const filterUpcoming = "Sắp đến hạn";
   static const filterDone = "Đã xử lý";
   static const noNotifications = "Không có thông báo";
+  static const noNotificationsHint =
+      "Đến ngày chụp hoá đơn, lãnh lương hay trả nợ, nhắc việc sẽ hiện ở đây.";
+  static const noNotificationsMatch = "Không có nhắc việc phù hợp bộ lọc";
+  static const noNotificationsMatchHint =
+      "Thử chọn Tất cả để xem mọi nhắc việc.";
+  static const notificationScheduleShortcut = "Cài lịch nhắc";
   static const reminderOverdue = "Quá hạn";
   static const reminderUpcoming = "Sắp đến";
   static const reminderDone = "Đã xử lý";
@@ -46,6 +54,7 @@ abstract final class S {
   static const deleteExpense = "Xóa chi tiêu";
   static const deleteExpenseConfirm = "Xóa khoản chi này? Không thể hoàn tác.";
   static const noExpenses = "Chưa có chi tiêu nào trong tháng này";
+  static const noExpensesHint = "Bấm + ở thanh dưới để ghi khoản chi đầu tiên.";
   static const category = "Danh mục";
   static const paidBy = "Người trả";
   static const expenseDate = "Ngày chi";
@@ -128,7 +137,11 @@ abstract final class S {
   static const done = "Xong";
   static const note = "Ghi chú";
   static const photo = "Ảnh hoá đơn";
-  static const pickPhoto = "Chụp hoặc chọn ảnh";
+  static const pickPhoto = "Chọn ảnh hoá đơn";
+  static const pickPhotoReplace = "Đổi ảnh khác";
+  static const photoSelected = "Đã chọn ảnh";
+  static const removePhoto = "Bỏ ảnh";
+  static const photoConstraintHint = "Ảnh JPEG, tự nén còn tối đa 1600px.";
   static const addPeriod = "Thêm kỳ điện";
   static const editPeriod = "Sửa kỳ điện";
   static const deletePeriod = "Xóa kỳ điện";
@@ -141,16 +154,24 @@ abstract final class S {
   static const duplicatePeriodTitle = "Kỳ điện đã tồn tại";
   static const duplicatePeriodConfirm =
       "Tháng này đã có kỳ điện. Ghi đè dữ liệu cũ?";
-  static const duplicatePeriodHint = "Tháng này đã có kỳ điện";
+  static const duplicatePeriodHint =
+      "Tháng này đã có kỳ điện — lưu sẽ ghi đè số cũ.";
   static const duplicateWaterPeriodTitle = "Kỳ nước đã tồn tại";
   static const duplicateWaterPeriodConfirm =
       "Tháng này đã có kỳ nước. Ghi đè dữ liệu cũ?";
-  static const duplicateWaterPeriodHint = "Tháng này đã có kỳ nước";
+  static const duplicateWaterPeriodHint =
+      "Tháng này đã có kỳ nước — lưu sẽ ghi đè số cũ.";
   static const overwrite = "Ghi đè";
   static const noHomes = "Chưa có nhà. Tạo nhà hoặc nhận lời mời.";
+  static const emptyHomeName = "Nhập tên nhà giúp mình nhé.";
   static const noPeriods = "Chưa có kỳ điện nào được ghi nhận";
+  static const noPeriodsHint = "Bấm + ở thanh dưới để thêm kỳ điện đầu tiên.";
   static const noWaterPeriods = "Chưa có kỳ nước nào được ghi nhận";
+  static const noWaterPeriodsHint =
+      "Bấm + ở thanh dưới để thêm kỳ nước đầu tiên.";
   static const invite = "Mời thành viên";
+  static const inviteScopeHint =
+      "Người vào nhà sẽ xem và ghi điện, nước, chi tiêu, thu nhập của nhà này. Chỉ chủ nhà đổi được cài đặt và mời thêm người.";
   static const inviteEmail = "Email Google";
   static const sendInvite = "Gửi lời mời";
   static const members = "Thành viên";
@@ -162,9 +183,12 @@ abstract final class S {
   static const remindDay = "Ngày nhắc";
   static const dayOfMonth = "Ngày trong tháng (1–31)";
   static const exportIcs = "Tải lịch nhắc (.ics)";
-  static const bannerPhoto = "Hôm nay đến ngày chụp hoá đơn điện / nước.";
-  static const bannerPayday = "Hôm nay là ngày lãnh lương.";
-  static const bannerRemind = "Hôm nay đến ngày nhắc đóng / ghi điện và nước.";
+  // Also used as reminder titles in Thông báo, where the row carries its own
+  // due date — so these stay date-neutral instead of saying "Hôm nay".
+  static const bannerToday = "Hôm nay";
+  static const bannerPhoto = "Chụp hoá đơn điện / nước";
+  static const bannerPayday = "Lãnh lương";
+  static const bannerRemind = "Ghi số & đóng tiền điện / nước";
   static const firstPeriodHint = "Kỳ đầu: nhập cả số cũ và số mới.";
   static const firstWaterPeriodHint = "Kỳ nước đầu: nhập cả số cũ và số mới.";
   static const invalidReadings = "Số mới phải lớn hơn hoặc bằng số cũ.";
@@ -187,6 +211,9 @@ abstract final class S {
   static const settingsSchedule = "Lịch nhắc";
   static const settingsMembers = "Thành viên";
   static const settingsAccount = "Tài khoản";
+  static const linkedGoogleAccount = "Đang liên kết tài khoản Google";
+  static const accountEmailManagedHint =
+      "Tên và email lấy từ Google. Muốn đổi thì đổi trong tài khoản Google.";
   static const settingsAppearance = "Giao diện";
   static const settingsSecurity = "Bảo mật";
   static const settingsInstall = "Thêm ra Màn hình chính";
@@ -241,6 +268,7 @@ abstract final class S {
   static const hasNote = "Có ghi chú";
   static const noHistoryMatch = "Không có kỳ điện phù hợp bộ lọc";
   static const noWaterHistoryMatch = "Không có kỳ nước phù hợp bộ lọc";
+  static const noHistoryMatchHint = "Mở bộ lọc và chọn Tất cả để xem lại.";
   static const detailPeriod = "Chi tiết kỳ điện";
   static const detailWaterPeriod = "Chi tiết kỳ nước";
   static const cancelInvite = "Huỷ lời mời";
@@ -258,6 +286,7 @@ abstract final class S {
   static const joinQrRevoke = "Thu hồi mã";
   static const joinQrRotated = "Đã tạo mã mới";
   static const joinQrRevoked = "Đã thu hồi mã mời";
+  static const paymentStatus = "Trạng thái";
   static const paid = "Đã thanh toán";
   static const unpaid = "Chưa chốt số";
   static const markPaid = "Đánh dấu đã thanh toán";
@@ -330,6 +359,10 @@ abstract final class S {
   // Savings
   static const termDeposit = "Sổ tiết kiệm ngân hàng";
   static const savingsGoal = "Tiết kiệm mục tiêu";
+  // Short forms for the segmented control, where the full names wrap to two
+  // lines and leave the two segments different heights.
+  static const termDepositShort = "Sổ ngân hàng";
+  static const savingsGoalShort = "Mục tiêu";
   static const addSavings = "Thêm tiết kiệm";
   static const editSavings = "Sửa tiết kiệm";
   static const savingsType = "Loại";

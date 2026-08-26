@@ -7,6 +7,7 @@ import "package:home_manager/core/models/bank_account.dart";
 import "package:home_manager/core/services/bank_account_service.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/features/shared/app_sheet.dart";
 import "package:home_manager/features/shared/app_toast.dart";
 import "package:home_manager/features/shared/bank_logo.dart";
 import "package:home_manager/features/shared/form_title.dart";
@@ -22,15 +23,8 @@ Future<void> showBankAccountForm({
   BankAccount? existing,
   required VoidCallback onSaved,
 }) {
-  return showModalBottomSheet<void>(
+  return showAppSheet<void>(
     context: context,
-    isScrollControlled: true,
-    backgroundColor: context.appColors.bgSurface,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(AppSpacing.cardRadius),
-      ),
-    ),
     builder:
         (context) => _BankAccountFormSheet(
           homeId: homeId,
@@ -229,22 +223,6 @@ class _BankAccountFormSheetState extends State<_BankAccountFormSheet> {
                 hint: "Vietcombank, Techcombank…",
                 prefix: BankLogo(bankName: _logoName, size: 24),
               ),
-            ] else if (_name.text.isNotEmpty) ...[
-              const SizedBox(height: AppSpacing.sm),
-              Row(
-                children: [
-                  BankLogo(bankName: _name.text, size: 28),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: Text(
-                      _name.text,
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
             ],
             const SizedBox(height: AppSpacing.formFieldGap),
             LabeledMoneyField(label: S.creditLimit, controller: _limit),
@@ -363,15 +341,8 @@ Future<void> showBankPeriodForm({
   BankAccountPeriod? existing,
   required VoidCallback onSaved,
 }) {
-  return showModalBottomSheet<void>(
+  return showAppSheet<void>(
     context: context,
-    isScrollControlled: true,
-    backgroundColor: context.appColors.bgSurface,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(AppSpacing.cardRadius),
-      ),
-    ),
     builder:
         (context) => _BankPeriodFormSheet(
           account: account,

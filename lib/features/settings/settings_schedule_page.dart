@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:home_manager/core/domain/form_dirty.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/models/home.dart";
 import "package:home_manager/core/services/home_service.dart";
@@ -29,8 +30,10 @@ class _SettingsSchedulePageState extends State<SettingsSchedulePage> {
   late final TextEditingController _photoDay;
   late final TextEditingController _payday;
   late final TextEditingController _remind;
+  late final List<String> _initialValues;
   String? _error;
   bool _saving = false;
+  bool _dirty = false;
 
   @override
   void initState() {
@@ -44,13 +47,27 @@ class _SettingsSchedulePageState extends State<SettingsSchedulePage> {
     _remind = TextEditingController(
       text: widget.home.remindDay?.toString() ?? "",
     );
+    _initialValues = [_photoDay.text, _payday.text, _remind.text];
+    for (final controller in [_photoDay, _payday, _remind]) {
+      controller.addListener(_onFieldChanged);
+    }
+  }
+
+  void _onFieldChanged() {
+    final dirty = isFormDirty(_initialValues, [
+      _photoDay.text,
+      _payday.text,
+      _remind.text,
+    ]);
+    if (dirty != _dirty) setState(() => _dirty = dirty);
   }
 
   @override
   void dispose() {
-    _photoDay.dispose();
-    _payday.dispose();
-    _remind.dispose();
+    for (final controller in [_photoDay, _payday, _remind]) {
+      controller.removeListener(_onFieldChanged);
+      controller.dispose();
+    }
     super.dispose();
   }
 
@@ -126,7 +143,7 @@ class _SettingsSchedulePageState extends State<SettingsSchedulePage> {
             if (owner) ...[
               const SizedBox(height: AppSpacing.lg),
               FilledButton(
-                onPressed: _saving ? null : _save,
+                onPressed: _saving || !_dirty ? null : _save,
                 child: const Text(S.save),
               ),
             ],

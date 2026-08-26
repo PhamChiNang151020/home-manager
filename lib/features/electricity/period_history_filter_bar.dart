@@ -6,6 +6,7 @@ import "package:home_manager/core/l10n/app_locale.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/features/shared/app_sheet.dart";
 import "package:home_manager/features/shared/labeled_text_field.dart";
 import "package:intl/intl.dart";
 
@@ -27,14 +28,9 @@ class PeriodHistoryFilterButton extends StatelessWidget {
       filterMonth != null || sortOrder != PeriodSortOrder.newestFirst;
 
   Future<void> _openSheet(BuildContext context) async {
-    await showModalBottomSheet<void>(
+    await showAppSheet<void>(
       context: context,
-      backgroundColor: context.appColors.bgSurface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AppSpacing.cardRadius),
-        ),
-      ),
+      isScrollControlled: false,
       builder: (sheetContext) {
         return _PeriodHistoryFilterSheet(
           filterMonth: filterMonth,

@@ -15,7 +15,7 @@ abstract final class AppTheme {
     final colors =
         brightness == Brightness.dark
             ? AppColorScheme.dark(accent.color)
-            : AppColorScheme.light(accent.color);
+            : AppColorScheme.light(accent.colorOnLight);
     final onPrimary =
         brightness == Brightness.dark ? colors.bgBase : Colors.white;
 
@@ -56,8 +56,15 @@ abstract final class AppTheme {
         elevation: 0,
         centerTitle: false,
         titleTextStyle: textTheme.titleLarge,
+        // Line the title up with MobileViewport instead of Material's 16.
+        titleSpacing: AppSpacing.screenHorizontal,
       ),
       cardTheme: CardTheme(
+        // Material defaults to 4 on every side, which pushes cards 4 further
+        // in than plain Material surfaces and leaves the two misaligned.
+        // Vertical only: keeps the gap between stacked cards, drops the
+        // horizontal offset.
+        margin: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
         color: colors.bgSurface,
         elevation: brightness == Brightness.dark ? 1 : 2,
         shadowColor:
@@ -80,6 +87,8 @@ abstract final class AppTheme {
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: colors.bgSurface,
         surfaceTintColor: Colors.transparent,
+        dragHandleColor: colors.border,
+        dragHandleSize: const Size(40, 4),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
             top: Radius.circular(AppSpacing.cardRadius),

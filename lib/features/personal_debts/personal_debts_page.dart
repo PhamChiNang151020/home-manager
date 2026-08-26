@@ -136,7 +136,10 @@ class PersonalDebtsPageState extends State<PersonalDebtsPage> {
       padding: AppSpacing.shellListPadding,
       children: [
         if (_items.isEmpty)
-          const EmptyStateView(message: S.noDebts)
+          const EmptyStateView(
+            message: S.noDebts,
+            icon: Icons.handshake_outlined,
+          )
         else ...[
           const SectionHeader(title: S.iOwe),
           if (iOwe.isEmpty)

@@ -7,6 +7,7 @@ import "package:home_manager/core/models/home.dart";
 import "package:home_manager/core/services/electricity_service.dart";
 import "package:home_manager/core/services/water_service.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/features/shared/app_refresh_indicator.dart";
 import "package:home_manager/features/water/water_form.dart";
 import "package:home_manager/features/water/water_summary_card.dart";
 import "package:home_manager/features/water/water_trend_chart.dart";
@@ -66,10 +67,15 @@ class WaterPageState extends State<WaterPage> {
     }
   }
 
-  Future<void> _load() async {
+  /// Pull-to-refresh has its own spinner, so it skips the full-page overlay —
+  /// otherwise one gesture puts two indicators on screen and veils the data
+  /// the user is looking at.
+  Future<void> _refresh() => _load(showOverlay: false);
+
+  Future<void> _load({bool showOverlay = true}) async {
     AppLog.d("Loading water periods for ${widget.home.id}");
     setState(() {
-      _loading = true;
+      if (showOverlay) _loading = true;
       _error = null;
     });
     try {
@@ -191,9 +197,8 @@ class WaterPageState extends State<WaterPage> {
 
     return LoadingOverlay(
       loading: _loading,
-      child: RefreshIndicator(
-        onRefresh: _load,
-        color: Theme.of(context).colorScheme.primary,
+      child: AppRefreshIndicator(
+        onRefresh: _refresh,
         child: ListView(
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
           children: [
@@ -202,9 +207,15 @@ class WaterPageState extends State<WaterPage> {
               child: ReminderBanner(home: widget.home),
             ),
             if (_items.isEmpty) ...[
-              const AnimatedEntrance(
+              AnimatedEntrance(
                 index: 1,
-                child: EmptyStateView(message: S.noWaterPeriods),
+                child: EmptyStateView(
+                  message: S.noWaterPeriods,
+                  icon: Icons.water_drop_outlined,
+                  description: S.noWaterPeriodsHint,
+                  actionLabel: S.addWaterPeriod,
+                  onAction: _openAddForm,
+                ),
               ),
             ] else ...[
               AnimatedEntrance(
@@ -231,9 +242,19 @@ class WaterPageState extends State<WaterPage> {
                 ),
               ),
               if (_filteredItems.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.only(bottom: AppSpacing.md),
-                  child: EmptyStateView(message: S.noWaterHistoryMatch),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                  child: EmptyStateView(
+                    message: S.noWaterHistoryMatch,
+                    icon: Icons.filter_alt_off_outlined,
+                    description: S.noHistoryMatchHint,
+                    actionLabel: S.filterAll,
+                    onAction:
+                        () => setState(() {
+                          _filterMonth = null;
+                          _sortOrder = PeriodSortOrder.newestFirst;
+                        }),
+                  ),
                 )
               else
                 for (var i = 0; i < _filteredItems.length; i++)

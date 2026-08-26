@@ -13,6 +13,7 @@ import "package:home_manager/core/services/ocr_service.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/expenses/expense_category_style.dart";
+import "package:home_manager/features/shared/app_sheet.dart";
 import "package:home_manager/features/shared/app_toast.dart";
 import "package:home_manager/features/shared/datetime_picker.dart";
 import "package:home_manager/features/shared/form_title.dart";
@@ -33,15 +34,8 @@ Future<bool> showQuickAddSheet({
   required String currentUserId,
   required VoidCallback onSaved,
 }) async {
-  final result = await showModalBottomSheet<bool>(
+  final result = await showAppSheet<bool>(
     context: context,
-    isScrollControlled: true,
-    backgroundColor: context.appColors.bgSurface,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(AppSpacing.cardRadius),
-      ),
-    ),
     builder: (context) {
       return _QuickAddSheet(
         home: home,
@@ -230,17 +224,6 @@ class _QuickAddSheetState extends State<_QuickAddSheet> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                margin: const EdgeInsets.only(bottom: AppSpacing.md),
-                decoration: BoxDecoration(
-                  color: colors.border,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
             Row(
               children: [
                 const Expanded(child: FormTitle(title: S.quickAddExpense)),
@@ -276,8 +259,8 @@ class _QuickAddSheetState extends State<_QuickAddSheet> {
                     onPressed: _saving ? null : _pickAndOcr,
                     icon: Icon(
                       _photoBytes != null
-                          ? Icons.photo_camera
-                          : Icons.photo_camera_outlined,
+                          ? Icons.photo_library
+                          : Icons.photo_library_outlined,
                     ),
                   ),
                 ),

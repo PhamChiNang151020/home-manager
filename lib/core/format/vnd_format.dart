@@ -6,15 +6,18 @@ abstract final class VndFormat {
   /// Display text with đ suffix, e.g. `539.000 đ`.
   static String format(double amount) => "${_number.format(amount)} đ";
 
-  /// Short axis label, e.g. `539k`, `1,2 tr`.
+  /// Short axis label, e.g. `539 k`, `1,2 tr`.
+  ///
+  /// Scale is chosen from the magnitude so a negative balance shortens the
+  /// same way a positive one does.
   static String compact(double amount) {
-    if (amount >= 1000000) {
-      final millions = amount / 1000000;
-      return "${_number.format(millions)} tr";
+    final magnitude = amount.abs();
+    final sign = amount < 0 ? "-" : "";
+    if (magnitude >= 1000000) {
+      return "$sign${_number.format(magnitude / 1000000)} tr";
     }
-    if (amount >= 1000) {
-      final thousands = amount / 1000;
-      return "${_number.format(thousands)} k";
+    if (magnitude >= 1000) {
+      return "$sign${_number.format(magnitude / 1000)} k";
     }
     return _number.format(amount);
   }

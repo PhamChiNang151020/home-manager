@@ -33,6 +33,25 @@ class _TransactionsHubPageState extends State<TransactionsHubPage>
   int _utilitySegment = 0;
   int _creditSegment = 0;
 
+  /// The four labels never fit a phone width, so each edge fades only while
+  /// there is really something scrolled past it.
+  bool _canScrollLeft = false;
+  bool _canScrollRight = true;
+
+  bool _onTabScroll(ScrollNotification notification) {
+    final metrics = notification.metrics;
+    if (metrics.axis != Axis.horizontal) return false;
+    final left = metrics.extentBefore > 1;
+    final right = metrics.extentAfter > 1;
+    if (left != _canScrollLeft || right != _canScrollRight) {
+      setState(() {
+        _canScrollLeft = left;
+        _canScrollRight = right;
+      });
+    }
+    return false;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -51,21 +70,33 @@ class _TransactionsHubPageState extends State<TransactionsHubPage>
 
     return Column(
       children: [
-        Material(
-          color: colors.bgBase,
-          child: TabBar(
-            controller: _tabs,
-            isScrollable: true,
-            labelColor: colors.accent,
-            unselectedLabelColor: colors.textMuted,
-            indicatorColor: colors.accent,
-            tabs: const [
-              Tab(text: S.tabUtilities),
-              Tab(text: S.tabDaily),
-              Tab(text: S.tabCreditDebt),
-              Tab(text: S.tabSavings),
-            ],
-          ),
+        Stack(
+          children: [
+            NotificationListener<ScrollNotification>(
+              onNotification: _onTabScroll,
+              child: Material(
+                color: colors.bgBase,
+                child: TabBar(
+                  controller: _tabs,
+                  isScrollable: true,
+                  // Material's scrollable default is startOffset, which
+                  // indents the first tab 52px past everything else.
+                  tabAlignment: TabAlignment.start,
+                  labelColor: colors.accent,
+                  unselectedLabelColor: colors.textMuted,
+                  indicatorColor: colors.accent,
+                  tabs: const [
+                    Tab(text: S.tabUtilities),
+                    Tab(text: S.tabDaily),
+                    Tab(text: S.tabCreditDebt),
+                    Tab(text: S.tabSavings),
+                  ],
+                ),
+              ),
+            ),
+            _TabEdgeFade(visible: _canScrollLeft, trailing: false),
+            _TabEdgeFade(visible: _canScrollRight, trailing: true),
+          ],
         ),
         Expanded(
           child: TabBarView(
@@ -111,14 +142,46 @@ class _TransactionsHubPageState extends State<TransactionsHubPage>
                           currentUserId: widget.currentUserId,
                         ),
               ),
-              SavingsPage(
-                home: widget.home,
-                savings: widget.services.savings,
-              ),
+              SavingsPage(home: widget.home, savings: widget.services.savings),
             ],
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Softens whichever edge of the tab strip has labels scrolled past it.
+class _TabEdgeFade extends StatelessWidget {
+  const _TabEdgeFade({required this.visible, required this.trailing});
+
+  final bool visible;
+  final bool trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    final base = context.appColors.bgBase;
+    return Positioned(
+      top: 0,
+      bottom: 0,
+      left: trailing ? null : 0,
+      right: trailing ? 0 : null,
+      child: IgnorePointer(
+        child: AnimatedOpacity(
+          opacity: visible ? 1 : 0,
+          duration: const Duration(milliseconds: 150),
+          child: Container(
+            width: AppSpacing.lg,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: trailing ? Alignment.centerLeft : Alignment.centerRight,
+                end: trailing ? Alignment.centerRight : Alignment.centerLeft,
+                colors: [base.withValues(alpha: 0), base],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -139,14 +202,12 @@ class _SegmentedHost extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      // Stretch so the control lines up with the page content instead of
+      // sitting centred at its intrinsic width.
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.md,
-            AppSpacing.sm,
-            AppSpacing.md,
-            AppSpacing.sm,
-          ),
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
           child: SegmentedButton<int>(
             segments: [
               for (var i = 0; i < labels.length; i++)

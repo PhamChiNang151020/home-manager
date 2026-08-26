@@ -13,8 +13,10 @@ import "package:home_manager/core/services/water_service.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/electricity/bill_photo_viewer.dart";
+import "package:home_manager/features/shared/app_sheet.dart";
 import "package:home_manager/features/water/water_period_month_conflict.dart";
 import "package:home_manager/features/shared/app_toast.dart";
+import "package:home_manager/features/shared/bill_photo_pick_field.dart";
 import "package:home_manager/features/shared/datetime_picker.dart";
 import "package:home_manager/features/shared/form_title.dart";
 import "package:home_manager/features/shared/labeled_money_field.dart";
@@ -44,15 +46,8 @@ Future<void> showWaterAddForm({
   required List<WaterPeriod> existingPeriods,
   required VoidCallback onSaved,
 }) {
-  return showModalBottomSheet<void>(
+  return showAppSheet<void>(
     context: context,
-    isScrollControlled: true,
-    backgroundColor: context.appColors.bgSurface,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(AppSpacing.cardRadius),
-      ),
-    ),
     builder: (context) {
       return _WaterAddSheet(
         home: home,
@@ -131,6 +126,7 @@ class _WaterAddSheetState extends State<_WaterAddSheet> {
   Uint8List? _photoBytes;
   String? _error;
   String? _duplicateHint;
+  bool _saving = false;
 
   bool get _isMeter => widget.home.trackingMode == TrackingMode.meter;
 
@@ -180,6 +176,7 @@ class _WaterAddSheetState extends State<_WaterAddSheet> {
   }
 
   Future<void> _save() async {
+    if (_saving) return;
     try {
       double? prev;
       double? neu;
@@ -203,7 +200,10 @@ class _WaterAddSheetState extends State<_WaterAddSheet> {
       }
       if (!await _confirmDuplicateIfNeeded()) return;
 
-      setState(() => _error = null);
+      setState(() {
+        _error = null;
+        _saving = true;
+      });
       String? photoPath;
       if (_photoBytes != null) {
         photoPath = await widget.photos.upload(
@@ -233,7 +233,12 @@ class _WaterAddSheetState extends State<_WaterAddSheet> {
       if (!mounted) return;
       popWithAppToast(context, S.toastWaterAdded, then: widget.onSaved);
     } catch (e) {
-      setState(() => _error = "$e");
+      if (mounted) {
+        setState(() {
+          _error = "$e";
+          _saving = false;
+        });
+      }
     }
   }
 
@@ -272,17 +277,6 @@ class _WaterAddSheetState extends State<_WaterAddSheet> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                margin: const EdgeInsets.only(bottom: AppSpacing.md),
-                decoration: BoxDecoration(
-                  color: colors.border,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
             FormTitle(title: S.addWaterPeriod),
             LabeledPickerField(
               label: S.month,
@@ -338,20 +332,10 @@ class _WaterAddSheetState extends State<_WaterAddSheet> {
             const SizedBox(height: AppSpacing.formFieldGap),
             LabeledTextField(label: S.note, controller: _note),
             const SizedBox(height: AppSpacing.md),
-            OutlinedButton.icon(
-              onPressed: () async {
-                final file = await ImagePicker().pickImage(
-                  source: ImageSource.gallery,
-                  imageQuality: 70,
-                  maxWidth: 1600,
-                );
-                if (file != null) {
-                  final bytes = await file.readAsBytes();
-                  setState(() => _photoBytes = bytes);
-                }
-              },
-              icon: const Icon(Icons.photo_camera_outlined),
-              label: Text(_photoBytes == null ? S.pickPhoto : "${S.photo} ✓"),
+            BillPhotoPickField(
+              bytes: _photoBytes,
+              enabled: !_saving,
+              onChanged: (bytes) => setState(() => _photoBytes = bytes),
             ),
             if (_error != null)
               Padding(
@@ -359,7 +343,10 @@ class _WaterAddSheetState extends State<_WaterAddSheet> {
                 child: Text(_error!, style: TextStyle(color: colors.error)),
               ),
             const SizedBox(height: AppSpacing.md),
-            FilledButton(onPressed: _save, child: const Text(S.save)),
+            FilledButton(
+              onPressed: _saving ? null : _save,
+              child: const Text(S.save),
+            ),
           ],
         ),
       ),
@@ -713,9 +700,9 @@ class _WaterPeriodDialogState extends State<_WaterPeriodDialog> {
                           setState(() => _photoBytes = bytes);
                         }
                       },
-                      icon: const Icon(Icons.photo_camera_outlined),
+                      icon: const Icon(Icons.photo_library_outlined),
                       label: Text(
-                        _photoBytes != null ? "${S.photo} ✓" : S.pickPhoto,
+                        _photoBytes != null ? S.photoSelected : S.pickPhoto,
                       ),
                     ),
                   ),

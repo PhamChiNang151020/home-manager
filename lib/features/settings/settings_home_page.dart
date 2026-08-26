@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:home_manager/core/domain/form_dirty.dart";
 import "package:home_manager/core/format/vnd_format.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/logging/app_log.dart";
@@ -32,9 +33,11 @@ class _SettingsHomePageState extends State<SettingsHomePage> {
   late final TextEditingController _name;
   late final TextEditingController _rate;
   late final TextEditingController _m3Rate;
+  late final List<String> _initialValues;
   String? _error;
   bool _saving = false;
   bool _deleting = false;
+  bool _dirty = false;
 
   @override
   void initState() {
@@ -42,13 +45,27 @@ class _SettingsHomePageState extends State<SettingsHomePage> {
     _name = TextEditingController(text: widget.home.name);
     _rate = TextEditingController(text: VndFormat.input(widget.home.kwhRate));
     _m3Rate = TextEditingController(text: VndFormat.input(widget.home.m3Rate));
+    _initialValues = [_name.text, _rate.text, _m3Rate.text];
+    for (final controller in [_name, _rate, _m3Rate]) {
+      controller.addListener(_onFieldChanged);
+    }
+  }
+
+  void _onFieldChanged() {
+    final dirty = isFormDirty(_initialValues, [
+      _name.text,
+      _rate.text,
+      _m3Rate.text,
+    ]);
+    if (dirty != _dirty) setState(() => _dirty = dirty);
   }
 
   @override
   void dispose() {
-    _name.dispose();
-    _rate.dispose();
-    _m3Rate.dispose();
+    for (final controller in [_name, _rate, _m3Rate]) {
+      controller.removeListener(_onFieldChanged);
+      controller.dispose();
+    }
     super.dispose();
   }
 
@@ -198,7 +215,7 @@ class _SettingsHomePageState extends State<SettingsHomePage> {
             if (owner) ...[
               const SizedBox(height: AppSpacing.lg),
               FilledButton(
-                onPressed: busy ? null : _save,
+                onPressed: busy || !_dirty ? null : _save,
                 child: const Text(S.save),
               ),
               const SizedBox(height: AppSpacing.lg),

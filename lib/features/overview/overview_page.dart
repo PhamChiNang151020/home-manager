@@ -13,6 +13,7 @@ import "package:home_manager/core/theme/app_icons.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/bank_credit/bank_credit_page.dart";
 import "package:home_manager/features/electricity/electricity_page.dart";
+import "package:home_manager/features/electricity/reminder_banner.dart";
 import "package:home_manager/features/expenses/expense_category_chart.dart";
 import "package:home_manager/features/expenses/expenses_page.dart";
 import "package:home_manager/features/income/income_page.dart";
@@ -24,8 +25,10 @@ import "package:home_manager/features/shared/animated_money_text.dart";
 import "package:home_manager/features/shared/app_asset_icon.dart";
 import "package:home_manager/features/shared/app_card.dart";
 import "package:home_manager/features/shared/app_loading.dart";
+import "package:home_manager/features/shared/app_refresh_indicator.dart";
 import "package:home_manager/features/shared/feature_page_scaffold.dart";
 import "package:home_manager/features/shared/loading_view.dart";
+import "package:home_manager/features/shell/quick_add_picker_sheet.dart";
 import "package:home_manager/features/water/water_page.dart";
 
 class OverviewPage extends StatefulWidget {
@@ -65,8 +68,13 @@ class _OverviewPageState extends State<OverviewPage> {
     }
   }
 
-  Future<void> _load() async {
-    setState(() => _loading = true);
+  /// Pull-to-refresh has its own spinner, so it skips the full-page overlay —
+  /// otherwise one gesture puts two indicators on screen and veils the data
+  /// the user is looking at.
+  Future<void> _refresh() => _load(showOverlay: false);
+
+  Future<void> _load({bool showOverlay = true}) async {
+    if (showOverlay) setState(() => _loading = true);
     try {
       final snapshot = await OverviewService(services).load(home.id);
       if (!mounted) return;
@@ -96,12 +104,23 @@ class _OverviewPageState extends State<OverviewPage> {
 
     return LoadingOverlay(
       loading: _loading,
-      child: RefreshIndicator(
-        onRefresh: _load,
+      child: AppRefreshIndicator(
+        onRefresh: _refresh,
         child: ListView(
           padding: AppSpacing.shellListPadding,
           children: [
             if (snap != null) ...[
+              ReminderBanner(
+                home: home,
+                onAction:
+                    () => showQuickAddPickerSheet(
+                      context: context,
+                      home: home,
+                      services: services,
+                      currentUserId: widget.currentUserId,
+                      onSaved: _load,
+                    ),
+              ),
               AnimatedEntrance(
                 index: 0,
                 child: Material(
@@ -149,8 +168,10 @@ class _OverviewPageState extends State<OverviewPage> {
                   crossAxisCount: 2,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
+                  // Cards keep a vertical margin, so only the cross axis
+                  // needs the full gap spelled out.
                   mainAxisSpacing: AppSpacing.sm,
-                  crossAxisSpacing: AppSpacing.sm,
+                  crossAxisSpacing: AppSpacing.md,
                   childAspectRatio: 2.2,
                   children: [
                     _QuickCard(
@@ -345,9 +366,9 @@ class _QuickCard extends StatelessWidget {
                   value,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
                 ),
               ],
             ),

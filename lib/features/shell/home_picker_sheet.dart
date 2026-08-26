@@ -3,6 +3,7 @@ import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/models/home.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/features/shared/app_sheet.dart";
 
 Future<void> showHomePickerSheet({
   required BuildContext context,
@@ -11,14 +12,9 @@ Future<void> showHomePickerSheet({
   required ValueChanged<Home> onSelected,
   required VoidCallback onAddHome,
 }) {
-  return showModalBottomSheet<void>(
+  return showAppSheet<void>(
     context: context,
-    backgroundColor: context.appColors.bgSurface,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(AppSpacing.cardRadius),
-      ),
-    ),
+    isScrollControlled: false,
     builder: (context) {
       final colors = context.appColors;
       return SafeArea(
