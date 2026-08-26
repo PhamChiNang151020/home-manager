@@ -6,11 +6,12 @@ void main() {
     expect(
       computeNetWorth(
         savingsTotal: 1000000,
+        walletsTotal: 500000,
         owedToMeTotal: 200000,
         bankUsedTotal: 300000,
         iOweTotal: 100000,
       ),
-      800000,
+      1300000,
     );
   });
 

@@ -43,12 +43,16 @@ Supabase Google provider vẫn dùng **Client ID + Secret loại Web**. Client i
 8. **OAuth consent screen**: nếu app đang Testing, thêm Gmail người test vào **Test users**.
 
 Không đổi **Authentication → Providers → Google** trên Supabase. Luồng iOS hiện tại là OAuth trình duyệt + custom scheme.
-4. Execute [`migrations/20260819000000_init.sql`](migrations/20260819000000_init.sql) (and later migrations in order, including invite email status).
+4. Execute [`migrations/20260819000000_init.sql`](migrations/20260819000000_init.sql) (and later migrations in order, including invite email status and **wallets** `20260826160000_wallets.sql`).
 5. Copy **Project URL** (Overview → **Copy**, do not type) and **anon** key. Never use the service role in the Flutter app.
 
 ### Invite email (Resend)
 
 See [`functions/README.md`](functions/README.md). Deploy `send-home-invite` and set secrets `RESEND_API_KEY`, `INVITE_FROM_EMAIL`, `APP_PUBLIC_URL` before testing “Gửi lời mời”.
+
+### Wallets
+
+Apply `20260826160000_wallets.sql` for `wallets` / `wallet_transactions` and RPCs `wallet_adjust`, `wallet_transfer`, `wallet_apply_expense`, `wallet_revert_expense`.
 
 **API key:** use **Legacy anon** (`eyJ...`) from tab *Legacy anon, service_role API keys* if publishable key (`sb_publishable_...`) fails on login.
 

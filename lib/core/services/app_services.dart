@@ -6,6 +6,7 @@ import "package:home_manager/core/services/income_service.dart";
 import "package:home_manager/core/services/invite_service.dart";
 import "package:home_manager/core/services/personal_debt_service.dart";
 import "package:home_manager/core/services/savings_service.dart";
+import "package:home_manager/core/services/wallet_service.dart";
 import "package:home_manager/core/services/water_service.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
 
@@ -21,7 +22,8 @@ class AppServices {
       invites = InviteService(client),
       bankAccounts = BankAccountService(client),
       personalDebts = PersonalDebtService(client),
-      savings = SavingsService(client);
+      savings = SavingsService(client),
+      wallets = WalletService(client);
 
   final HomeService homes;
   final ElectricityService electricity;
@@ -33,4 +35,5 @@ class AppServices {
   final BankAccountService bankAccounts;
   final PersonalDebtService personalDebts;
   final SavingsService savings;
+  final WalletService wallets;
 }

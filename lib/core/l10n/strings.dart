@@ -26,6 +26,7 @@ abstract final class S {
   static const tabUtilities = "Điện · Nước";
   static const tabDaily = "Hàng ngày";
   static const tabCreditDebt = "Tín dụng · Nợ";
+  static const tabWallet = "Ví";
   static const tabSavings = "Tiết kiệm";
   static const filterOverdue = "Quá hạn";
   static const filterUpcoming = "Sắp đến hạn";
@@ -321,6 +322,39 @@ abstract final class S {
 
   // Finance hub
   static const finance = "Tài chính";
+  static const wallet = "Ví";
+  static const walletDesc = "Tiền mặt, tài khoản, tín dụng và nợ";
+  static const walletCash = "Tiền mặt";
+  static const walletBank = "Tài khoản NH";
+  static const walletEwallet = "Ví điện tử";
+  static const walletBalance = "Số dư";
+  static const walletTotal = "Tổng số dư ví";
+  static const addWallet = "Thêm ví";
+  static const editWallet = "Sửa ví";
+  static const deleteWallet = "Xóa ví";
+  static const deleteWalletConfirm = "Xóa ví và toàn bộ lịch sử giao dịch?";
+  static const walletAdjust = "Điều chỉnh số dư";
+  static const walletTransfer = "Chuyển giữa ví";
+  static const walletTransferFrom = "Từ ví";
+  static const walletTransferTo = "Sang ví";
+  static const walletHistory = "Lịch sử";
+  static const walletPayFrom = "Trả từ ví";
+  static const walletPayFromNone = "Không trừ ví";
+  static const walletInitialBalance = "Số dư ban đầu";
+  static const noWallets = "Chưa có ví nào";
+  static const noWalletTxns = "Chưa có giao dịch";
+  static const toastWalletAdded = "Đã thêm ví";
+  static const toastWalletSaved = "Đã lưu ví";
+  static const toastWalletDeleted = "Đã xóa ví";
+  static const toastWalletAdjusted = "Đã điều chỉnh số dư";
+  static const toastWalletTransferred = "Đã chuyển tiền";
+  static const walletTxnAdjust = "Điều chỉnh";
+  static const walletTxnExpense = "Chi tiêu";
+  static const walletTxnTransferOut = "Chuyển đi";
+  static const walletTxnTransferIn = "Nhận chuyển";
+  static const walletSectionCredit = "Tín dụng ngân hàng";
+  static const walletSectionDebts = "Nợ vay mượn";
+  static const walletSeeAll = "Xem tất cả";
   static const bankCredit = "Tín dụng NH";
   static const personalDebts = "Nợ vay mượn";
   static const savings = "Tiết kiệm";

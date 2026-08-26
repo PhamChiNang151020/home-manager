@@ -4,11 +4,10 @@ import "package:home_manager/core/models/home.dart";
 import "package:home_manager/core/services/app_services.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
-import "package:home_manager/features/bank_credit/bank_credit_page.dart";
 import "package:home_manager/features/electricity/electricity_page.dart";
 import "package:home_manager/features/expenses/expenses_page.dart";
-import "package:home_manager/features/personal_debts/personal_debts_page.dart";
 import "package:home_manager/features/savings/savings_page.dart";
+import "package:home_manager/features/wallet/wallet_hub_page.dart";
 import "package:home_manager/features/water/water_page.dart";
 
 class TransactionsHubPage extends StatefulWidget {
@@ -31,7 +30,6 @@ class _TransactionsHubPageState extends State<TransactionsHubPage>
     with SingleTickerProviderStateMixin {
   late final TabController _tabs;
   int _utilitySegment = 0;
-  int _creditSegment = 0;
 
   /// The four labels never fit a phone width, so each edge fades only while
   /// there is really something scrolled past it.
@@ -88,7 +86,7 @@ class _TransactionsHubPageState extends State<TransactionsHubPage>
                   tabs: const [
                     Tab(text: S.tabUtilities),
                     Tab(text: S.tabDaily),
-                    Tab(text: S.tabCreditDebt),
+                    Tab(text: S.tabWallet),
                     Tab(text: S.tabSavings),
                   ],
                 ),
@@ -125,22 +123,13 @@ class _TransactionsHubPageState extends State<TransactionsHubPage>
                 homesApi: widget.services.homes,
                 photos: widget.services.photos,
                 currentUserId: widget.currentUserId,
+                wallets: widget.services.wallets,
               ),
-              _SegmentedHost(
-                labels: const [S.bankCredit, S.personalDebts],
-                index: _creditSegment,
-                onChanged: (i) => setState(() => _creditSegment = i),
-                child:
-                    _creditSegment == 0
-                        ? BankCreditPage(
-                          home: widget.home,
-                          bank: widget.services.bankAccounts,
-                        )
-                        : PersonalDebtsPage(
-                          home: widget.home,
-                          debts: widget.services.personalDebts,
-                          currentUserId: widget.currentUserId,
-                        ),
+              WalletHubPage(
+                home: widget.home,
+                services: widget.services,
+                currentUserId: widget.currentUserId,
+                embedded: true,
               ),
               SavingsPage(home: widget.home, savings: widget.services.savings),
             ],

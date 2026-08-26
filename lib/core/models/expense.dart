@@ -38,6 +38,7 @@ class Expense {
     required this.createdAt,
     this.note,
     this.receiptPhotoPath,
+    this.walletId,
     this.category,
     this.paidByName,
   });
@@ -51,6 +52,7 @@ class Expense {
   final DateTime createdAt;
   final String? note;
   final String? receiptPhotoPath;
+  final String? walletId;
   final ExpenseCategory? category;
   final String? paidByName;
 
@@ -70,6 +72,7 @@ class Expense {
       ),
       note: json["note"] as String?,
       receiptPhotoPath: json["receipt_photo_path"] as String?,
+      walletId: json["wallet_id"] as String?,
       category:
           categoryJson is Map
               ? ExpenseCategory.fromJson(

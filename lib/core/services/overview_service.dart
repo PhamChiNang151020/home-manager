@@ -31,6 +31,7 @@ class OverviewSnapshot {
     required this.bankLimit,
     required this.debtNet,
     required this.savingsTotal,
+    required this.walletsTotal,
     required this.incomeSpendHistory,
     required this.categorySpend,
   });
@@ -44,6 +45,7 @@ class OverviewSnapshot {
   final double bankLimit;
   final double debtNet;
   final double savingsTotal;
+  final double walletsTotal;
   final List<IncomeSpendPoint> incomeSpendHistory;
   final List<CategorySpend> categorySpend;
 }
@@ -122,11 +124,14 @@ class OverviewService {
       debts.where((d) => d.iOwe && !d.isSettled).map((d) => d.remainingAmount),
     );
     final savingsTotal = sumAmounts(savingsList.map((s) => s.currentAmount));
+    final walletsList = await _services.wallets.list(homeId);
+    final walletsTotal = sumAmounts(walletsList.map((w) => w.balanceVnd));
     final monthIncome = sumAmounts(monthIncomes.map((i) => i.amountVnd));
 
     return OverviewSnapshot(
       netWorth: computeNetWorth(
         savingsTotal: savingsTotal,
+        walletsTotal: walletsTotal,
         owedToMeTotal: owedToMe,
         bankUsedTotal: bankUsed,
         iOweTotal: iOwe,
@@ -139,6 +144,7 @@ class OverviewService {
       bankLimit: bankLimit,
       debtNet: owedToMe - iOwe,
       savingsTotal: savingsTotal,
+      walletsTotal: walletsTotal,
       incomeSpendHistory: buildIncomeSpendHistory(
         endMonth: m,
         incomes: allIncomes,

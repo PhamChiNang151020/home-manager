@@ -1,11 +1,16 @@
 /// Net worth = assets − liabilities for overview dashboard.
 double computeNetWorth({
   required double savingsTotal,
+  required double walletsTotal,
   required double owedToMeTotal,
   required double bankUsedTotal,
   required double iOweTotal,
 }) {
-  return savingsTotal + owedToMeTotal - bankUsedTotal - iOweTotal;
+  return savingsTotal +
+      walletsTotal +
+      owedToMeTotal -
+      bankUsedTotal -
+      iOweTotal;
 }
 
 double sumAmounts(Iterable<double> values) {

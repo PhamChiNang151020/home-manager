@@ -5,8 +5,10 @@ import "package:home_manager/core/format/vnd_format.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/models/expense.dart";
 import "package:home_manager/core/models/home.dart";
+import "package:home_manager/core/models/wallet.dart";
 import "package:home_manager/core/services/electricity_service.dart";
 import "package:home_manager/core/services/expense_service.dart";
+import "package:home_manager/core/services/wallet_service.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/electricity/bill_photo_viewer.dart";
@@ -28,6 +30,8 @@ Future<void> showExpenseForm({
   required List<ExpenseCategory> categories,
   required List<HomeMember> members,
   required String currentUserId,
+  List<Wallet> wallets = const [],
+  WalletService? walletService,
   Expense? existing,
   required VoidCallback onSaved,
 }) {
@@ -41,6 +45,8 @@ Future<void> showExpenseForm({
         categories: categories,
         members: members,
         currentUserId: currentUserId,
+        wallets: wallets,
+        walletService: walletService,
         existing: existing,
         onSaved: onSaved,
       );
@@ -56,7 +62,9 @@ class _ExpenseFormSheet extends StatefulWidget {
     required this.categories,
     required this.members,
     required this.currentUserId,
+    required this.wallets,
     required this.onSaved,
+    this.walletService,
     this.existing,
   });
 
@@ -66,6 +74,8 @@ class _ExpenseFormSheet extends StatefulWidget {
   final List<ExpenseCategory> categories;
   final List<HomeMember> members;
   final String currentUserId;
+  final List<Wallet> wallets;
+  final WalletService? walletService;
   final Expense? existing;
   final VoidCallback onSaved;
 
@@ -79,9 +89,12 @@ class _ExpenseFormSheetState extends State<_ExpenseFormSheet> {
   late String _categoryId;
   late String _paidBy;
   late DateTime _date;
+  String? _walletId;
   Uint8List? _photoBytes;
   String? _error;
   bool _saving = false;
+
+  static const _noneWallet = "";
 
   @override
   void initState() {
@@ -94,6 +107,7 @@ class _ExpenseFormSheetState extends State<_ExpenseFormSheet> {
     _categoryId = existing?.categoryId ?? widget.categories.first.id;
     _paidBy = existing?.paidBy ?? widget.currentUserId;
     _date = existing?.expenseDate ?? DateTime.now();
+    _walletId = existing?.walletId;
   }
 
   @override
@@ -155,6 +169,21 @@ class _ExpenseFormSheetState extends State<_ExpenseFormSheet> {
           note: _note.text.trim().isEmpty ? null : _note.text.trim(),
           receiptPhotoPath: photoPath,
         );
+      }
+
+      final walletSvc = widget.walletService;
+      if (walletSvc != null) {
+        if (existing != null) {
+          await walletSvc.revertExpense(saved.id);
+        }
+        final selected = _walletId;
+        if (selected != null && selected.isNotEmpty) {
+          await walletSvc.applyExpense(
+            expenseId: saved.id,
+            walletId: selected,
+            amount: money,
+          );
+        }
       }
 
       if (!mounted) return;
@@ -251,6 +280,33 @@ class _ExpenseFormSheetState extends State<_ExpenseFormSheet> {
               },
             ),
             const SizedBox(height: AppSpacing.formFieldGap),
+            if (widget.wallets.isNotEmpty)
+              LabeledDropdownField<String>(
+                label: S.walletPayFrom,
+                value: _walletId ?? _noneWallet,
+                items: [
+                  SelectOption(
+                    value: _noneWallet,
+                    builder: (_) => const Text(S.walletPayFromNone),
+                  ),
+                  for (final w in widget.wallets)
+                    SelectOption(
+                      value: w.id,
+                      builder:
+                          (_) => Text(
+                            "${w.name} (${VndFormat.compact(w.balanceVnd)})",
+                          ),
+                    ),
+                ],
+                onChanged: (value) {
+                  if (value == null) return;
+                  setState(
+                    () => _walletId = value.isEmpty ? null : value,
+                  );
+                },
+              ),
+            if (widget.wallets.isNotEmpty)
+              const SizedBox(height: AppSpacing.formFieldGap),
             LabeledTextField(label: S.note, controller: _note),
             const SizedBox(height: AppSpacing.md),
             Row(

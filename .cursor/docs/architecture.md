@@ -24,6 +24,7 @@ Track electricity for two family homes on iPhone (PWA or iOS Simulator) with Goo
 - `home_members` — `owner` \| `member`
 - `home_invites` — pending email until Google email matches
 - `home_join_links` — reusable QR token (14 days); scan then Google login, no email match
+- `wallets` / `wallet_transactions` — liquid cash/bank/ewallet balances + ledger (adjust / transfer / expense)
 - `electricity_periods` / `water_periods` — unique `(home_id, period_month)`
 - `expense_categories` — 5 defaults seeded per home
 - `expenses` — amount, category, paid_by, date, optional receipt

@@ -5,9 +5,11 @@ import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/logging/app_log.dart";
 import "package:home_manager/core/models/expense.dart";
 import "package:home_manager/core/models/home.dart";
+import "package:home_manager/core/models/wallet.dart";
 import "package:home_manager/core/services/electricity_service.dart";
 import "package:home_manager/core/services/expense_service.dart";
 import "package:home_manager/core/services/home_service.dart";
+import "package:home_manager/core/services/wallet_service.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/expenses/expense_category_chart.dart";
@@ -35,6 +37,7 @@ class ExpensesPage extends StatefulWidget {
     required this.homesApi,
     required this.photos,
     required this.currentUserId,
+    this.wallets,
   });
 
   final Home home;
@@ -42,6 +45,7 @@ class ExpensesPage extends StatefulWidget {
   final HomeService homesApi;
   final BillPhotoService photos;
   final String currentUserId;
+  final WalletService? wallets;
 
   @override
   ExpensesPageState createState() => ExpensesPageState();
@@ -51,6 +55,7 @@ class ExpensesPageState extends State<ExpensesPage> {
   List<Expense> _monthItems = [];
   List<ExpenseCategory> _categories = [];
   List<HomeMember> _members = [];
+  List<Wallet> _wallets = [];
   bool _loading = true;
   String? _error;
   late DateTime _day;
@@ -86,17 +91,21 @@ class ExpensesPageState extends State<ExpensesPage> {
     try {
       // One round trip instead of three — none of the three depends on
       // another.
-      final (categories, members, items) =
+      final walletsFuture =
+          widget.wallets?.list(widget.home.id) ?? Future.value(<Wallet>[]);
+      final (categories, members, items, wallets) =
           await (
             widget.expenses.listCategories(widget.home.id),
             widget.homesApi.listMembers(widget.home.id),
             widget.expenses.list(widget.home.id, month: monthStart(_day)),
+            walletsFuture,
           ).wait;
       if (!mounted) return;
       setState(() {
         _categories = categories;
         _members = members;
         _monthItems = items;
+        _wallets = wallets;
         _loading = false;
       });
     } catch (e, st) {
@@ -148,6 +157,8 @@ class ExpensesPageState extends State<ExpensesPage> {
       categories: _categories,
       members: _members,
       currentUserId: widget.currentUserId,
+      wallets: _wallets,
+      walletService: widget.wallets,
       existing: existing,
       onSaved: _load,
     );
@@ -177,6 +188,10 @@ class ExpensesPageState extends State<ExpensesPage> {
       final path = expense.receiptPhotoPath;
       if (path != null && path.isNotEmpty) {
         await widget.photos.remove(path);
+      }
+      final walletSvc = widget.wallets;
+      if (walletSvc != null && expense.walletId != null) {
+        await walletSvc.revertExpense(expense.id);
       }
       await widget.expenses.delete(expense.id);
       return true;

@@ -30,6 +30,7 @@ import "package:home_manager/features/shared/app_refresh_indicator.dart";
 import "package:home_manager/features/shared/feature_page_scaffold.dart";
 import "package:home_manager/features/shared/loading_view.dart";
 import "package:home_manager/features/shell/quick_add_picker_sheet.dart";
+import "package:home_manager/features/wallet/wallet_hub_page.dart";
 import "package:home_manager/features/water/water_page.dart";
 
 class OverviewPage extends StatefulWidget {
@@ -204,6 +205,12 @@ class _OverviewPageState extends State<OverviewPage> {
                       onTap: () => _pushIncome(context),
                     ),
                     _QuickCard(
+                      icon: Icons.account_balance_wallet_outlined,
+                      title: S.wallet,
+                      value: VndFormat.compact(snap.walletsTotal),
+                      onTap: () => _pushWallet(context),
+                    ),
+                    _QuickCard(
                       icon: Icons.credit_card_outlined,
                       title: S.bankCredit,
                       value: VndFormat.compact(snap.bankUsed),
@@ -270,6 +277,7 @@ class _OverviewPageState extends State<OverviewPage> {
             homesApi: services.homes,
             photos: services.photos,
             currentUserId: widget.currentUserId,
+            wallets: services.wallets,
           ),
         ),
       ),
@@ -280,6 +288,19 @@ class _OverviewPageState extends State<OverviewPage> {
     Navigator.push<void>(
       context,
       AppPageRoute<void>(page: IncomeRoutePage(home: home, services: services)),
+    );
+  }
+
+  void _pushWallet(BuildContext context) {
+    Navigator.push<void>(
+      context,
+      AppPageRoute<void>(
+        page: WalletRoutePage(
+          home: home,
+          services: services,
+          currentUserId: widget.currentUserId,
+        ),
+      ),
     );
   }
 

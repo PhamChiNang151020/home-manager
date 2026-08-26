@@ -53,6 +53,9 @@ Cập nhật khi thêm test file. Agent dùng bảng này để phát hiện gap
 | ELEC-M05 | upsert omits is_paid when null | `test/integration/electricity_service_test.dart` | done |
 | INV-01 | HomeInvite email_sent_at parse | `test/unit/home_invite_test.dart` | done |
 | INV-01 | invite RPC returns invite id | `test/integration/invite_service_test.dart` | done |
+| WAL-01 | Wallet model parse | `test/unit/wallet_model_test.dart` | done |
+| WAL-02 | transfer / applyExpense RPC | `test/integration/wallet_service_test.dart` | done |
+| WAL-01 | wallet hub copy | `test/widget/wallet_hub_page_test.dart` | done |
 | INV-03 | Home.fromJson parses fields | `test/unit/models_test.dart` | planned |
 | INV-04 | parse ?join= and native scheme | `test/unit/join_link_test.dart` | done |
 | INV-04 | persist pending join token | `test/unit/join_link_store_test.dart` | done |
