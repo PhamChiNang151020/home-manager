@@ -1,0 +1,27 @@
+name: Daily reminder push
+
+on:
+  schedule:
+    # 08:00 Asia/Ho_Chi_Minh = 01:00 UTC
+    - cron: "0 1 * * *"
+  workflow_dispatch:
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Invoke send-reminder-push
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          if [ -z "${SUPABASE_URL}" ] || [ -z "${CRON_SECRET}" ]; then
+            echo "Missing SUPABASE_URL or CRON_SECRET"
+            exit 1
+          fi
+          BASE="${SUPABASE_URL%/}"
+          curl -fsS -X POST "${BASE}/functions/v1/send-reminder-push" \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            -H "Content-Type: application/json" \
+            --data '{}'

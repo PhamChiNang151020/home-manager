@@ -18,7 +18,8 @@ Consult this file before grepping the repo. Update when adding modules under `li
 | Lock | `lib/core/state/lock_controller.dart` + `lib/core/services/lock_service.dart` (local SHA-256 PIN) |
 | Reminders badge | `lib/core/state/reminder_controller.dart` + `lib/core/domain/reminder_aggregator.dart` |
 | Services locator | `lib/core/services/app_services.dart` |
-| FCM (web Phase 1) | `lib/core/config/firebase_web_config.dart` + `lib/core/services/notification_service.dart` + `web/firebase-messaging-sw.js` |
+| FCM (web) | `lib/core/config/firebase_web_config.dart` + `lib/core/services/notification_service.dart` + `lib/core/services/fcm_token_service.dart` + `web/firebase-messaging-sw.js` |
+| Reminder push (server) | `supabase/functions/send-reminder-push/` + `.github/workflows/daily-reminder-push.yml` |
 
 **Firebase pin (do not upgrade casually):** `firebase_core` **4.13.0**, `firebase_core_web` **3.10.0**, `firebase_messaging` **16.5.0** — `firebase_core_web` 3.11.0+ requires `dart:js_interop` `Object.isA` not supported on Dart **3.7.2** / Flutter **3.29.2** (project-pinned). Do not `flutter pub upgrade` these without testing web compile first.
 

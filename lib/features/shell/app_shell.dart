@@ -175,6 +175,7 @@ class _AppShellState extends State<AppShell> {
                                   homes: session.homes,
                                   homesApi: services.homes,
                                   invites: services.invites,
+                                  notifications: services.notifications,
                                   theme: widget.theme,
                                   lock: widget.lock,
                                   user: session.user,

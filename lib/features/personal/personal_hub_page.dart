@@ -32,6 +32,7 @@ class PersonalHubPage extends StatelessWidget {
     required this.homes,
     required this.homesApi,
     required this.invites,
+    required this.notifications,
     required this.theme,
     required this.lock,
     required this.user,
@@ -45,6 +46,7 @@ class PersonalHubPage extends StatelessWidget {
   final List<Home> homes;
   final HomeService homesApi;
   final InviteService invites;
+  final NotificationService notifications;
   final ThemeController theme;
   final LockController lock;
   final User? user;
@@ -130,6 +132,7 @@ class PersonalHubPage extends StatelessWidget {
                     page: PersonalSettingsPage(
                       home: home,
                       homesApi: homesApi,
+                      notifications: notifications,
                       theme: theme,
                       lock: lock,
                       onChanged: onChanged,
@@ -188,6 +191,7 @@ class PersonalSettingsPage extends StatelessWidget {
     super.key,
     required this.home,
     required this.homesApi,
+    required this.notifications,
     required this.theme,
     required this.lock,
     required this.onChanged,
@@ -195,6 +199,7 @@ class PersonalSettingsPage extends StatelessWidget {
 
   final Home home;
   final HomeService homesApi;
+  final NotificationService notifications;
   final ThemeController theme;
   final LockController lock;
   final VoidCallback onChanged;
@@ -296,7 +301,7 @@ class PersonalSettingsPage extends StatelessWidget {
                     AppPageRoute<void>(page: const InstallHomeScreenPage()),
                   ),
             ),
-            const _NotificationTestTile(),
+            _NotificationTestTile(notifications: notifications),
           ],
         ),
       ),
@@ -304,43 +309,53 @@ class PersonalSettingsPage extends StatelessWidget {
   }
 }
 
-/// Phase 1: request permission + show FCM token for manual Firebase Console tests.
+/// Request permission, show FCM token, upsert to Supabase (Phase 2).
 class _NotificationTestTile extends StatefulWidget {
-  const _NotificationTestTile();
+  const _NotificationTestTile({required this.notifications});
+
+  final NotificationService notifications;
 
   @override
   State<_NotificationTestTile> createState() => _NotificationTestTileState();
 }
 
 class _NotificationTestTileState extends State<_NotificationTestTile> {
-  final _notifications = const NotificationService();
   bool _busy = false;
   String? _token;
   String? _message;
+  bool _messageOk = false;
 
   Future<void> _onTap() async {
     if (_busy) return;
     setState(() {
       _busy = true;
       _message = null;
+      _messageOk = false;
       _token = null;
     });
     try {
-      if (!_notifications.isAvailable) {
+      final result = await widget.notifications.enableAndRegister();
+      if (!result.configured) {
         setState(() => _message = S.settingsNotifyNotConfigured);
         return;
       }
-      final status = await _notifications.requestPermission();
-      if (status != NotificationPermissionStatus.granted) {
+      if (result.status != NotificationPermissionStatus.granted) {
         setState(() => _message = S.settingsNotifyDenied);
         return;
       }
-      final token = await _notifications.getToken();
-      if (token == null || token.isEmpty) {
+      if (result.tokenFailed || result.token == null) {
         setState(() => _message = S.settingsNotifyTokenFailed);
         return;
       }
-      setState(() => _token = token);
+      setState(() {
+        _token = result.token;
+        if (result.saved) {
+          _message = S.settingsNotifySaved;
+          _messageOk = true;
+        } else {
+          _message = S.settingsNotifySaveFailed;
+        }
+      });
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -381,7 +396,9 @@ class _NotificationTestTileState extends State<_NotificationTestTile> {
               padding: const EdgeInsets.only(top: AppSpacing.sm),
               child: Text(
                 _message!,
-                style: TextStyle(color: colors.warning),
+                style: TextStyle(
+                  color: _messageOk ? colors.accent : colors.warning,
+                ),
               ),
             ),
           if (_token != null) ...[

@@ -227,13 +227,16 @@ abstract final class S {
   static const settingsInstall = "Thêm ra Màn hình chính";
   static const settingsNotifyTest = "Bật thông báo (thử nghiệm)";
   static const settingsNotifyTestDesc =
-      "Xin quyền · lấy FCM token (Phase 1)";
+      "Xin quyền · lấy FCM token · lưu thiết bị";
   static const settingsNotifyNotConfigured =
       "Chưa cấu hình Firebase. Thêm --dart-define FIREBASE_* hoặc secret GitHub.";
   static const settingsNotifyDenied = "Bạn đã từ chối quyền thông báo.";
   static const settingsNotifyTokenFailed =
       "Không lấy được FCM token. Xem console để biết lỗi.";
   static const settingsNotifyTokenLabel = "FCM token (sao chép để test):";
+  static const settingsNotifySaved = "Đã lưu token lên máy chủ.";
+  static const settingsNotifySaveFailed =
+      "Lấy token OK nhưng chưa lưu được (đăng nhập / migration?).";
   static const settingsHomeDesc = "Tên nhà, đơn giá điện / nước";
   static const settingsScheduleDesc = "Ngày chụp, lương, nhắc · xuất .ics";
   static const settingsMembersDesc = "QR mời vào nhà · thành viên · email";

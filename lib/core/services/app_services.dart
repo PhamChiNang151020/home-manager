@@ -1,9 +1,11 @@
 import "package:home_manager/core/services/bank_account_service.dart";
 import "package:home_manager/core/services/electricity_service.dart";
 import "package:home_manager/core/services/expense_service.dart";
+import "package:home_manager/core/services/fcm_token_service.dart";
 import "package:home_manager/core/services/home_service.dart";
 import "package:home_manager/core/services/income_service.dart";
 import "package:home_manager/core/services/invite_service.dart";
+import "package:home_manager/core/services/notification_service.dart";
 import "package:home_manager/core/services/personal_debt_service.dart";
 import "package:home_manager/core/services/savings_service.dart";
 import "package:home_manager/core/services/wallet_service.dart";
@@ -23,7 +25,9 @@ class AppServices {
       bankAccounts = BankAccountService(client),
       personalDebts = PersonalDebtService(client),
       savings = SavingsService(client),
-      wallets = WalletService(client);
+      wallets = WalletService(client),
+      fcmTokens = FcmTokenService(client),
+      notifications = NotificationService(tokens: FcmTokenService(client));
 
   final HomeService homes;
   final ElectricityService electricity;
@@ -36,4 +40,6 @@ class AppServices {
   final PersonalDebtService personalDebts;
   final SavingsService savings;
   final WalletService wallets;
+  final FcmTokenService fcmTokens;
+  final NotificationService notifications;
 }
