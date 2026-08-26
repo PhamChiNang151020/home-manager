@@ -5,7 +5,6 @@ import "package:home_manager/core/theme/app_accent.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/core/theme/mobile_viewport.dart";
-import "package:home_manager/features/shared/app_asset_icon.dart";
 
 class SettingsAppearancePage extends StatelessWidget {
   const SettingsAppearancePage({super.key, required this.theme});
@@ -71,6 +70,17 @@ class SettingsAppearancePage extends StatelessWidget {
                       ),
                   ],
                 ),
+                const SizedBox(height: AppSpacing.lg),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text(S.themeGlass),
+                  subtitle: Text(
+                    S.themeGlassDesc,
+                    style: TextStyle(color: colors.textMuted),
+                  ),
+                  value: theme.glass,
+                  onChanged: theme.setGlass,
+                ),
               ],
             ),
           ),
@@ -113,7 +123,12 @@ class _AccentChip extends StatelessWidget {
               width: selected ? 2 : 1,
             ),
           ),
-          child: AppAssetIcon(accent.previewAsset, size: 64),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: accent.color,
+              borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+            ),
+          ),
         ),
       ),
     );

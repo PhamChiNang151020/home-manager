@@ -33,7 +33,7 @@ class ReminderBanner extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const AppAssetIcon(AppIcons.reminder, size: 24),
+            const AppIcon(AppIcons.reminder, size: 24),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Column(

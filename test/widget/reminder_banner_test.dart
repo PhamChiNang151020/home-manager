@@ -34,10 +34,10 @@ void main() {
     );
 
     expect(find.text(S.bannerPhoto), findsOneWidget);
+    expect(find.byType(AppIcon), findsOneWidget);
     expect(
       find.byWidgetPredicate(
-        (widget) =>
-            widget is AppAssetIcon && widget.assetPath == AppIcons.reminder,
+        (widget) => widget is AppIcon && widget.icon == AppIcons.reminder,
       ),
       findsOneWidget,
     );

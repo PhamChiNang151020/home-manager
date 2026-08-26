@@ -55,16 +55,18 @@ Consult this file before grepping the repo. Update when adding modules under `li
 | Pull-to-refresh | `lib/features/shared/app_refresh_indicator.dart` — kéo xuống hiện cùng overlay `AppLoadingScrim` với lần tải đầu |
 | Sticky CTA / feature scaffold | `sticky_primary_bar.dart`, `feature_page_scaffold.dart` |
 | Brand logo | `lib/features/shared/app_brand_logo.dart` (`assets/brand/logo.png`) |
-| Feature / category icons | `lib/core/theme/app_icons.dart` + `app_asset_icon.dart` (`assets/*.png`) |
-| Accent previews | `assets/brand/appearance_preview/icon-accent-*.png` |
+| Feature / category icons | `lib/core/theme/app_icons.dart` (`IconData`) + `app_asset_icon.dart` (`AppIcon`) |
+| Glass surfaces | `app_glass_surface.dart` (`.blurred` chrome / `.light` lists), `app_ambient_background.dart` (radial blobs); default off via `ThemeController.glass` / Cài đặt giao diện |
 | PWA icons | `web/icons/` + `web/favicon.png`, `web/manifest.json` |
+| Web renderer | `web/flutter_bootstrap.js` — CanvasKit (`renderer: "canvaskit"`) for stable blur |
 
 ## Core
 
 | Item | Path |
 |------|------|
 | Copy (VI) | `lib/core/l10n/strings.dart` |
-| Theme | `lib/core/theme/app_theme.dart` (Nunito), `app_color_scheme.dart` (incl. category colors), `app_spacing.dart`, `safe_bottom_padding.dart` |
+| Theme | `lib/core/theme/app_theme.dart` (Nunito, `glass:`), `app_color_scheme.dart` (glass tokens + ambient), `app_spacing.dart`, `safe_bottom_padding.dart` |
+| Theme state | `lib/core/state/theme_controller.dart` — mode, accent, glass |
 | Fonts | `assets/fonts/Nunito/static/` (Regular 400 · Medium 500 · SemiBold 600 · Bold 700) |
 | Domain | `electricity_validation.dart`, `water_validation.dart`, `meter_math.dart`, `month_balance.dart`, `month_clamp.dart`, `expense_totals.dart`, `net_worth.dart`, `reminder_aggregator.dart`, `receipt_amount_parser.dart`, `selected_home.dart`, `period_history_filter.dart`, `pwa_install.dart`, `bank_brand.dart`, `join_link.dart`, `oauth_launch.dart`, `safe_bottom_inset.dart`, `form_dirty.dart` |
 | Models | `home.dart`, `electricity_period.dart`, `water_period.dart`, `expense.dart`, `expense_preset.dart`, `income.dart`, `tracking_mode.dart`, `lock_settings.dart`, `bank_account.dart`, `personal_debt.dart`, `savings.dart`, `reminder_item.dart` |

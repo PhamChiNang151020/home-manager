@@ -24,6 +24,7 @@ import "package:home_manager/features/shared/animated_entrance.dart";
 import "package:home_manager/features/shared/animated_money_text.dart";
 import "package:home_manager/features/shared/app_asset_icon.dart";
 import "package:home_manager/features/shared/app_card.dart";
+import "package:home_manager/features/shared/app_glass_surface.dart";
 import "package:home_manager/features/shared/app_loading.dart";
 import "package:home_manager/features/shared/app_refresh_indicator.dart";
 import "package:home_manager/features/shared/feature_page_scaffold.dart";
@@ -123,27 +124,23 @@ class _OverviewPageState extends State<OverviewPage> {
               ),
               AnimatedEntrance(
                 index: 0,
-                child: Material(
-                  color: colors.bgElevated,
-                  borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        AnimatedMoneyText(
-                          amount: snap.netWorth,
-                          large: true,
-                          style: heroStyle,
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        Text(
-                          S.netWorthHomeLabel(home.name),
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(color: colors.textMuted),
-                        ),
-                      ],
-                    ),
+                child: AppGlassSurface.blurred(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AnimatedMoneyText(
+                        amount: snap.netWorth,
+                        large: true,
+                        style: heroStyle,
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Text(
+                        S.netWorthHomeLabel(home.name),
+                        style: Theme.of(context).textTheme.bodySmall
+                            ?.copyWith(color: colors.textMuted),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -175,7 +172,7 @@ class _OverviewPageState extends State<OverviewPage> {
                   childAspectRatio: 2.2,
                   children: [
                     _QuickCard(
-                      iconPath: AppIcons.electricity,
+                      icon: AppIcons.electricity,
                       title: S.electricity,
                       value:
                           snap.latestElectricity == null
@@ -186,7 +183,7 @@ class _OverviewPageState extends State<OverviewPage> {
                       onTap: () => _pushElectricity(context),
                     ),
                     _QuickCard(
-                      iconPath: AppIcons.water,
+                      icon: AppIcons.water,
                       title: S.water,
                       value:
                           snap.latestWater == null
@@ -195,13 +192,13 @@ class _OverviewPageState extends State<OverviewPage> {
                       onTap: () => _pushWater(context),
                     ),
                     _QuickCard(
-                      iconPath: AppIcons.expenses,
+                      icon: AppIcons.expenses,
                       title: S.expenses,
                       value: VndFormat.compact(snap.monthExpenses),
                       onTap: () => _pushExpenses(context),
                     ),
                     _QuickCard(
-                      iconPath: AppIcons.income,
+                      icon: AppIcons.income,
                       title: S.income,
                       value: VndFormat.compact(snap.monthIncome),
                       onTap: () => _pushIncome(context),
@@ -323,11 +320,9 @@ class _QuickCard extends StatelessWidget {
     required this.title,
     required this.value,
     required this.onTap,
-    this.iconPath,
     this.icon,
   });
 
-  final String? iconPath;
   final IconData? icon;
   final String title;
   final String value;
@@ -344,10 +339,7 @@ class _QuickCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          if (iconPath != null)
-            AppAssetIcon(iconPath!, size: 22)
-          else if (icon != null)
-            Icon(icon, size: 22, color: colors.accent),
+          if (icon != null) AppIcon(icon!, size: 22),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Column(

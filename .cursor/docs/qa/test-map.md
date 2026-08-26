@@ -68,6 +68,8 @@ Cập nhật khi thêm test file. Agent dùng bảng này để phát hiện gap
 | UI-08 | a full-height sheet header stays clear of the status bar | `test/widget/app_sheet_test.dart` | done |
 | UI-09 | no sheet bypasses `showAppSheet` (double handle / safe area) | `test/widget/app_sheet_test.dart` | done |
 | UI-10 | pull-to-refresh shows the branded overlay, not Material's disc | `test/widget/app_refresh_indicator_test.dart` | done |
+| UI-11 | glass toggle persists; frosted surface when on | `test/widget/app_glass_surface_test.dart` | done |
+| UI-12 | AppIcon renders tinted Material IconData | `test/widget/app_icon_test.dart` | done |
 
 ## Test layout
 

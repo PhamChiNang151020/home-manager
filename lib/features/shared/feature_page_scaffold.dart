@@ -2,6 +2,7 @@ import "package:flutter/material.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/core/theme/mobile_viewport.dart";
+import "package:home_manager/features/shared/app_ambient_background.dart";
 import "package:home_manager/features/shared/app_asset_icon.dart";
 import "package:home_manager/features/shared/sticky_primary_bar.dart";
 
@@ -18,38 +19,41 @@ class FeaturePageScaffold extends StatelessWidget {
 
   final String title;
   final Widget body;
-  final String? titleIcon;
+  final IconData? titleIcon;
   final String? actionLabel;
   final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
-    return ColoredBox(
-      color: colors.bgBase,
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: colors.bgBase,
-          surfaceTintColor: Colors.transparent,
-          title:
-              titleIcon == null
-                  ? Text(title)
-                  : Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      AppAssetIcon(titleIcon!, size: 26),
-                      const SizedBox(width: AppSpacing.sm),
-                      Flexible(child: Text(title)),
-                    ],
-                  ),
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        const AppAmbientBackground(),
+        Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            backgroundColor: colors.glass ? Colors.transparent : colors.bgBase,
+            surfaceTintColor: Colors.transparent,
+            title:
+                titleIcon == null
+                    ? Text(title)
+                    : Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        AppIcon(titleIcon!, size: 26),
+                        const SizedBox(width: AppSpacing.sm),
+                        Flexible(child: Text(title)),
+                      ],
+                    ),
+          ),
+          body: MobileViewport(child: body),
+          bottomNavigationBar:
+              actionLabel == null || onAction == null
+                  ? null
+                  : StickyPrimaryBar(label: actionLabel!, onPressed: onAction!),
         ),
-        body: MobileViewport(child: body),
-        bottomNavigationBar:
-            actionLabel == null || onAction == null
-                ? null
-                : StickyPrimaryBar(label: actionLabel!, onPressed: onAction!),
-      ),
+      ],
     );
   }
 }

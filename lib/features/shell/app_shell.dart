@@ -13,6 +13,7 @@ import "package:home_manager/features/notifications/notifications_page.dart";
 import "package:home_manager/features/overview/overview_page.dart";
 import "package:home_manager/features/personal/personal_hub_page.dart";
 import "package:home_manager/features/pwa/install_home_screen_banner.dart";
+import "package:home_manager/features/shared/app_ambient_background.dart";
 import "package:home_manager/features/shared/app_loading.dart";
 import "package:home_manager/features/shell/app_bottom_nav.dart";
 import "package:home_manager/features/shell/quick_add_picker_sheet.dart";
@@ -86,130 +87,133 @@ class _AppShellState extends State<AppShell> {
     final services = widget.services;
     final colors = context.appColors;
 
-    return ColoredBox(
-      color: colors.bgBase,
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: colors.bgBase,
-          surfaceTintColor: Colors.transparent,
-          title: Text(
-            home == null
-                ? S.appName
-                : switch (_tab) {
-                  0 => S.overview,
-                  1 => S.transactions,
-                  2 => S.notifications,
-                  _ => S.personal,
-                },
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        const AppAmbientBackground(),
+        Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            backgroundColor: colors.glass ? Colors.transparent : colors.bgBase,
+            surfaceTintColor: Colors.transparent,
+            title: Text(
+              home == null
+                  ? S.appName
+                  : switch (_tab) {
+                    0 => S.overview,
+                    1 => S.transactions,
+                    2 => S.notifications,
+                    _ => S.personal,
+                  },
+            ),
           ),
-        ),
-        body: MobileViewport(
-          child: Column(
-            children: [
-              const InstallHomeScreenBanner(),
-              Expanded(
-                child: LoadingOverlay(
-                  loading: session.loading,
-                  child:
-                      home == null
-                          ? Center(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Text(S.noHomes),
-                                if (session.error != null) ...[
-                                  const SizedBox(height: AppSpacing.sm),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: AppSpacing.md,
+          body: MobileViewport(
+            child: Column(
+              children: [
+                const InstallHomeScreenBanner(),
+                Expanded(
+                  child: LoadingOverlay(
+                    loading: session.loading,
+                    child:
+                        home == null
+                            ? Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Text(S.noHomes),
+                                  if (session.error != null) ...[
+                                    const SizedBox(height: AppSpacing.sm),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: AppSpacing.md,
+                                      ),
+                                      child: Text(
+                                        session.error!,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(color: colors.error),
+                                      ),
                                     ),
-                                    child: Text(
-                                      session.error!,
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(color: colors.error),
-                                    ),
+                                  ],
+                                  const SizedBox(height: AppSpacing.md),
+                                  FilledButton(
+                                    onPressed:
+                                        () => showCreateHomeDialog(
+                                          context: context,
+                                          homesApi: services.homes,
+                                          onCreated: session.refreshHomes,
+                                        ),
+                                    child: const Text(S.addHome),
                                   ),
                                 ],
-                                const SizedBox(height: AppSpacing.md),
-                                FilledButton(
-                                  onPressed:
+                              ),
+                            )
+                            : IndexedStack(
+                              index: _tab,
+                              children: [
+                                OverviewPage(
+                                  key: ValueKey("overview-${home.id}"),
+                                  home: home,
+                                  services: services,
+                                  currentUserId: session.user?.id ?? "",
+                                ),
+                                TransactionsHubPage(
+                                  key: ValueKey("tx-${home.id}"),
+                                  home: home,
+                                  services: services,
+                                  currentUserId: session.user?.id ?? "",
+                                ),
+                                NotificationsPage(
+                                  key: ValueKey("notif-${home.id}"),
+                                  home: home,
+                                  services: services,
+                                  reminders: _reminders,
+                                  currentUserId: session.user?.id ?? "",
+                                ),
+                                PersonalHubPage(
+                                  key: ValueKey("personal-${home.id}"),
+                                  home: home,
+                                  homes: session.homes,
+                                  homesApi: services.homes,
+                                  invites: services.invites,
+                                  theme: widget.theme,
+                                  lock: widget.lock,
+                                  user: session.user,
+                                  onChanged: session.refreshHomes,
+                                  onSelectHome: (h) {
+                                    session.selectHome(h);
+                                    _reminders.refresh(h);
+                                  },
+                                  onAddHome:
                                       () => showCreateHomeDialog(
                                         context: context,
                                         homesApi: services.homes,
                                         onCreated: session.refreshHomes,
                                       ),
-                                  child: const Text(S.addHome),
+                                  onSignOut: session.signOut,
                                 ),
                               ],
                             ),
-                          )
-                          : IndexedStack(
-                            index: _tab,
-                            children: [
-                              OverviewPage(
-                                key: ValueKey("overview-${home.id}"),
-                                home: home,
-                                services: services,
-                                currentUserId: session.user?.id ?? "",
-                              ),
-                              TransactionsHubPage(
-                                key: ValueKey("tx-${home.id}"),
-                                home: home,
-                                services: services,
-                                currentUserId: session.user?.id ?? "",
-                              ),
-                              NotificationsPage(
-                                key: ValueKey("notif-${home.id}"),
-                                home: home,
-                                services: services,
-                                reminders: _reminders,
-                                currentUserId: session.user?.id ?? "",
-                              ),
-                              PersonalHubPage(
-                                key: ValueKey("personal-${home.id}"),
-                                home: home,
-                                homes: session.homes,
-                                homesApi: services.homes,
-                                invites: services.invites,
-                                theme: widget.theme,
-                                lock: widget.lock,
-                                user: session.user,
-                                onChanged: session.refreshHomes,
-                                onSelectHome: (h) {
-                                  session.selectHome(h);
-                                  _reminders.refresh(h);
-                                },
-                                onAddHome:
-                                    () => showCreateHomeDialog(
-                                      context: context,
-                                      homesApi: services.homes,
-                                      onCreated: session.refreshHomes,
-                                    ),
-                                onSignOut: session.signOut,
-                              ),
-                            ],
-                          ),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
+          bottomNavigationBar:
+              home == null
+                  ? null
+                  : AnimatedBuilder(
+                    animation: _reminders,
+                    builder: (context, _) {
+                      return AppBottomNav(
+                        tabIndex: _tab,
+                        notificationBadge: _reminders.badgeCount,
+                        onTabSelected: (index) => setState(() => _tab = index),
+                        onQuickAdd: _openQuickAdd,
+                      );
+                    },
+                  ),
         ),
-        bottomNavigationBar:
-            home == null
-                ? null
-                : AnimatedBuilder(
-                  animation: _reminders,
-                  builder: (context, _) {
-                    return AppBottomNav(
-                      tabIndex: _tab,
-                      notificationBadge: _reminders.badgeCount,
-                      onTabSelected: (index) => setState(() => _tab = index),
-                      onQuickAdd: _openQuickAdd,
-                    );
-                  },
-                ),
-      ),
+      ],
     );
   }
 }

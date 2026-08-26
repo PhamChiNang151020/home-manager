@@ -43,10 +43,12 @@ class HomeManagerApp extends StatelessWidget {
           theme: AppTheme.build(
             brightness: Brightness.light,
             accent: theme.accent,
+            glass: theme.glass,
           ),
           darkTheme: AppTheme.build(
             brightness: Brightness.dark,
             accent: theme.accent,
+            glass: theme.glass,
           ),
           themeMode: theme.mode,
           builder: _syncWebThemeColor,
@@ -80,10 +82,12 @@ class MissingConfigApp extends StatelessWidget {
           theme: AppTheme.build(
             brightness: Brightness.light,
             accent: theme.accent,
+            glass: theme.glass,
           ),
           darkTheme: AppTheme.build(
             brightness: Brightness.dark,
             accent: theme.accent,
+            glass: theme.glass,
           ),
           themeMode: theme.mode,
           builder: _syncWebThemeColor,

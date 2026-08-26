@@ -6,6 +6,7 @@ import "package:home_manager/core/theme/app_icons.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/core/theme/safe_bottom_padding.dart";
 import "package:home_manager/features/shared/app_asset_icon.dart";
+import "package:home_manager/features/shared/app_glass_surface.dart";
 
 /// Custom 5-slot bottom bar: Overview | Transactions | (+) | Notifications | Personal.
 class AppBottomNav extends StatelessWidget {
@@ -39,54 +40,59 @@ class AppBottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final bottomInset = safeBottomPaddingOf(context);
-    return Material(
-      color: colors.bgSurface,
-      elevation: 0,
-      child: Padding(
-        padding: EdgeInsets.only(bottom: bottomInset),
-        child: SizedBox(
-          height: _barHeight + AppSpacing.sm,
-          child: Row(
-            children: [
-              Expanded(
-                child: _NavItem(
-                  iconPath: AppIcons.dashboard,
-                  label: S.overview,
-                  selected: tabIndex == 0,
-                  onTap: () => _selectTab(0),
-                ),
+    final row = Padding(
+      padding: EdgeInsets.only(bottom: bottomInset),
+      child: SizedBox(
+        height: _barHeight + AppSpacing.sm,
+        child: Row(
+          children: [
+            Expanded(
+              child: _NavItem(
+                icon: AppIcons.dashboard,
+                label: S.overview,
+                selected: tabIndex == 0,
+                onTap: () => _selectTab(0),
               ),
-              Expanded(
-                child: _NavItem(
-                  iconPath: AppIcons.expenses,
-                  label: S.transactions,
-                  selected: tabIndex == 1,
-                  onTap: () => _selectTab(1),
-                ),
+            ),
+            Expanded(
+              child: _NavItem(
+                icon: AppIcons.expenses,
+                label: S.transactions,
+                selected: tabIndex == 1,
+                onTap: () => _selectTab(1),
               ),
-              Expanded(child: _QuickAddButton(onTap: _quickAdd)),
-              Expanded(
-                child: _NavItem(
-                  iconPath: AppIcons.reminder,
-                  label: S.notifications,
-                  selected: tabIndex == 2,
-                  onTap: () => _selectTab(2),
-                  badgeCount: notificationBadge,
-                ),
+            ),
+            Expanded(child: _QuickAddButton(onTap: _quickAdd)),
+            Expanded(
+              child: _NavItem(
+                icon: AppIcons.reminder,
+                label: S.notifications,
+                selected: tabIndex == 2,
+                onTap: () => _selectTab(2),
+                badgeCount: notificationBadge,
               ),
-              Expanded(
-                child: _NavItem(
-                  iconPath: AppIcons.settings,
-                  label: S.personal,
-                  selected: tabIndex == 3,
-                  onTap: () => _selectTab(3),
-                ),
+            ),
+            Expanded(
+              child: _NavItem(
+                icon: AppIcons.settings,
+                label: S.personal,
+                selected: tabIndex == 3,
+                onTap: () => _selectTab(3),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
+
+    if (colors.glass) {
+      return AppGlassSurface.blurred(
+        borderRadius: BorderRadius.zero,
+        child: row,
+      );
+    }
+
+    return Material(color: colors.bgSurface, elevation: 0, child: row);
   }
 }
 
@@ -124,14 +130,14 @@ class _QuickAddButton extends StatelessWidget {
 
 class _NavItem extends StatelessWidget {
   const _NavItem({
-    required this.iconPath,
+    required this.icon,
     required this.label,
     required this.selected,
     required this.onTap,
     this.badgeCount = 0,
   });
 
-  final String iconPath;
+  final IconData icon;
   final String label;
   final bool selected;
   final VoidCallback onTap;
@@ -149,9 +155,10 @@ class _NavItem extends StatelessWidget {
           Stack(
             clipBehavior: Clip.none,
             children: [
-              Opacity(
-                opacity: selected ? 1 : 0.72,
-                child: AppAssetIcon(iconPath, size: selected ? 26 : 24),
+              AppIcon(
+                icon,
+                size: selected ? 26 : 24,
+                color: selected ? colors.accent : colors.textMuted,
               ),
               if (badgeCount > 0)
                 Positioned(

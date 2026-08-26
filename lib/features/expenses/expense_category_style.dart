@@ -16,10 +16,7 @@ class ExpenseCategoryIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final path = AppIcons.expenseCategory(iconKey);
-    if (path != null) {
-      return AppAssetIcon(path, size: size);
-    }
-    return Icon(Icons.more_horiz, size: size, color: color);
+    final icon = AppIcons.expenseCategory(iconKey) ?? Icons.more_horiz;
+    return AppIcon(icon, size: size, color: color);
   }
 }

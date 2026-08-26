@@ -203,7 +203,7 @@ class _QuickAddPickerState extends State<_QuickAddPicker> {
               ),
               const SizedBox(height: AppSpacing.md),
               _PickTile(
-                iconPath: AppIcons.expenses,
+                icon: AppIcons.expenses,
                 label: S.expenses,
                 busy: _busy == S.expenses,
                 enabled: _busy == null,
@@ -211,7 +211,7 @@ class _QuickAddPickerState extends State<_QuickAddPicker> {
               ),
               const SizedBox(height: AppSpacing.sm),
               _PickTile(
-                iconPath: AppIcons.electricity,
+                icon: AppIcons.electricity,
                 label: S.electricity,
                 busy: _busy == S.electricity,
                 enabled: _busy == null,
@@ -219,7 +219,7 @@ class _QuickAddPickerState extends State<_QuickAddPicker> {
               ),
               const SizedBox(height: AppSpacing.sm),
               _PickTile(
-                iconPath: AppIcons.water,
+                icon: AppIcons.water,
                 label: S.water,
                 busy: _busy == S.water,
                 enabled: _busy == null,
@@ -264,11 +264,9 @@ class _PickTile extends StatelessWidget {
     required this.onTap,
     required this.busy,
     required this.enabled,
-    this.iconPath,
     this.icon,
   });
 
-  final String? iconPath;
   final IconData? icon;
   final String label;
   final bool busy;
@@ -291,10 +289,10 @@ class _PickTile extends StatelessWidget {
           ),
           child: Row(
             children: [
-              if (iconPath != null)
-                AppAssetIcon(iconPath!, size: 32)
+              if (icon != null)
+                AppIcon(icon!, size: 32)
               else
-                Icon(icon, size: 32, color: colors.accent),
+                Icon(Icons.circle, size: 32, color: colors.accent),
               const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Text(

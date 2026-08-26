@@ -1,11 +1,12 @@
 import "package:flutter/material.dart";
+import "package:home_manager/core/theme/app_color_scheme.dart";
+import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/features/shared/app_glass_surface.dart";
 
 /// Single entry point for modal sheets.
 ///
-/// [useSafeArea] is the important part: a tall sheet grows to the full screen
-/// height, and without it the sheet's own header slides under the status bar
-/// and the Dynamic Island. Background and shape come from `bottomSheetTheme`,
-/// the drag handle from `dragHandleColor` / `dragHandleSize`.
+/// [useSafeArea] keeps tall sheets clear of the status bar. When glass is on,
+/// the sheet chrome is frosted via [AppGlassSurface.blurred].
 Future<T?> showAppSheet<T>({
   required BuildContext context,
   required WidgetBuilder builder,
@@ -18,6 +19,15 @@ Future<T?> showAppSheet<T>({
     useRootNavigator: useRootNavigator,
     useSafeArea: true,
     showDragHandle: true,
-    builder: builder,
+    builder: (sheetContext) {
+      final child = builder(sheetContext);
+      if (!sheetContext.appColors.glass) return child;
+      return AppGlassSurface.blurred(
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(AppSpacing.cardRadius),
+        ),
+        child: child,
+      );
+    },
   );
 }

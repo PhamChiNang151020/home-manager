@@ -4,10 +4,15 @@ import "package:home_manager/core/theme/app_accent.dart";
 @immutable
 class AppColorScheme extends ThemeExtension<AppColorScheme> {
   const AppColorScheme({
+    required this.glass,
     required this.bgBase,
     required this.bgSurface,
     required this.bgElevated,
     required this.border,
+    required this.glassFill,
+    required this.glassBorder,
+    required this.ambientTop,
+    required this.ambientBottom,
     required this.textPrimary,
     required this.textSecondary,
     required this.textMuted,
@@ -22,10 +27,17 @@ class AppColorScheme extends ThemeExtension<AppColorScheme> {
     required this.catOther,
   });
 
+  /// Frosted surfaces + ambient gradient when true.
+  final bool glass;
+
   final Color bgBase;
   final Color bgSurface;
   final Color bgElevated;
   final Color border;
+  final Color glassFill;
+  final Color glassBorder;
+  final Color ambientTop;
+  final Color ambientBottom;
   final Color textPrimary;
   final Color textSecondary;
   final Color textMuted;
@@ -55,12 +67,22 @@ class AppColorScheme extends ThemeExtension<AppColorScheme> {
     };
   }
 
-  static AppColorScheme dark(Color accent) {
+  static AppColorScheme dark(Color accent, {bool glass = false}) {
+    const base = Color(0xFF0B0D10);
+    const surface = Color(0xFF151A21);
     return AppColorScheme(
-      bgBase: const Color(0xFF0B0D10),
-      bgSurface: const Color(0xFF151A21),
+      glass: glass,
+      bgBase: base,
+      bgSurface: surface,
       bgElevated: const Color(0xFF1A1E24),
       border: const Color(0xFF273140),
+      glassFill: glass ? surface.withValues(alpha: 0.55) : surface,
+      glassBorder:
+          glass
+              ? Colors.white.withValues(alpha: 0.14)
+              : const Color(0xFF273140),
+      ambientTop: Color.lerp(base, accent, 0.22)!,
+      ambientBottom: base,
       textPrimary: const Color(0xFFE9EEF5),
       textSecondary: const Color(0xFF94A3B8),
       textMuted: const Color(0xFF7A8799),
@@ -78,12 +100,22 @@ class AppColorScheme extends ThemeExtension<AppColorScheme> {
 
   /// Pass [AppAccent.colorOnLight], not [AppAccent.color] — the bright brand
   /// tone is not legible on these backgrounds.
-  static AppColorScheme light(Color accent) {
+  static AppColorScheme light(Color accent, {bool glass = false}) {
+    const base = Color(0xFFF5F6F8);
+    const surface = Color(0xFFFFFFFF);
     return AppColorScheme(
-      bgBase: const Color(0xFFF5F6F8),
-      bgSurface: const Color(0xFFFFFFFF),
+      glass: glass,
+      bgBase: base,
+      bgSurface: surface,
       bgElevated: const Color(0xFFEEF1F5),
       border: const Color(0xFFD1D9E6),
+      glassFill: glass ? surface.withValues(alpha: 0.72) : surface,
+      glassBorder:
+          glass
+              ? Colors.white.withValues(alpha: 0.55)
+              : const Color(0xFFD1D9E6),
+      ambientTop: Color.lerp(base, accent, 0.12)!,
+      ambientBottom: base,
       textPrimary: const Color(0xFF0F172A),
       textSecondary: const Color(0xFF475569),
       textMuted: const Color(0xFF5B6B7F),
@@ -101,10 +133,15 @@ class AppColorScheme extends ThemeExtension<AppColorScheme> {
 
   @override
   AppColorScheme copyWith({
+    bool? glass,
     Color? bgBase,
     Color? bgSurface,
     Color? bgElevated,
     Color? border,
+    Color? glassFill,
+    Color? glassBorder,
+    Color? ambientTop,
+    Color? ambientBottom,
     Color? textPrimary,
     Color? textSecondary,
     Color? textMuted,
@@ -119,10 +156,15 @@ class AppColorScheme extends ThemeExtension<AppColorScheme> {
     Color? catOther,
   }) {
     return AppColorScheme(
+      glass: glass ?? this.glass,
       bgBase: bgBase ?? this.bgBase,
       bgSurface: bgSurface ?? this.bgSurface,
       bgElevated: bgElevated ?? this.bgElevated,
       border: border ?? this.border,
+      glassFill: glassFill ?? this.glassFill,
+      glassBorder: glassBorder ?? this.glassBorder,
+      ambientTop: ambientTop ?? this.ambientTop,
+      ambientBottom: ambientBottom ?? this.ambientBottom,
       textPrimary: textPrimary ?? this.textPrimary,
       textSecondary: textSecondary ?? this.textSecondary,
       textMuted: textMuted ?? this.textMuted,
@@ -142,10 +184,16 @@ class AppColorScheme extends ThemeExtension<AppColorScheme> {
   AppColorScheme lerp(AppColorScheme? other, double t) {
     if (other == null) return this;
     return AppColorScheme(
+      glass: t < 0.5 ? glass : other.glass,
       bgBase: Color.lerp(bgBase, other.bgBase, t) ?? bgBase,
       bgSurface: Color.lerp(bgSurface, other.bgSurface, t) ?? bgSurface,
       bgElevated: Color.lerp(bgElevated, other.bgElevated, t) ?? bgElevated,
       border: Color.lerp(border, other.border, t) ?? border,
+      glassFill: Color.lerp(glassFill, other.glassFill, t) ?? glassFill,
+      glassBorder: Color.lerp(glassBorder, other.glassBorder, t) ?? glassBorder,
+      ambientTop: Color.lerp(ambientTop, other.ambientTop, t) ?? ambientTop,
+      ambientBottom:
+          Color.lerp(ambientBottom, other.ambientBottom, t) ?? ambientBottom,
       textPrimary: Color.lerp(textPrimary, other.textPrimary, t) ?? textPrimary,
       textSecondary:
           Color.lerp(textSecondary, other.textSecondary, t) ?? textSecondary,

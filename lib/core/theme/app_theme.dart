@@ -11,11 +11,12 @@ abstract final class AppTheme {
   static ThemeData build({
     required Brightness brightness,
     required AppAccent accent,
+    bool glass = false,
   }) {
     final colors =
         brightness == Brightness.dark
-            ? AppColorScheme.dark(accent.color)
-            : AppColorScheme.light(accent.colorOnLight);
+            ? AppColorScheme.dark(accent.color, glass: glass)
+            : AppColorScheme.light(accent.colorOnLight, glass: glass);
     final onPrimary =
         brightness == Brightness.dark ? colors.bgBase : Colors.white;
 
@@ -41,6 +42,9 @@ abstract final class AppTheme {
       displayColor: colors.textPrimary,
     );
 
+    final surfaceColor = glass ? colors.glassFill : colors.bgSurface;
+    final barColor = glass ? Colors.transparent : colors.bgBase;
+
     return ThemeData(
       useMaterial3: true,
       brightness: brightness,
@@ -48,12 +52,13 @@ abstract final class AppTheme {
       fontFamily: AppFonts.nunito,
       textTheme: textTheme,
       primaryTextTheme: textTheme,
-      scaffoldBackgroundColor: colors.bgBase,
+      scaffoldBackgroundColor: glass ? Colors.transparent : colors.bgBase,
       extensions: [colors],
       appBarTheme: AppBarTheme(
-        backgroundColor: colors.bgBase,
+        backgroundColor: barColor,
         foregroundColor: colors.textPrimary,
         elevation: 0,
+        scrolledUnderElevation: glass ? 0 : null,
         centerTitle: false,
         titleTextStyle: textTheme.titleLarge,
         // Line the title up with MobileViewport instead of Material's 16.
@@ -65,27 +70,27 @@ abstract final class AppTheme {
         // Vertical only: keeps the gap between stacked cards, drops the
         // horizontal offset.
         margin: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
-        color: colors.bgSurface,
-        elevation: brightness == Brightness.dark ? 1 : 2,
+        color: surfaceColor,
+        elevation: glass ? 0 : (brightness == Brightness.dark ? 1 : 2),
         shadowColor:
             brightness == Brightness.dark
                 ? Colors.black.withValues(alpha: 0.35)
                 : Colors.black.withValues(alpha: 0.08),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-          side: BorderSide(color: colors.border),
+          side: BorderSide(color: glass ? colors.glassBorder : colors.border),
         ),
       ),
       dialogTheme: DialogTheme(
-        backgroundColor: colors.bgSurface,
+        backgroundColor: surfaceColor,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-          side: BorderSide(color: colors.border),
+          side: BorderSide(color: glass ? colors.glassBorder : colors.border),
         ),
       ),
       bottomSheetTheme: BottomSheetThemeData(
-        backgroundColor: colors.bgSurface,
+        backgroundColor: glass ? Colors.transparent : colors.bgSurface,
         surfaceTintColor: Colors.transparent,
         dragHandleColor: colors.border,
         dragHandleSize: const Size(40, 4),
@@ -96,7 +101,7 @@ abstract final class AppTheme {
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: colors.bgSurface,
+        backgroundColor: surfaceColor,
         indicatorColor: colors.accentMuted(),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
@@ -115,7 +120,7 @@ abstract final class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: colors.bgSurface,
+        fillColor: surfaceColor,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md,
           vertical: AppSpacing.sm + 4,

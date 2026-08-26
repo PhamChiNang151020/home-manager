@@ -238,7 +238,7 @@ class PersonalSettingsPage extends StatelessWidget {
               },
             ),
             _HubTile(
-              leading: const AppAssetIcon(AppIcons.reminder, size: 28),
+              leading: const AppIcon(AppIcons.reminder, size: 28),
               title: S.settingsSchedule,
               subtitle: S.settingsScheduleDesc,
               onTap:

@@ -1,6 +1,7 @@
 import "package:flutter/material.dart";
-import "package:home_manager/core/theme/app_icons.dart";
 
+/// Bright brand accents for chips / previews. Darker [colorOnLight] lives on
+/// [AppAccent] for text and fills on light surfaces.
 enum AppAccent {
   amber,
   blue,
@@ -27,8 +28,6 @@ enum AppAccent {
   };
 
   String get storageKey => name;
-
-  String get previewAsset => AppIcons.accentPreview(name);
 
   static AppAccent fromStorage(String? value) {
     return AppAccent.values.firstWhere(

@@ -221,7 +221,7 @@ abstract final class S {
   static const settingsScheduleDesc = "Ngày chụp, lương, nhắc · xuất .ics";
   static const settingsMembersDesc = "QR mời vào nhà · thành viên · email";
   static const settingsAccountDesc = "Đăng xuất";
-  static const settingsAppearanceDesc = "Sáng / tối, màu nhấn";
+  static const settingsAppearanceDesc = "Sáng / tối, màu nhấn, hiệu ứng kính";
   static const settingsSecurityDesc = "Khoá ứng dụng bằng PIN";
   static const settingsInstallDesc = "iPhone: cài nhanh ra Màn hình chính";
   static const installBannerTitle = "Thêm Tổ Ấm ra Màn hình chính";
@@ -255,6 +255,9 @@ abstract final class S {
   static const themeModeLight = "Sáng";
   static const themeModeDark = "Tối";
   static const themeAccent = "Màu nhấn";
+  static const themeGlass = "Hiệu ứng kính";
+  static const themeGlassDesc =
+      "Nền trong suốt mờ như kính. Có thể chậm hơn trên trình duyệt.";
   static const history = "Lịch sử";
   static const filterHistory = "Lọc lịch sử";
   static const filterAll = "Tất cả";

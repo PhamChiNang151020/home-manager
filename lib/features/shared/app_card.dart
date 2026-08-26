@@ -1,6 +1,7 @@
 import "package:flutter/material.dart";
 import "package:home_manager/core/theme/app_motion.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/features/shared/app_glass_surface.dart";
 
 class AppCard extends StatefulWidget {
   const AppCard({
@@ -43,23 +44,21 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final card = Card(
-      child: Padding(padding: widget.padding, child: widget.child),
+    final card = Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+      child: AppGlassSurface.light(padding: widget.padding, child: widget.child),
     );
 
-    Widget result = card;
-    if (widget.onTap != null) {
-      result = GestureDetector(
-        onTapDown: (_) => _pressController.forward(),
-        onTapUp: (_) {
-          _pressController.reverse();
-          widget.onTap!();
-        },
-        onTapCancel: () => _pressController.reverse(),
-        child: ScaleTransition(scale: _scale, child: card),
-      );
-    }
+    if (widget.onTap == null) return card;
 
-    return result;
+    return GestureDetector(
+      onTapDown: (_) => _pressController.forward(),
+      onTapUp: (_) {
+        _pressController.reverse();
+        widget.onTap!();
+      },
+      onTapCancel: () => _pressController.reverse(),
+      child: ScaleTransition(scale: _scale, child: card),
+    );
   }
 }

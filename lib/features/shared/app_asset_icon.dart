@@ -1,19 +1,16 @@
 import "package:flutter/material.dart";
+import "package:home_manager/core/theme/app_color_scheme.dart";
 
-/// Neon PNG mark. Does not tint — glow is baked into the file.
-class AppAssetIcon extends StatelessWidget {
-  const AppAssetIcon(this.assetPath, {super.key, this.size = 24});
+/// Tinted vector icon used across nav, hubs, and category chips.
+class AppIcon extends StatelessWidget {
+  const AppIcon(this.icon, {super.key, this.size = 24, this.color});
 
-  final String assetPath;
+  final IconData icon;
   final double size;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
-    return Image.asset(
-      assetPath,
-      width: size,
-      height: size,
-      filterQuality: FilterQuality.medium,
-    );
+    return Icon(icon, size: size, color: color ?? context.appColors.accent);
   }
 }
