@@ -226,6 +226,34 @@
   </style>
 </head>
 <body>
+  <script>
+    // Block WebKit edge-swipe-back/forward before Flutter owns touch events.
+    // Standalone / Home Screen / Web Clip only — leave Safari tab browser-back alone.
+    (function () {
+      var isStandalone = window.matchMedia('(display-mode: standalone)').matches
+        || window.matchMedia('(display-mode: fullscreen)').matches
+        || window.navigator.standalone === true;
+      if (!isStandalone) return;
+
+      var EDGE_THRESHOLD = 24;
+      var startX = null;
+
+      document.addEventListener('touchstart', function (e) {
+        if (e.touches.length === 1) {
+          startX = e.touches[0].clientX;
+        }
+      }, { passive: true });
+
+      document.addEventListener('touchmove', function (e) {
+        if (startX === null) return;
+        var fromLeft = startX < EDGE_THRESHOLD;
+        var fromRight = startX > window.innerWidth - EDGE_THRESHOLD;
+        if (fromLeft || fromRight) {
+          e.preventDefault();
+        }
+      }, { passive: false });
+    })();
+  </script>
   <div id="splash">
     <img src="icons/Icon-192.png" alt="Tổ Ấm" width="96" height="96" />
     <p class="splash-name">Tổ Ấm</p>
@@ -244,6 +272,7 @@
     window.addEventListener('flutter-first-frame', removeSplash);
     setTimeout(removeSplash, 8000);
 
+    // Secondary defense if an edge gesture slips past the touch blocker above.
     (function installPwaHistoryGuard() {
       if (window.__pwaHistoryGuardInstalled) return;
       window.__pwaHistoryGuardInstalled = true;
