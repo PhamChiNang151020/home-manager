@@ -6,6 +6,12 @@
       "sourceType": "github",
       "skillPath": "skills/checklist-design/SKILL.md",
       "computedHash": "11262f891135f1eca3bb696c37f96177bd1fa35c77fe74c22ad19a8861f9236d"
+    },
+    "impeccable": {
+      "source": "pbakaus/impeccable",
+      "sourceType": "github",
+      "skillPath": ".cursor/skills/impeccable/SKILL.md",
+      "computedHash": "fc9106b2b240a4abdbe9abf1e5d026ab06c3315f3b79b7e029383e17abb341b2"
     }
   }
 }
