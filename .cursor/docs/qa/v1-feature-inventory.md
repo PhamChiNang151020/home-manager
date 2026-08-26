@@ -34,6 +34,7 @@ Status: `[ ]` chưa có automated test · `[x]` đã có · `[~]` một phần
 | INV-01 | Invites | Invite by email | `invite_service.dart` | RPC | | | x | x | [ ] |
 | INV-02 | Invites | List pending invites | `invite_service.dart` | query parse | | | x | x | [ ] |
 | INV-03 | Invites | List members | `home_service.dart` | join parse | x | | x | x | [ ] |
+| INV-04 | Invites | Join QR token (scan → login → home) | `join_link.dart`, `invite_service.dart` | parse URL + RPC | x | x | x | x | [x] |
 | FMT-01 | Format | VND format / parse / compact | `vnd_format.dart` | pure | x | | | | [x] |
 
 ## Notes

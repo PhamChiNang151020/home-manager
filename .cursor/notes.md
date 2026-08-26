@@ -6,22 +6,22 @@ Locked decisions. Do not change without discussion.
 
 ## Platform scope
 
-- **v1:** Flutter **Web only** (`--platforms=web`). Install on iPhone via Safari **Add to Home Screen** (PWA).
-- Do **not** add iOS/Android native targets without approval.
-- Reason: iPhone banking apps block **Developer Mode**; native sideload is incompatible with daily banking on the same device.
+- **v1:** Flutter **Web** PWA. Install on iPhone via Safari **Add to Home Screen**.
+- **v2+:** Native **iOS Simulator** target (`ios/`, bundle `com.pcn.home_manager`). App Store / TestFlight when an Apple Developer account exists.
+- Native sideload still requires Developer Mode; do not sideload onto a daily-driver iPhone that needs banking apps.
+- Do **not** add Android without approval.
 
 ## Distribution
 
-- No App Store.
-- No Xcode install / Developer Mode.
-- Deploy static `flutter build web --base-href /home-manager/` to **GitHub Pages**.
+- Primary: static `flutter build web --base-href /home-manager/` to **GitHub Pages**.
+- iOS: `flutter run -d "iPhone 17 Pro"` (Simulator). App Store later.
 - Private repo + Pages may need GitHub Pro; fallback: Cloudflare Pages or Firebase Hosting (source stays on GitHub).
 
 ## Auth and data
 
 - **Source of truth:** Supabase (Postgres + RLS + Storage). Online-first for family sync.
-- **Auth:** Google via Supabase OAuth.
-- **Owner invites** members **per home** by Google email.
+- **Auth:** Google via Supabase OAuth. Web uses page origin; iOS uses `com.pcn.home-manager://login-callback`.
+- **Owner invites** per home by **join QR token** (scan → Google login) or Google email.
 - Anon key + project URL are public (RLS protects rows). Never commit the **service role** key.
 - Do not log PII or bill photos to analytics.
 

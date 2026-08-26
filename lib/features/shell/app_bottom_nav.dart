@@ -3,6 +3,7 @@ import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_icons.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/core/theme/safe_bottom_padding.dart";
 import "package:home_manager/features/shared/app_asset_icon.dart";
 
 /// Custom 5-slot bottom bar: Overview | Transactions | (+) | Notifications | Personal.
@@ -26,48 +27,52 @@ class AppBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final bottomInset = safeBottomPaddingOf(context);
     return Material(
       color: colors.bgSurface,
       elevation: 0,
-      child: SizedBox(
-        height: _barHeight + AppSpacing.sm,
-        child: Row(
-          children: [
-            Expanded(
-              child: _NavItem(
-                iconPath: AppIcons.dashboard,
-                label: S.overview,
-                selected: tabIndex == 0,
-                onTap: () => onTabSelected(0),
+      child: Padding(
+        padding: EdgeInsets.only(bottom: bottomInset),
+        child: SizedBox(
+          height: _barHeight + AppSpacing.sm,
+          child: Row(
+            children: [
+              Expanded(
+                child: _NavItem(
+                  iconPath: AppIcons.dashboard,
+                  label: S.overview,
+                  selected: tabIndex == 0,
+                  onTap: () => onTabSelected(0),
+                ),
               ),
-            ),
-            Expanded(
-              child: _NavItem(
-                iconPath: AppIcons.expenses,
-                label: S.transactions,
-                selected: tabIndex == 1,
-                onTap: () => onTabSelected(1),
+              Expanded(
+                child: _NavItem(
+                  iconPath: AppIcons.expenses,
+                  label: S.transactions,
+                  selected: tabIndex == 1,
+                  onTap: () => onTabSelected(1),
+                ),
               ),
-            ),
-            Expanded(child: _QuickAddButton(onTap: onQuickAdd)),
-            Expanded(
-              child: _NavItem(
-                iconPath: AppIcons.reminder,
-                label: S.notifications,
-                selected: tabIndex == 2,
-                onTap: () => onTabSelected(2),
-                badgeCount: notificationBadge,
+              Expanded(child: _QuickAddButton(onTap: onQuickAdd)),
+              Expanded(
+                child: _NavItem(
+                  iconPath: AppIcons.reminder,
+                  label: S.notifications,
+                  selected: tabIndex == 2,
+                  onTap: () => onTabSelected(2),
+                  badgeCount: notificationBadge,
+                ),
               ),
-            ),
-            Expanded(
-              child: _NavItem(
-                iconPath: AppIcons.settings,
-                label: S.personal,
-                selected: tabIndex == 3,
-                onTap: () => onTabSelected(3),
+              Expanded(
+                child: _NavItem(
+                  iconPath: AppIcons.settings,
+                  label: S.personal,
+                  selected: tabIndex == 3,
+                  onTap: () => onTabSelected(3),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

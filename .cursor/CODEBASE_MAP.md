@@ -1,4 +1,4 @@
-# CODEBASE_MAP — home_manager (Flutter Web) v2
+# CODEBASE_MAP — home_manager (Flutter Web + iOS) v2
 
 Consult this file before grepping the repo. Update when adding modules under `lib/`.
 
@@ -61,11 +61,11 @@ Consult this file before grepping the repo. Update when adding modules under `li
 | Item | Path |
 |------|------|
 | Copy (VI) | `lib/core/l10n/strings.dart` |
-| Theme | `lib/core/theme/app_theme.dart` (Nunito), `app_color_scheme.dart` (incl. category colors), `app_spacing.dart` |
+| Theme | `lib/core/theme/app_theme.dart` (Nunito), `app_color_scheme.dart` (incl. category colors), `app_spacing.dart`, `safe_bottom_padding.dart` |
 | Fonts | `assets/fonts/Nunito/static/` (Regular 400 · Medium 500 · SemiBold 600 · Bold 700) |
-| Domain | `electricity_validation.dart`, `water_validation.dart`, `meter_math.dart`, `month_balance.dart`, `month_clamp.dart`, `expense_totals.dart`, `net_worth.dart`, `reminder_aggregator.dart`, `receipt_amount_parser.dart`, `selected_home.dart`, `period_history_filter.dart`, `pwa_install.dart`, `bank_brand.dart` |
+| Domain | `electricity_validation.dart`, `water_validation.dart`, `meter_math.dart`, `month_balance.dart`, `month_clamp.dart`, `expense_totals.dart`, `net_worth.dart`, `reminder_aggregator.dart`, `receipt_amount_parser.dart`, `selected_home.dart`, `period_history_filter.dart`, `pwa_install.dart`, `bank_brand.dart`, `join_link.dart`, `oauth_launch.dart`, `safe_bottom_inset.dart` |
 | Models | `home.dart`, `electricity_period.dart`, `water_period.dart`, `expense.dart`, `expense_preset.dart`, `income.dart`, `tracking_mode.dart`, `lock_settings.dart`, `bank_account.dart`, `personal_debt.dart`, `savings.dart`, `reminder_item.dart` |
-| Services | `home_service.dart`, `invite_service.dart`, `electricity_service.dart` (`BillPhotoService`), `water_service.dart`, `expense_service.dart`, `income_service.dart`, `overview_service.dart`, `ocr_service.dart`, `lock_service.dart`, `bank_account_service.dart`, `personal_debt_service.dart`, `savings_service.dart` |
+| Services | `home_service.dart`, `invite_service.dart`, `join_link_store.dart`, `electricity_service.dart` (`BillPhotoService`), `water_service.dart`, `expense_service.dart`, `income_service.dart`, `overview_service.dart`, `ocr_service.dart`, `lock_service.dart`, `bank_account_service.dart`, `personal_debt_service.dart`, `savings_service.dart` |
 
 ## Supabase
 
@@ -83,6 +83,7 @@ Consult this file before grepping the repo. Update when adding modules under `li
 | Expense presets RPC | `20260821100000_add_expense_presets_rpc.sql` |
 | Drop loan category seed | `20260821110000_drop_loan_expense_category_seed.sql` |
 | Delete home RPC | `20260821120000_delete_home_rpc.sql` |
+| Join QR token | `20260825090000_home_join_links.sql` |
 | Seed (elec/water/expense/income) | `supabase/seeds/seed_home_testing.sql` |
 | Seed (finance) | `supabase/seeds/seed_finance_testing.sql` |
 

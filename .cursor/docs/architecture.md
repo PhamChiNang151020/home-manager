@@ -2,11 +2,11 @@
 
 ## Problem
 
-Track electricity for two family homes on iPhone **without** App Store or Developer Mode, with Google login and sync.
+Track electricity for two family homes on iPhone (PWA or iOS Simulator) with Google login and sync.
 
 ## Layers
 
-1. **UI (Flutter Web)** — Material 3, Vietnamese, PWA standalone.
+1. **UI** — Material 3, Vietnamese. Flutter Web PWA + native iOS Simulator.
 2. **Domain / services** — homes, invites, electricity/water periods, expenses, income, photos, ICS. No Supabase in widgets.
 3. **Supabase** — Auth (Google), Postgres + RLS, Storage for bill JPEGs.
 
@@ -23,6 +23,7 @@ Track electricity for two family homes on iPhone **without** App Store or Develo
 - `homes` — name, `tracking_mode`, `kwh_rate`, `m3_rate`, calendar days, `created_by`
 - `home_members` — `owner` \| `member`
 - `home_invites` — pending email until Google email matches
+- `home_join_links` — reusable QR token (14 days); scan then Google login, no email match
 - `electricity_periods` / `water_periods` — unique `(home_id, period_month)`
 - `expense_categories` — 5 defaults seeded per home
 - `expenses` — amount, category, paid_by, date, optional receipt
@@ -35,8 +36,11 @@ Storage: bucket `bill-photos`. Electricity `homes/{id}/{yyyy-mm}.jpg`; water `ho
 1. Sign in with Google.
 2. Trigger upserts `profiles`.
 3. RPC `accept_pending_invites` attaches memberships for matching email.
-4. Owner calls `invite_to_home(home_id, email)`.
-5. RLS: only members read/write that home’s rows and photos.
+4. Owner shows a **join QR** (`create_or_get_join_link`); invitee opens `?join=<token>` and after login RPC `accept_invite_token` attaches membership (email ignored).
+5. Owner may also call `invite_to_home(home_id, email)`.
+6. RLS: only members read/write that home’s rows and photos.
+
+OAuth redirect: web page origin; iOS `com.pcn.home-manager://login-callback`.
 
 ## Reminders
 
@@ -52,7 +56,7 @@ flutter build web --base-href /home-manager/ \
   --dart-define=SUPABASE_ANON_KEY=...
 ```
 
-OAuth redirect URLs: `http://localhost:*` and the Pages origin.
+OAuth redirect URLs: `http://localhost:*`, the Pages origin, and `com.pcn.home-manager://login-callback` (iOS).
 
 ## Error cases
 

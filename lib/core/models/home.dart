@@ -76,3 +76,23 @@ class HomeInvite {
     );
   }
 }
+
+class HomeJoinLink {
+  const HomeJoinLink({
+    required this.token,
+    required this.homeId,
+    required this.expiresAt,
+  });
+
+  final String token;
+  final String homeId;
+  final DateTime expiresAt;
+
+  factory HomeJoinLink.fromJson(Map<String, dynamic> json) {
+    return HomeJoinLink(
+      token: json["token"] as String,
+      homeId: json["home_id"] as String,
+      expiresAt: DateTime.parse(json["expires_at"] as String),
+    );
+  }
+}

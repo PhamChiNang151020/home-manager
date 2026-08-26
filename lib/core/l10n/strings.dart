@@ -192,11 +192,11 @@ abstract final class S {
   static const settingsInstall = "Thêm ra Màn hình chính";
   static const settingsHomeDesc = "Tên nhà, đơn giá điện / nước";
   static const settingsScheduleDesc = "Ngày chụp, lương, nhắc · xuất .ics";
-  static const settingsMembersDesc = "Thành viên và lời mời";
+  static const settingsMembersDesc = "QR mời vào nhà · thành viên · email";
   static const settingsAccountDesc = "Đăng xuất";
   static const settingsAppearanceDesc = "Sáng / tối, màu nhấn";
   static const settingsSecurityDesc = "Khoá ứng dụng bằng PIN";
-  static const settingsInstallDesc = "iPhone: cài nhanh · QR gửi người nhà";
+  static const settingsInstallDesc = "iPhone: cài nhanh ra Màn hình chính";
   static const installBannerTitle = "Thêm Tổ Ấm ra Màn hình chính";
   static const installBannerIosSafari =
       "Bấm Cài nhanh → Cài đặt → Cài. iOS có thể báo Chưa xác minh — bấm Cài tiếp.";
@@ -211,11 +211,11 @@ abstract final class S {
       "Bấm Cài nhanh → Cho phép → Cài đặt → Cài. iOS có thể báo \"Chưa xác minh\" — bấm Cài tiếp.";
   static const installIosWebClipInApp =
       "Mở bằng Safari trước, rồi bấm Cài nhanh trên iPhone.";
-  static const installGuide = "Mã QR gửi người nhà";
+  static const installGuide = "Mã QR cài app";
   static const installDismiss = "Đóng";
-  static const installQrSectionTitle = "Gửi cho người nhà";
+  static const installQrSectionTitle = "Cài đặt trên điện thoại khác";
   static const installQrHint =
-      "Chụp màn hình mã này rồi gửi ảnh. Người nhà mở Safari, quét mã, bấm Cài nhanh trên trang mở ra.";
+      "Quét mã để mở trang cài Tổ Ấm ra Màn hình chính. Mã này không thêm người vào nhà — dùng Chia sẻ để mời thành viên.";
   static const installCopyLink = "Sao chép liên kết (cho bạn)";
   static const installLinkCopied = "Đã sao chép liên kết";
   static const installIosProfileRemoveTitle = "Gỡ profile khỏi iPhone";
@@ -247,6 +247,17 @@ abstract final class S {
   static const cancelInviteConfirm = "Huỷ lời mời đã gửi đến";
   static const pendingInviteHint = "Đang chờ chấp nhận";
   static const sending = "Đang gửi…";
+  static const joinQrTitle = "Mã QR mời vào nhà";
+  static const joinQrHint =
+      "Người nhà quét mã, đăng nhập Google — sẽ thấy nhà này. Không cần nhập email trước.";
+  static const joinQrExpiryHint = "Mã có hạn 14 ngày. Tạo mã mới nếu cần.";
+  static const joinQrCopy = "Sao chép liên kết mời";
+  static const joinQrCopied = "Đã sao chép liên kết mời";
+  static const joinQrCreate = "Tạo mã QR";
+  static const joinQrRegenerate = "Tạo mã mới";
+  static const joinQrRevoke = "Thu hồi mã";
+  static const joinQrRotated = "Đã tạo mã mới";
+  static const joinQrRevoked = "Đã thu hồi mã mời";
   static const paid = "Đã thanh toán";
   static const unpaid = "Chưa chốt số";
   static const markPaid = "Đánh dấu đã thanh toán";

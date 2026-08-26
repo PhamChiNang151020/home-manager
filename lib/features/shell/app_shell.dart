@@ -1,8 +1,6 @@
-import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/services/app_services.dart";
-import "package:home_manager/core/services/pwa_runtime.dart";
 import "package:home_manager/core/state/lock_controller.dart";
 import "package:home_manager/core/state/reminder_controller.dart";
 import "package:home_manager/core/state/session_controller.dart";
@@ -120,6 +118,19 @@ class _AppShellState extends State<AppShell> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 const Text(S.noHomes),
+                                if (session.error != null) ...[
+                                  const SizedBox(height: AppSpacing.sm),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: AppSpacing.md,
+                                    ),
+                                    child: Text(
+                                      session.error!,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(color: colors.error),
+                                    ),
+                                  ),
+                                ],
                                 const SizedBox(height: AppSpacing.md),
                                 FilledButton(
                                   onPressed:
@@ -187,20 +198,16 @@ class _AppShellState extends State<AppShell> {
         bottomNavigationBar:
             home == null
                 ? null
-                : SafeArea(
-                  top: false,
-                  bottom: !(kIsWeb && pwaIosHomeScreenShell()),
-                  child: AnimatedBuilder(
-                    animation: _reminders,
-                    builder: (context, _) {
-                      return AppBottomNav(
-                        tabIndex: _tab,
-                        notificationBadge: _reminders.badgeCount,
-                        onTabSelected: (index) => setState(() => _tab = index),
-                        onQuickAdd: _openQuickAdd,
-                      );
-                    },
-                  ),
+                : AnimatedBuilder(
+                  animation: _reminders,
+                  builder: (context, _) {
+                    return AppBottomNav(
+                      tabIndex: _tab,
+                      notificationBadge: _reminders.badgeCount,
+                      onTabSelected: (index) => setState(() => _tab = index),
+                      onQuickAdd: _openQuickAdd,
+                    );
+                  },
                 ),
       ),
     );

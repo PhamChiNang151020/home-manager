@@ -51,6 +51,22 @@ void registerSupabaseFallbacks() {
   registerFallbackValue(DateTime(2026));
 }
 
+/// Completes with [value] when an RPC builder is awaited.
+class ImmediateRpcResult extends Fake
+    implements PostgrestFilterBuilder<dynamic> {
+  ImmediateRpcResult(this._value);
+
+  final dynamic _value;
+
+  @override
+  Future<U> then<U>(
+    FutureOr<U> Function(dynamic) onValue, {
+    Function? onError,
+  }) {
+    return Future<dynamic>.value(_value).then(onValue, onError: onError);
+  }
+}
+
 void stubPeriodUpsert({
   required MockSupabaseClient client,
   required MockSupabaseQueryBuilder table,

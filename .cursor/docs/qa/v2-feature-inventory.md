@@ -17,12 +17,14 @@ See also [v1-feature-inventory.md](v1-feature-inventory.md) for electricity/auth
 | OVW-02 | Overview | Month clamp / stepper | `month_clamp.dart` | x | x | | [x] |
 | OVW-03 | Overview | 6-month spend fold + MoM | `month_balance.dart` | x | | | [x] |
 | UI-01 | Shared | Select sheet for dropdowns | `select_sheet.dart` | | x | | [x] |
+| UI-03 | Shell | iOS home-indicator bottom inset | `safe_bottom_inset.dart` | x | x | | [x] |
 | UI-02 | Shared | Period detail view (điện/nước) | `period_detail_view.dart` | | x | | [x] |
 | REM-02 | Reminders | Same-day order photo → payday → remind | `reminder_banner.dart` | | x | | [x] |
 | HOME-03 | Homes | Persist selected home | `selected_home.dart` | x | | | [x] |
 | ELEC-M05 | Electricity | upsert omits is_paid | `electricity_service.dart` | | | x | [x] |
 | PWA-01 | PWA | Install surface + share URL | `pwa_install.dart` | x | | | [x] |
 | PWA-02 | PWA | Install banner + QR page | `install_home_screen_banner.dart` | | x | | [x] |
+| INV-04 | Invites | Join QR token | `join_link.dart` | x | x | x | [x] |
 
 ## Update rule
 

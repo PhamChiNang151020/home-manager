@@ -1,8 +1,11 @@
 import "package:flutter/material.dart";
+import "package:flutter/services.dart";
+import "package:home_manager/core/domain/join_link.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/models/home.dart";
 import "package:home_manager/core/services/home_service.dart";
 import "package:home_manager/core/services/invite_service.dart";
+import "package:home_manager/core/services/pwa_install_runtime.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/core/theme/mobile_viewport.dart";
@@ -10,6 +13,7 @@ import "package:home_manager/features/shared/app_loading.dart";
 import "package:home_manager/features/shared/app_toast.dart";
 import "package:home_manager/features/shared/labeled_text_field.dart";
 import "package:home_manager/features/shared/section_header.dart";
+import "package:qr_flutter/qr_flutter.dart";
 
 class SettingsMembersPage extends StatefulWidget {
   const SettingsMembersPage({
@@ -17,11 +21,13 @@ class SettingsMembersPage extends StatefulWidget {
     required this.home,
     required this.homesApi,
     required this.invites,
+    this.joinShareUrl,
   });
 
   final Home home;
   final HomeService homesApi;
   final InviteService invites;
+  final String? joinShareUrl;
 
   @override
   State<SettingsMembersPage> createState() => _SettingsMembersPageState();
@@ -31,8 +37,10 @@ class _SettingsMembersPageState extends State<SettingsMembersPage> {
   final _inviteEmail = TextEditingController();
   List<HomeMember> _members = [];
   List<HomeInvite> _pending = [];
+  HomeJoinLink? _joinLink;
   String? _error;
   bool _sending = false;
+  bool _joinBusy = false;
 
   @override
   void initState() {
@@ -46,6 +54,8 @@ class _SettingsMembersPageState extends State<SettingsMembersPage> {
     super.dispose();
   }
 
+  String get _shareBase => widget.joinShareUrl ?? currentPwaShareUrl();
+
   Future<void> _load() async {
     try {
       final members = await widget.homesApi.listMembers(widget.home.id);
@@ -53,10 +63,15 @@ class _SettingsMembersPageState extends State<SettingsMembersPage> {
           widget.home.isOwner
               ? await widget.invites.listPending(widget.home.id)
               : <HomeInvite>[];
+      HomeJoinLink? joinLink;
+      if (widget.home.isOwner) {
+        joinLink = await widget.invites.createOrGetJoinLink(widget.home.id);
+      }
       if (mounted) {
         setState(() {
           _members = members;
           _pending = pending;
+          _joinLink = joinLink;
           _error = null;
         });
       }
@@ -82,6 +97,51 @@ class _SettingsMembersPageState extends State<SettingsMembersPage> {
     } finally {
       if (mounted) setState(() => _sending = false);
     }
+  }
+
+  Future<void> _rotateJoinLink() async {
+    setState(() {
+      _joinBusy = true;
+      _error = null;
+    });
+    try {
+      final link = await widget.invites.createOrGetJoinLink(
+        widget.home.id,
+        rotate: true,
+      );
+      if (mounted) {
+        setState(() => _joinLink = link);
+        showAppToast(context, S.joinQrRotated);
+      }
+    } catch (e) {
+      if (mounted) setState(() => _error = "$e");
+    } finally {
+      if (mounted) setState(() => _joinBusy = false);
+    }
+  }
+
+  Future<void> _revokeJoinLink() async {
+    setState(() {
+      _joinBusy = true;
+      _error = null;
+    });
+    try {
+      await widget.invites.revokeJoinLink(widget.home.id);
+      if (mounted) {
+        setState(() => _joinLink = null);
+        showAppToast(context, S.joinQrRevoked, kind: AppToastKind.destructive);
+      }
+    } catch (e) {
+      if (mounted) setState(() => _error = "$e");
+    } finally {
+      if (mounted) setState(() => _joinBusy = false);
+    }
+  }
+
+  Future<void> _copyJoinUrl(String url) async {
+    await Clipboard.setData(ClipboardData(text: url));
+    if (!mounted) return;
+    showAppToast(context, S.joinQrCopied);
   }
 
   Future<void> _cancelInvite(HomeInvite invite) async {
@@ -126,6 +186,13 @@ class _SettingsMembersPageState extends State<SettingsMembersPage> {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final owner = widget.home.isOwner;
+    final joinUrl =
+        _joinLink == null
+            ? null
+            : JoinLink.httpsJoinUrl(
+              baseUrl: _shareBase,
+              token: _joinLink!.token,
+            );
 
     return Scaffold(
       appBar: AppBar(title: const Text(S.settingsMembers)),
@@ -136,6 +203,24 @@ class _SettingsMembersPageState extends State<SettingsMembersPage> {
             const SectionHeader(title: S.members),
             for (final member in _members) _MemberTile(member: member),
             if (owner) ...[
+              const SectionHeader(title: S.joinQrTitle),
+              if (joinUrl != null)
+                JoinQrSection(
+                  joinUrl: joinUrl,
+                  expiresAt: _joinLink!.expiresAt,
+                  busy: _joinBusy,
+                  onCopy: () => _copyJoinUrl(joinUrl),
+                  onRegenerate: _rotateJoinLink,
+                  onRevoke: _revokeJoinLink,
+                )
+              else
+                Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                  child: OutlinedButton(
+                    onPressed: _joinBusy ? null : _rotateJoinLink,
+                    child: Text(_joinBusy ? S.sending : S.joinQrCreate),
+                  ),
+                ),
               const SectionHeader(title: S.invite),
               LabeledTextField(
                 label: S.inviteEmail,
@@ -172,6 +257,90 @@ class _SettingsMembersPageState extends State<SettingsMembersPage> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class JoinQrSection extends StatelessWidget {
+  const JoinQrSection({
+    super.key,
+    required this.joinUrl,
+    required this.expiresAt,
+    required this.busy,
+    required this.onCopy,
+    required this.onRegenerate,
+    required this.onRevoke,
+  });
+
+  final String joinUrl;
+  final DateTime expiresAt;
+  final bool busy;
+  final VoidCallback onCopy;
+  final VoidCallback onRegenerate;
+  final VoidCallback onRevoke;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          S.joinQrHint,
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: colors.textSecondary),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        Center(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: QrImageView(
+                data: joinUrl,
+                size: 220,
+                backgroundColor: Colors.white,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        Text(
+          "${S.joinQrExpiryHint} ${expiresAt.toLocal().day.toString().padLeft(2, "0")}/${expiresAt.toLocal().month.toString().padLeft(2, "0")}/${expiresAt.toLocal().year}",
+          textAlign: TextAlign.center,
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: colors.textMuted),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        OutlinedButton.icon(
+          onPressed: busy ? null : onCopy,
+          icon: const Icon(Icons.copy_outlined, size: 18),
+          label: const Text(S.joinQrCopy),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: busy ? null : onRegenerate,
+                child: const Text(S.joinQrRegenerate),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: OutlinedButton(
+                onPressed: busy ? null : onRevoke,
+                child: const Text(S.joinQrRevoke),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

@@ -13,6 +13,17 @@
       ]
     },
     {
+      "name": "home-manager (iPhone 17 Pro)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "deviceId": "iPhone 17 Pro",
+      "toolArgs": [
+        "--dart-define-from-file=.vscode/supabase.local.json"
+      ],
+      "preLaunchTask": "boot-iphone-17-pro"
+    },
+    {
       "name": "home-manager (iOS Simulator via Safari)",
       "request": "launch",
       "type": "dart",

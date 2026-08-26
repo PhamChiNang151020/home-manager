@@ -1,6 +1,7 @@
 import "package:flutter/material.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/core/theme/safe_bottom_padding.dart";
 
 class StickyPrimaryBar extends StatelessWidget {
   const StickyPrimaryBar({
@@ -17,26 +18,24 @@ class StickyPrimaryBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final bottom = safeBottomPaddingOf(context);
     return Container(
-      padding: const EdgeInsets.fromLTRB(
+      padding: EdgeInsets.fromLTRB(
         AppSpacing.screenHorizontal,
         AppSpacing.sm,
         AppSpacing.screenHorizontal,
-        AppSpacing.sm,
+        AppSpacing.sm + bottom,
       ),
       decoration: BoxDecoration(
         color: colors.bgSurface,
         border: Border(top: BorderSide(color: colors.border)),
       ),
-      child: SafeArea(
-        top: false,
-        child: SizedBox(
-          width: double.infinity,
-          child: FilledButton.icon(
-            onPressed: onPressed,
-            icon: Icon(icon),
-            label: Text(label),
-          ),
+      child: SizedBox(
+        width: double.infinity,
+        child: FilledButton.icon(
+          onPressed: onPressed,
+          icon: Icon(icon),
+          label: Text(label),
         ),
       ),
     );

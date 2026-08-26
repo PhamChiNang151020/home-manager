@@ -30,6 +30,8 @@ Cập nhật khi thêm test file. Agent dùng bảng này để phát hiện gap
 | FMT-01 | format and parse vi_VN | `test/unit/vnd_format_test.dart` | done |
 | FMT-01 | compact k and tr labels | `test/unit/vnd_format_test.dart` | done |
 | AUTH-03 | auth gate loading state | `test/widget/auth_gate_test.dart` | planned |
+| AUTH-02 | native OAuth uses system browser | `test/unit/oauth_launch_mode_test.dart` | done |
+| UI-03 | iOS bottom nav home-indicator inset | `test/unit/safe_bottom_inset_test.dart`, `test/widget/app_bottom_nav_test.dart` | done |
 | HOME-03 | selectHome updates selected | `test/integration/session_controller_test.dart` | planned |
 | HOME-03 | resolveSelectedHome prefers persisted id | `test/unit/selected_home_test.dart` | done |
 | WAT-01 | water meter validation | `test/unit/water_validation_test.dart` | done |
@@ -50,6 +52,10 @@ Cập nhật khi thêm test file. Agent dùng bảng này để phát hiện gap
 | REM-02 | same-day reminder order photo → payday → remind | `test/widget/reminder_banner_test.dart` | done |
 | ELEC-M05 | upsert omits is_paid when null | `test/integration/electricity_service_test.dart` | done |
 | INV-03 | Home.fromJson parses fields | `test/unit/models_test.dart` | planned |
+| INV-04 | parse ?join= and native scheme | `test/unit/join_link_test.dart` | done |
+| INV-04 | persist pending join token | `test/unit/join_link_store_test.dart` | done |
+| INV-04 | owner join QR actions | `test/widget/settings_members_page_test.dart` | done |
+| INV-04 | create / accept / revoke join RPCs | `test/integration/invite_service_test.dart` | done |
 
 ## Test layout
 

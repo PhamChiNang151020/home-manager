@@ -2,9 +2,19 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "boot-iphone-17-pro",
+      "type": "shell",
+      "command": "xcrun simctl boot \"iPhone 17 Pro\" 2>/dev/null; open -a Simulator; echo \"iPhone 17 Pro simulator ready\"",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "focus": false
+      }
+    },
+    {
       "label": "boot-ios-simulator",
       "type": "shell",
-      "command": "xcrun simctl boot 45FF47A0-7D0C-4418-A867-E427176E6EA8 2>/dev/null; open -a Simulator; nohup \"${workspaceFolder}/.vscode/open_safari_when_ready.sh\" > /tmp/home-manager-safari-open.log 2>&1 & echo \"Simulator ready — Safari waiter started (log: /tmp/home-manager-safari-open.log)\"",
+      "command": "xcrun simctl boot \"iPhone 17 Pro\" 2>/dev/null; open -a Simulator; nohup \"${workspaceFolder}/.vscode/open_safari_when_ready.sh\" > /tmp/home-manager-safari-open.log 2>&1 & echo \"Simulator ready — Safari waiter started (log: /tmp/home-manager-safari-open.log)\"",
       "presentation": {
         "reveal": "always",
         "panel": "shared",

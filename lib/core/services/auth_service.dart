@@ -1,4 +1,6 @@
+import "package:flutter/foundation.dart";
 import "package:home_manager/core/config/app_config.dart";
+import "package:home_manager/core/domain/oauth_launch.dart";
 import "package:home_manager/core/logging/app_log.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
 
@@ -16,6 +18,7 @@ class AuthService {
     return _client.auth.signInWithOAuth(
       OAuthProvider.google,
       redirectTo: AppConfig.oauthRedirect,
+      authScreenLaunchMode: oauthLaunchMode(isWeb: kIsWeb),
     );
   }
 

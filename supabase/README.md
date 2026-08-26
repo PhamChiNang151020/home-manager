@@ -5,8 +5,44 @@ Run this SQL in the Supabase SQL editor (or `supabase db push` if the CLI is lin
 1. Create a project at [supabase.com](https://supabase.com).
 2. **Authentication → Providers → Google**: enable, add Client ID/secret from Google Cloud.
 3. **Authentication → URL configuration**: add
-   - `http://localhost:port` (Flutter web debug)
+   - `http://localhost:8080` and `http://localhost:8080/` (Flutter web debug)
    - `https://phamchinang151020.github.io/home-manager/` (Pages)
+   - `com.pcn.home-manager://login-callback` (iOS Simulator / native)
+
+## iOS Google login (Simulator)
+
+Web login already uses a **Web** OAuth client in Supabase. Keep that. Native iOS needs two extra console steps.
+
+### 1. Redirect URL trên Supabase
+
+1. Mở [Supabase Dashboard](https://supabase.com/dashboard) → chọn project Tổ Ấm.
+2. **Authentication** → **URL Configuration**.
+3. **Redirect URLs** → **Add URL**.
+4. Dán đúng:
+
+   `com.pcn.home-manager://login-callback`
+
+5. **Save**. Không xóa URL web (`localhost`, GitHub Pages).
+
+Sai một ký tự thì login xong kẹt Safari / không về app.
+
+### 2. Google OAuth iOS client
+
+Supabase Google provider vẫn dùng **Client ID + Secret loại Web**. Client iOS **không có secret** — không dán đè lên ô Web.
+
+1. Mở [Google Cloud Console](https://console.cloud.google.com/) → cùng project đang dùng cho login web.
+2. **APIs & Services** → **Credentials**.
+3. **+ Create credentials** → **OAuth client ID**.
+4. Application type: **iOS**.
+5. Name: `Tổ Ấm iOS` (tùy ý).
+6. Bundle ID (đúng từng ký tự):
+
+   `com.pcn.home_manager`
+
+7. **Create** → copy **Client ID** (`….apps.googleusercontent.com`) để lưu. Không cần điền vào Supabase.
+8. **OAuth consent screen**: nếu app đang Testing, thêm Gmail người test vào **Test users**.
+
+Không đổi **Authentication → Providers → Google** trên Supabase. Luồng iOS hiện tại là OAuth trình duyệt + custom scheme.
 4. Execute [`migrations/20260819000000_init.sql`](migrations/20260819000000_init.sql).
 5. Copy **Project URL** (Overview → **Copy**, do not type) and **anon** key. Never use the service role in the Flutter app.
 

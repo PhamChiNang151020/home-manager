@@ -33,4 +33,40 @@ class InviteService {
         )
         .toList();
   }
+
+  Future<HomeJoinLink> createOrGetJoinLink(
+    String homeId, {
+    bool rotate = false,
+  }) async {
+    AppLog.i("Join link for $homeId rotate=$rotate");
+    final result = await _client.rpc(
+      "create_or_get_join_link",
+      params: {"p_home_id": homeId, "p_rotate": rotate},
+    );
+    return HomeJoinLink.fromJson(_asJsonMap(result));
+  }
+
+  Future<String> acceptJoinToken(String token) async {
+    AppLog.i("Accepting join token");
+    final result = await _client.rpc(
+      "accept_invite_token",
+      params: {"p_token": token},
+    );
+    return result as String;
+  }
+
+  Future<void> revokeJoinLink(String homeId) async {
+    AppLog.i("Revoking join link for $homeId");
+    await _client.rpc("revoke_join_link", params: {"p_home_id": homeId});
+  }
+
+  static Map<String, dynamic> _asJsonMap(dynamic result) {
+    if (result is Map<String, dynamic>) {
+      return result;
+    }
+    if (result is Map) {
+      return Map<String, dynamic>.from(result);
+    }
+    throw FormatException("Unexpected join link payload: $result");
+  }
 }

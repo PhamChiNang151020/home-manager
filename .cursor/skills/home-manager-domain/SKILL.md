@@ -2,8 +2,8 @@
 name: home-manager-domain
 description: >-
   Domain rules for home_manager: two homes (meter vs invoice), Google auth,
-  Supabase RLS, bill photos, reminder days, and Flutter Web PWA. Use when
-  implementing screens, schema, storage, or invites.
+  Supabase RLS, bill photos, reminder days, Flutter Web PWA, and iOS Simulator.
+  Use when implementing screens, schema, storage, or invites.
 ---
 
 # home_manager — domain
@@ -17,7 +17,7 @@ Vietnamese UI. Electricity, water, expenses, income.
 - **Nhà tôi (`meter`):** enter new kWh / m³; previous from last period; amount = delta × rate (`kwh_rate` default 3500, `m3_rate` default 10000).
 - **Nhà ba mẹ (`invoice`):** enter bill amount + photo. No meter math.
 - Shell: Tổng quan · Chi tiêu · Cài đặt. Điện / Nước / Thu nhập from Tổng quan.
-- Owner invites per home by Google email.
+- Owner invites per home by join QR (token) or Google email.
 - Calendar days: photo due, payday, remind (shared for điện + nước).
 
 ## Storage
@@ -28,8 +28,9 @@ Vietnamese UI. Electricity, water, expenses, income.
 
 ## Platform
 
-- Flutter Web / PWA only.
-- Do not enable iOS/Android, Developer Mode, or App Store workflows.
+- Flutter Web / PWA and native iOS Simulator (`ios/`).
+- App Store / TestFlight only with an Apple Developer account.
+- Do not enable Android without approval.
 
 ## UI
 
@@ -39,7 +40,7 @@ Vietnamese UI. Electricity, water, expenses, income.
 
 ## Out of scope for v2
 
-- Native iOS install
+- App Store submit (until Apple Developer is set up)
 - Shopping list
 - Web Push (documented in `.cursor/docs/web-push.md`)
 - Paid hosting

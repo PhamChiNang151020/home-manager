@@ -117,6 +117,13 @@ class _QuickAddSheetState extends State<_QuickAddSheet> {
       if (file == null) return;
       final bytes = await file.readAsBytes();
       if (!mounted) return;
+      if (!isReceiptOcrSupported) {
+        setState(() {
+          _photoBytes = bytes;
+          _error = null;
+        });
+        return;
+      }
       setState(() {
         _photoBytes = bytes;
         _ocrBusy = true;

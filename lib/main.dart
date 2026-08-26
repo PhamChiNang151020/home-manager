@@ -33,6 +33,7 @@ Future<void> main() async {
   final session = SessionController(
     auth: AuthService(client),
     homesApi: HomeService(client),
+    invites: services.invites,
   );
   await session.start();
   runApp(

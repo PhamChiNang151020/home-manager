@@ -5,12 +5,16 @@ import "dart:typed_data";
 
 import "package:web/web.dart" as web;
 
+bool get isReceiptOcrSupported => true;
+
 /// Runs Tesseract.js OCR on [imageBytes] (JPEG/PNG). Prefers Vietnamese, falls
 /// back to English if `vie` traineddata fails to load.
 Future<String> recognizeReceiptText(Uint8List imageBytes) async {
   final tesseract = web.window.getProperty("Tesseract".toJS);
   if (tesseract.isUndefinedOrNull || !tesseract.isA<JSObject>()) {
-    throw StateError("Tesseract.js chưa được tải. Kiểm tra CDN trong index.html.");
+    throw StateError(
+      "Tesseract.js chưa được tải. Kiểm tra CDN trong index.html.",
+    );
   }
 
   final recognize = (tesseract as JSObject).getProperty("recognize".toJS);
@@ -18,8 +22,7 @@ Future<String> recognizeReceiptText(Uint8List imageBytes) async {
     throw StateError("Tesseract.recognize không khả dụng.");
   }
 
-  final dataUrl =
-      "data:image/jpeg;base64,${base64Encode(imageBytes)}";
+  final dataUrl = "data:image/jpeg;base64,${base64Encode(imageBytes)}";
 
   try {
     return await _recognizeWithLang(recognize as JSFunction, dataUrl, "vie");

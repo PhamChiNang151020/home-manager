@@ -2,9 +2,19 @@
 
 1. Copy `supabase.local.json.example` → `supabase.local.json` (same folder).
 2. Fill values from Supabase **Project Overview → Copy** (Project URL) and **API Keys**.
-3. Run and Debug → **home-manager (Chrome)** (F5).
+3. Run and Debug → **home-manager (Chrome)** (F5) for web, or **home-manager (iPhone 17 Pro)** for the native Simulator.
 
 `supabase.local.json` is gitignored — do not commit keys.
+
+## iPhone 17 Pro Simulator
+
+1. Install the **iPhone 17 Pro** runtime in Xcode (`xcrun simctl list devices` should list it).
+2. Choose Run and Debug → **home-manager (iPhone 17 Pro)**.
+3. Confirm `flutter devices` shows `iPhone 17 Pro`.
+
+Native iOS OAuth: see [supabase/README.md](../supabase/README.md) (Redirect URL + Google iOS client). Do not replace the existing **Web** Client ID in Supabase.
+
+**home-manager (iOS Simulator via Safari)** still runs the **web** app and opens Safari on the simulator.
 
 ## Which API key?
 
