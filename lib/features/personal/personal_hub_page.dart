@@ -301,7 +301,7 @@ class PersonalSettingsPage extends StatelessWidget {
                     AppPageRoute<void>(page: const InstallHomeScreenPage()),
                   ),
             ),
-            _NotificationTestTile(notifications: notifications),
+            _NotificationSettingsTile(notifications: notifications),
           ],
         ),
       ),
@@ -309,53 +309,93 @@ class PersonalSettingsPage extends StatelessWidget {
   }
 }
 
-/// Request permission, show FCM token, upsert to Supabase (Phase 2).
-class _NotificationTestTile extends StatefulWidget {
-  const _NotificationTestTile({required this.notifications});
+/// Toggle push notifications (permission + token upsert / delete). No token UI.
+class _NotificationSettingsTile extends StatefulWidget {
+  const _NotificationSettingsTile({required this.notifications});
 
   final NotificationService notifications;
 
   @override
-  State<_NotificationTestTile> createState() => _NotificationTestTileState();
+  State<_NotificationSettingsTile> createState() =>
+      _NotificationSettingsTileState();
 }
 
-class _NotificationTestTileState extends State<_NotificationTestTile> {
+class _NotificationSettingsTileState extends State<_NotificationSettingsTile> {
   bool _busy = false;
-  String? _token;
+  bool _loaded = false;
+  bool _enabled = false;
   String? _message;
   bool _messageOk = false;
 
-  Future<void> _onTap() async {
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final on = await widget.notifications.isEnabledLocally();
+    if (!mounted) return;
+    setState(() {
+      _enabled = on;
+      _loaded = true;
+    });
+  }
+
+  Future<void> _onChanged(bool value) async {
     if (_busy) return;
     setState(() {
       _busy = true;
       _message = null;
       _messageOk = false;
-      _token = null;
     });
     try {
-      final result = await widget.notifications.enableAndRegister();
-      if (!result.configured) {
-        setState(() => _message = S.settingsNotifyNotConfigured);
+      if (!widget.notifications.isAvailable) {
+        setState(() {
+          _enabled = false;
+          _message = S.settingsNotifyNotConfigured;
+        });
         return;
       }
-      if (result.status != NotificationPermissionStatus.granted) {
-        setState(() => _message = S.settingsNotifyDenied);
-        return;
-      }
-      if (result.tokenFailed || result.token == null) {
-        setState(() => _message = S.settingsNotifyTokenFailed);
-        return;
-      }
-      setState(() {
-        _token = result.token;
-        if (result.saved) {
-          _message = S.settingsNotifySaved;
-          _messageOk = true;
-        } else {
-          _message = S.settingsNotifySaveFailed;
+      if (value) {
+        final result = await widget.notifications.enableAndRegister();
+        if (!result.configured) {
+          setState(() {
+            _enabled = false;
+            _message = S.settingsNotifyNotConfigured;
+          });
+          return;
         }
-      });
+        if (result.status != NotificationPermissionStatus.granted) {
+          setState(() {
+            _enabled = false;
+            _message = S.settingsNotifyDenied;
+          });
+          return;
+        }
+        if (result.tokenFailed || !result.saved) {
+          setState(() {
+            _enabled = false;
+            _message =
+                result.tokenFailed
+                    ? S.settingsNotifyTokenFailed
+                    : S.settingsNotifySaveFailed;
+          });
+          return;
+        }
+        setState(() {
+          _enabled = true;
+          _message = S.settingsNotifyOn;
+          _messageOk = true;
+        });
+      } else {
+        await widget.notifications.disableAndUnregister();
+        setState(() {
+          _enabled = false;
+          _message = S.settingsNotifyOff;
+          _messageOk = true;
+        });
+      }
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -370,25 +410,28 @@ class _NotificationTestTileState extends State<_NotificationTestTile> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           AppCard(
-            onTap: _busy ? null : _onTap,
             padding: EdgeInsets.zero,
-            child: ListTile(
-              leading: Icon(
+            child: SwitchListTile(
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+              ),
+              secondary: Icon(
                 Icons.notifications_outlined,
                 color: colors.accent,
               ),
-              title: const Text(S.settingsNotifyTest),
-              subtitle: Text(
-                _busy ? "…" : S.settingsNotifyTestDesc,
+              title: const Text(S.settingsNotifyTitle),
+              subtitle: const Text(S.settingsNotifyDesc),
+              value: _enabled,
+              onChanged: (!_loaded || _busy) ? null : _onChanged,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: AppSpacing.sm),
+            child: Text(
+              S.settingsNotifyIosHint,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: colors.textMuted,
               ),
-              trailing:
-                  _busy
-                      ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                      : Icon(Icons.chevron_right, color: colors.textMuted),
             ),
           ),
           if (_message != null)
@@ -401,22 +444,6 @@ class _NotificationTestTileState extends State<_NotificationTestTile> {
                 ),
               ),
             ),
-          if (_token != null) ...[
-            Padding(
-              padding: const EdgeInsets.only(top: AppSpacing.sm),
-              child: Text(
-                S.settingsNotifyTokenLabel,
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  color: colors.textSecondary,
-                ),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            SelectableText(
-              _token!,
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-          ],
         ],
       ),
     );

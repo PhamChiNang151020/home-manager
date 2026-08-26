@@ -1,10 +1,15 @@
-// Sends reminder push notifications for homes whose schedule day matches
-// today (Asia/Ho_Chi_Minh). Invoked by GitHub Actions cron with CRON_SECRET.
+// Reminder push (daily cron) + broadcast push (e.g. new app version after deploy).
+// Auth: Authorization Bearer CRON_SECRET
 // Secrets: CRON_SECRET, FIREBASE_SERVICE_ACCOUNT_JSON, FIREBASE_PROJECT_ID
 // (plus auto SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY).
+//
+// Body:
+//   {} or omitted → daily schedule reminders (Asia/Ho_Chi_Minh)
+//   { "mode": "broadcast", "title": "...", "body": "..." } → all fcm_tokens
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import * as jose from "https://esm.sh/jose@5.2.4";
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const corsHeaders: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
@@ -66,10 +71,32 @@ Deno.serve(async (req) => {
       return json({ error: "invalid FIREBASE_SERVICE_ACCOUNT_JSON" }, 500);
     }
 
-    const { year, month, day } = vietnamYmd();
+    const payload = await req.json().catch(() => ({}));
     const admin = createClient(supabaseUrl, serviceKey, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
+    const accessToken = await getGoogleAccessToken(serviceAccount);
+
+    if (payload?.mode === "broadcast") {
+      const title =
+        typeof payload.title === "string" && payload.title.trim()
+          ? payload.title.trim()
+          : "Tổ Ấm";
+      const body =
+        typeof payload.body === "string" && payload.body.trim()
+          ? payload.body.trim()
+          : "Có bản cập nhật mới.";
+      const result = await sendToAllTokens(
+        admin,
+        projectId,
+        accessToken,
+        title,
+        body,
+      );
+      return json({ ok: true, mode: "broadcast", ...result });
+    }
+
+    const { year, month, day } = vietnamYmd();
 
     const { data: homes, error: homesError } = await admin
       .from("homes")
@@ -118,10 +145,15 @@ Deno.serve(async (req) => {
     });
 
     if (dueHomes.length === 0) {
-      return json({ ok: true, date: `${year}-${month}-${day}`, sent: 0, jobs: 0 });
+      return json({
+        ok: true,
+        mode: "reminders",
+        date: `${year}-${pad(month)}-${pad(day)}`,
+        sent: 0,
+        jobs: 0,
+      });
     }
 
-    const accessToken = await getGoogleAccessToken(serviceAccount);
     let sent = 0;
     let failed = 0;
     const details: Record<string, unknown>[] = [];
@@ -149,33 +181,24 @@ Deno.serve(async (req) => {
         continue;
       }
 
-      for (const row of tokens ?? []) {
-        const token = (row as { token: string }).token;
-        try {
-          await sendFcm(projectId, accessToken, token, job.title, job.body);
-          sent += 1;
-        } catch (err) {
-          failed += 1;
-          details.push({
-            home_id: job.home.id,
-            kind: job.kind,
-            error: String(err),
-          });
-          // Drop invalid tokens so they stop failing every day.
-          const msg = String(err);
-          if (
-            msg.includes("UNREGISTERED") ||
-            msg.includes("INVALID_ARGUMENT") ||
-            msg.includes("NOT_FOUND")
-          ) {
-            await admin.from("fcm_tokens").delete().eq("token", token);
-          }
-        }
+      const batch = await deliverTokens(
+        admin,
+        projectId,
+        accessToken,
+        (tokens ?? []).map((r: { token: string }) => r.token),
+        job.title,
+        job.body,
+      );
+      sent += batch.sent;
+      failed += batch.failed;
+      for (const d of batch.details) {
+        details.push({ home_id: job.home.id, kind: job.kind, ...d });
       }
     }
 
     return json({
       ok: true,
+      mode: "reminders",
       date: `${year}-${pad(month)}-${pad(day)}`,
       jobs: dueHomes.length,
       sent,
@@ -186,6 +209,60 @@ Deno.serve(async (req) => {
     return json({ error: String(err) }, 500);
   }
 });
+
+async function sendToAllTokens(
+  admin: SupabaseClient,
+  projectId: string,
+  accessToken: string,
+  title: string,
+  body: string,
+): Promise<{ sent: number; failed: number; details: Record<string, unknown>[] }> {
+  const { data: tokens, error } = await admin.from("fcm_tokens").select("token");
+  if (error) {
+    throw new Error(error.message);
+  }
+  return deliverTokens(
+    admin,
+    projectId,
+    accessToken,
+    (tokens ?? []).map((r: { token: string }) => r.token),
+    title,
+    body,
+  );
+}
+
+async function deliverTokens(
+  admin: SupabaseClient,
+  projectId: string,
+  accessToken: string,
+  tokens: string[],
+  title: string,
+  body: string,
+): Promise<{ sent: number; failed: number; details: Record<string, unknown>[] }> {
+  let sent = 0;
+  let failed = 0;
+  const details: Record<string, unknown>[] = [];
+  const unique = [...new Set(tokens.filter(Boolean))];
+
+  for (const token of unique) {
+    try {
+      await sendFcm(projectId, accessToken, token, title, body);
+      sent += 1;
+    } catch (err) {
+      failed += 1;
+      details.push({ error: String(err) });
+      const msg = String(err);
+      if (
+        msg.includes("UNREGISTERED") ||
+        msg.includes("INVALID_ARGUMENT") ||
+        msg.includes("NOT_FOUND")
+      ) {
+        await admin.from("fcm_tokens").delete().eq("token", token);
+      }
+    }
+  }
+  return { sent, failed, details };
+}
 
 function vietnamYmd(): { year: number; month: number; day: number } {
   const parts = new Intl.DateTimeFormat("en-CA", {
@@ -262,7 +339,11 @@ async function sendFcm(
           notification: { title, body },
           webpush: {
             headers: { Urgency: "high" },
-            notification: { title, body, icon: "/home-manager/icons/Icon-192.png" },
+            notification: {
+              title,
+              body,
+              icon: "/home-manager/icons/Icon-192.png",
+            },
           },
         },
       }),

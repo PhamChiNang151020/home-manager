@@ -225,18 +225,21 @@ abstract final class S {
   static const settingsAppearance = "Giao diện";
   static const settingsSecurity = "Bảo mật";
   static const settingsInstall = "Thêm ra Màn hình chính";
-  static const settingsNotifyTest = "Bật thông báo (thử nghiệm)";
-  static const settingsNotifyTestDesc =
-      "Xin quyền · lấy FCM token · lưu thiết bị";
+  static const settingsNotifyTitle = "Bật thông báo";
+  static const settingsNotifyDesc =
+      "Nhắc lịch nhà và khi có bản cập nhật app";
+  static const settingsNotifyIosHint =
+      "iPhone: thêm Tổ Ấm ra Màn hình chính rồi bật thông báo trong app.";
   static const settingsNotifyNotConfigured =
-      "Chưa cấu hình Firebase. Thêm --dart-define FIREBASE_* hoặc secret GitHub.";
-  static const settingsNotifyDenied = "Bạn đã từ chối quyền thông báo.";
+      "Chưa cấu hình Firebase trên bản build này.";
+  static const settingsNotifyDenied =
+      "Bạn đã từ chối quyền thông báo. Bật lại trong cài đặt trình duyệt / hệ thống.";
   static const settingsNotifyTokenFailed =
-      "Không lấy được FCM token. Xem console để biết lỗi.";
-  static const settingsNotifyTokenLabel = "FCM token (sao chép để test):";
-  static const settingsNotifySaved = "Đã lưu token lên máy chủ.";
+      "Không lấy được quyền gửi thông báo. Thử lại sau.";
   static const settingsNotifySaveFailed =
-      "Lấy token OK nhưng chưa lưu được (đăng nhập / migration?).";
+      "Đã được quyền nhưng chưa lưu được thiết bị. Thử lại.";
+  static const settingsNotifyOn = "Đã bật thông báo.";
+  static const settingsNotifyOff = "Đã tắt thông báo.";
   static const settingsHomeDesc = "Tên nhà, đơn giá điện / nước";
   static const settingsScheduleDesc = "Ngày chụp, lương, nhắc · xuất .ics";
   static const settingsMembersDesc = "QR mời vào nhà · thành viên · email";

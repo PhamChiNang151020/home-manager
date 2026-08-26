@@ -41,7 +41,14 @@ Pending tiles show send status and allow **Gửi lại**.
 
 ## `send-reminder-push`
 
-Daily FCM reminders for homes whose `photo_due_day` / `payday_day` / `remind_day` match **today in Asia/Ho_Chi_Minh**. Called by GitHub Actions (`.github/workflows/daily-reminder-push.yml`), not by the Flutter app.
+Daily FCM reminders for homes whose `photo_due_day` / `payday_day` / `remind_day` match **today in Asia/Ho_Chi_Minh**. Also supports **broadcast** (all tokens) for new app version after Pages deploy.
+
+Called by GitHub Actions with `CRON_SECRET` — not by the Flutter app.
+
+**Bodies**
+
+- `{}` — daily reminders
+- `{ "mode": "broadcast", "title": "...", "body": "..." }` — notify every `fcm_tokens` row
 
 ### Secrets (Supabase Edge)
 

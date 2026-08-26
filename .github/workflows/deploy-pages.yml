@@ -75,8 +75,24 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - uses: actions/checkout@v4
       - id: deployment
         uses: actions/deploy-pages@v4
+      - name: Notify users of new version
+        if: success()
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          VERSION=$(grep '^version:' pubspec.yaml | head -1 | sed 's/version:[[:space:]]*//' | cut -d'+' -f1)
+          echo "Broadcasting version v${VERSION}"
+          BASE="${SUPABASE_URL%/}"
+          curl -fsS -X POST "${BASE}/functions/v1/send-reminder-push" \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            -H "Content-Type: application/json" \
+            --data "{\"mode\":\"broadcast\",\"title\":\"Tổ Ấm đã cập nhật\",\"body\":\"Phiên bản mới v${VERSION} đã sẵn sàng. Mở app để dùng.\"}"
       - name: Notify Slack on success
         if: success()
         run: |

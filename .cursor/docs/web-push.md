@@ -29,12 +29,18 @@ Flutter Web FCM: request permission, show token, background SW `showNotification
 
 Apply migration on the Supabase project before testing save.
 
-## Phase 3 — daily reminder push (done)
+## Phase 3 — daily reminder + version broadcast
 
 - Edge Function: `supabase/functions/send-reminder-push/`
-- Cron: `.github/workflows/daily-reminder-push.yml` at **08:00 ICT** (`0 1 * * *` UTC)
-- Matches `photo_due_day` / `payday_day` / `remind_day` (clamped to month length, VN timezone)
-- Notifies all home members who have rows in `fcm_tokens`
+  - `{}` → reminders for today’s schedule days (VN)
+  - `{ "mode": "broadcast", "title", "body" }` → all stored FCM tokens (used after Pages deploy)
+- Cron: `.github/workflows/daily-reminder-push.yml` at **08:00 ICT**
+- Deploy: `deploy-pages.yml` broadcasts “Tổ Ấm đã cập nhật vX.Y.Z” after successful Pages deploy
+
+### App settings
+
+Cá nhân → Cài đặt → **Bật thông báo** (switch). iPhone cần Add to Home Screen.
+Token không hiện trên UI người dùng.
 
 ### Supabase Edge Secrets
 
