@@ -94,6 +94,13 @@ abstract final class S {
   static const toastHomeCreated = "Đã tạo nhà";
   static const toastScheduleSaved = "Đã lưu lịch nhắc";
   static const toastInviteSent = "Đã gửi lời mời";
+  static String toastInviteEmailSent(String email) =>
+      "Đã gửi email mời tới $email";
+  static const toastInviteEmailFailed =
+      "Đã lưu lời mời nhưng gửi email thất bại. Thử Gửi lại.";
+  static const resendInviteEmail = "Gửi lại";
+  static const inviteEmailSentHint = "Đã gửi email";
+  static const inviteEmailNotSentHint = "Chưa gửi được email";
   static const toastInviteCancelled = "Đã huỷ lời mời";
   static const toastPinSaved = "Đã lưu mã PIN";
   static const readingReceiptAmount = "Đang đọc số tiền...";
@@ -171,7 +178,7 @@ abstract final class S {
       "Bấm + ở thanh dưới để thêm kỳ nước đầu tiên.";
   static const invite = "Mời thành viên";
   static const inviteScopeHint =
-      "Người vào nhà sẽ xem và ghi điện, nước, chi tiêu, thu nhập của nhà này. Chỉ chủ nhà đổi được cài đặt và mời thêm người.";
+      "App gửi email kèm liên kết vào nhà. Người nhận mở link, đăng nhập Google — sẽ xem và ghi điện, nước, chi tiêu. Chỉ chủ nhà đổi được cài đặt và mời thêm người.";
   static const inviteEmail = "Email Google";
   static const sendInvite = "Gửi lời mời";
   static const members = "Thành viên";

@@ -72,6 +72,22 @@ void main() {
     ).called(1);
   });
 
+  test("invite returns invite id from RPC", () async {
+    when(() => client.rpc(any(), params: any(named: "params"))).thenAnswer(
+      (_) => ImmediateRpcResult("inv-1"),
+    );
+
+    final id = await service.invite(homeId: "h1", email: "a@b.com");
+
+    expect(id, "inv-1");
+    verify(
+      () => client.rpc(
+        "invite_to_home",
+        params: {"p_home_id": "h1", "p_email": "a@b.com"},
+      ),
+    ).called(1);
+  });
+
   test("revokeJoinLink calls RPC", () async {
     when(
       () => client.rpc(any(), params: any(named: "params")),

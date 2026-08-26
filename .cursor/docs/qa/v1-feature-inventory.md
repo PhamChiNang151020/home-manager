@@ -31,7 +31,7 @@ Status: `[ ]` chưa có automated test · `[x]` đã có · `[~]` một phần
 | SET-01 | Settings | Update home name / rate / days | `settings_home_page.dart` | RPC | | | x | x | [ ] |
 | SET-02 | Settings | ICS export (3 events) | `ics_export_service.dart` | buildCalendar | x | | | x | [x] |
 | SET-03 | Settings | Theme / appearance | `theme_controller.dart` | prefs | | x | | x | [ ] |
-| INV-01 | Invites | Invite by email | `invite_service.dart` | RPC | | | x | x | [ ] |
+| INV-01 | Invites | Invite by email + Resend mail | `invite_service.dart`, `send-home-invite` | RPC + Edge Function | | | x | x | [ ] |
 | INV-02 | Invites | List pending invites | `invite_service.dart` | query parse | | | x | x | [ ] |
 | INV-03 | Invites | List members | `home_service.dart` | join parse | x | | x | x | [ ] |
 | INV-04 | Invites | Join QR token (scan → login → home) | `join_link.dart`, `invite_service.dart` | parse URL + RPC | x | x | x | x | [x] |

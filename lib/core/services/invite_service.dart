@@ -7,12 +7,55 @@ class InviteService {
 
   final SupabaseClient _client;
 
-  Future<void> invite({required String homeId, required String email}) {
+  /// Creates a pending invite row and returns its id.
+  Future<String> invite({required String homeId, required String email}) async {
     AppLog.i("Inviting $email to home $homeId");
-    return _client.rpc(
+    final result = await _client.rpc(
       "invite_to_home",
       params: {"p_home_id": homeId, "p_email": email},
     );
+    final id = "$result".trim();
+    if (id.isEmpty || id == "null") {
+      throw Exception("invite_to_home không trả về id");
+    }
+    return id;
+  }
+
+  /// Creates the invite then asks the Edge Function to email the join link.
+  Future<void> inviteAndNotify({
+    required String homeId,
+    required String email,
+  }) async {
+    final inviteId = await invite(homeId: homeId, email: email);
+    await sendInviteEmail(inviteId);
+  }
+
+  Future<void> sendInviteEmail(String inviteId) async {
+    AppLog.i("Sending invite email for $inviteId");
+    try {
+      final response = await _client.functions.invoke(
+        "send-home-invite",
+        body: {"invite_id": inviteId},
+      );
+      if (response.status >= 200 && response.status < 300) {
+        return;
+      }
+      final data = response.data;
+      final detail = _errorDetail(data) ?? "status ${response.status}";
+      throw Exception(detail);
+    } on FunctionException catch (e) {
+      final detail = _errorDetail(e.details) ?? e.reasonPhrase ?? "HTTP ${e.status}";
+      throw Exception(detail);
+    }
+  }
+
+  static String? _errorDetail(dynamic data) {
+    if (data is Map) {
+      final error = data["error"] ?? data["msg"] ?? data["message"];
+      if (error != null) return "$error";
+    }
+    if (data is String && data.trim().isNotEmpty) return data;
+    return null;
   }
 
   Future<void> cancel(String inviteId) {

@@ -62,17 +62,29 @@ class HomeInvite {
     required this.id,
     required this.email,
     required this.status,
+    this.emailSentAt,
+    this.emailLastError,
   });
 
   final String id;
   final String email;
   final String status;
+  final DateTime? emailSentAt;
+  final String? emailLastError;
+
+  bool get emailSent => emailSentAt != null;
 
   factory HomeInvite.fromJson(Map<String, dynamic> json) {
+    final sentRaw = json["email_sent_at"];
     return HomeInvite(
       id: json["id"] as String,
       email: json["email"] as String,
       status: json["status"] as String,
+      emailSentAt:
+          sentRaw is String && sentRaw.isNotEmpty
+              ? DateTime.tryParse(sentRaw)
+              : null,
+      emailLastError: json["email_last_error"] as String?,
     );
   }
 }

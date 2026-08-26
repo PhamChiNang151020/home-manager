@@ -14,6 +14,7 @@ Owner shows a join QR on Chia sẻ; family scans, signs in with Google, and sees
   - `home_join_links` token (join without matching email)
   - Members page QR; persist `?join=` until after Google login
   - Clarify PWA install QR is not a home invite
+  - Email invite sends real mail via Resend Edge Function (`send-home-invite`) with join URL
 - Out of scope:
   - Apple Developer signing, TestFlight, App Store listing
   - Native OCR (web Tesseract only)
@@ -42,6 +43,8 @@ Owner shows a join QR on Chia sẻ; family scans, signs in with Google, and sees
 - [x] Scan QR while signed out → token persisted → login → join
 - [x] Expired / revoked token shows error, does not create a new home
 - [x] Email invite path still works (`accept_pending_invites`)
+- [ ] Resend Edge Function delivers mail with `?join=` (manual: deploy + secrets)
+- [ ] Pending tile shows sent / not-sent; **Gửi lại** retries
 - [x] PWA install QR copy no longer implies joining a home
 - [x] OCR button does not crash on iOS (hidden or web-only)
 
@@ -53,6 +56,7 @@ Owner shows a join QR on Chia sẻ; family scans, signs in with Google, and sees
 | Unit | `test/unit/join_link_store_test.dart` | persist / clear token |
 | Widget | `test/widget/settings_members_page_test.dart` | owner sees join QR |
 | Widget | `test/widget/install_home_screen_test.dart` | install copy is not invite copy |
+| Unit | `test/unit/home_invite_test.dart` | `email_sent_at` parse |
 | Integration | `test/integration/invite_service_test.dart` | create / accept / revoke RPCs |
 
 Map IDs to [test-map.md](../test-map.md) when tests exist.

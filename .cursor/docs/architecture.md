@@ -37,7 +37,7 @@ Storage: bucket `bill-photos`. Electricity `homes/{id}/{yyyy-mm}.jpg`; water `ho
 2. Trigger upserts `profiles`.
 3. RPC `accept_pending_invites` attaches memberships for matching email.
 4. Owner shows a **join QR** (`create_or_get_join_link`); invitee opens `?join=<token>` and after login RPC `accept_invite_token` attaches membership (email ignored).
-5. Owner may also call `invite_to_home(home_id, email)`.
+5. Owner may also call `invite_to_home(home_id, email)`; app then invokes Edge Function `send-home-invite` (Resend) with the join URL.
 6. RLS: only members read/write that home’s rows and photos.
 
 OAuth redirect: web page origin; iOS `com.pcn.home-manager://login-callback`.

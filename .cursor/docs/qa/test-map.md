@@ -51,6 +51,8 @@ Cập nhật khi thêm test file. Agent dùng bảng này để phát hiện gap
 | UI-02 | period detail stacked rows + unpaid badge | `test/widget/period_detail_view_test.dart` | done |
 | REM-02 | same-day reminder order photo → payday → remind | `test/widget/reminder_banner_test.dart` | done |
 | ELEC-M05 | upsert omits is_paid when null | `test/integration/electricity_service_test.dart` | done |
+| INV-01 | HomeInvite email_sent_at parse | `test/unit/home_invite_test.dart` | done |
+| INV-01 | invite RPC returns invite id | `test/integration/invite_service_test.dart` | done |
 | INV-03 | Home.fromJson parses fields | `test/unit/models_test.dart` | planned |
 | INV-04 | parse ?join= and native scheme | `test/unit/join_link_test.dart` | done |
 | INV-04 | persist pending join token | `test/unit/join_link_store_test.dart` | done |

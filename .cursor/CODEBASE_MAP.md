@@ -89,6 +89,8 @@ Consult this file before grepping the repo. Update when adding modules under `li
 | Drop loan category seed | `20260821110000_drop_loan_expense_category_seed.sql` |
 | Delete home RPC | `20260821120000_delete_home_rpc.sql` |
 | Join QR token | `20260825090000_home_join_links.sql` |
+| Invite email status | `20260826140000_home_invite_email_status.sql` |
+| Edge: send invite email | `supabase/functions/send-home-invite/` (Resend) |
 | Seed (elec/water/expense/income) | `supabase/seeds/seed_home_testing.sql` |
 | Seed (finance) | `supabase/seeds/seed_finance_testing.sql` |
 

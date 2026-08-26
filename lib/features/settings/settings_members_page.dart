@@ -88,12 +88,56 @@ class _SettingsMembersPageState extends State<SettingsMembersPage> {
       _error = null;
     });
     try {
-      await widget.invites.invite(homeId: widget.home.id, email: email);
+      final inviteId = await widget.invites.invite(
+        homeId: widget.home.id,
+        email: email,
+      );
       _inviteEmail.clear();
-      await _load();
-      if (mounted) showAppToast(context, S.toastInviteSent);
+      try {
+        await widget.invites.sendInviteEmail(inviteId);
+        await _load();
+        if (mounted) {
+          showAppToast(context, S.toastInviteEmailSent(email));
+        }
+      } catch (e) {
+        await _load();
+        if (mounted) {
+          setState(() => _error = "${S.toastInviteEmailFailed}\n$e");
+          showAppToast(
+            context,
+            S.toastInviteEmailFailed,
+            kind: AppToastKind.destructive,
+          );
+        }
+      }
     } catch (e) {
       if (mounted) setState(() => _error = "$e");
+    } finally {
+      if (mounted) setState(() => _sending = false);
+    }
+  }
+
+  Future<void> _resendInviteEmail(HomeInvite invite) async {
+    setState(() {
+      _sending = true;
+      _error = null;
+    });
+    try {
+      await widget.invites.sendInviteEmail(invite.id);
+      await _load();
+      if (mounted) {
+        showAppToast(context, S.toastInviteEmailSent(invite.email));
+      }
+    } catch (e) {
+      await _load();
+      if (mounted) {
+        setState(() => _error = "${S.toastInviteEmailFailed}\n$e");
+        showAppToast(
+          context,
+          S.toastInviteEmailFailed,
+          kind: AppToastKind.destructive,
+        );
+      }
     } finally {
       if (mounted) setState(() => _sending = false);
     }
@@ -254,6 +298,8 @@ class _SettingsMembersPageState extends State<SettingsMembersPage> {
                 for (final invite in _pending)
                   _PendingInviteTile(
                     invite: invite,
+                    onResend:
+                        _sending ? null : () => _resendInviteEmail(invite),
                     onCancel: () => _cancelInvite(invite),
                   ),
               ],
@@ -402,30 +448,58 @@ class _MemberTile extends StatelessWidget {
 }
 
 class _PendingInviteTile extends StatelessWidget {
-  const _PendingInviteTile({required this.invite, required this.onCancel});
+  const _PendingInviteTile({
+    required this.invite,
+    required this.onCancel,
+    this.onResend,
+  });
+
   final HomeInvite invite;
   final VoidCallback onCancel;
+  final VoidCallback? onResend;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final sent = invite.emailSent;
     return ListTile(
       contentPadding: EdgeInsets.zero,
       leading: CircleAvatar(
-        backgroundColor: colors.warningMuted(),
-        child: Icon(Icons.mail_outline, color: colors.warning, size: 18),
+        backgroundColor:
+            sent
+                ? colors.success.withValues(alpha: 0.2)
+                : colors.warningMuted(),
+        child: Icon(
+          sent ? Icons.mark_email_read_outlined : Icons.mail_outline,
+          color: sent ? colors.success : colors.warning,
+          size: 18,
+        ),
       ),
       title: Text(invite.email),
       subtitle: Text(
-        S.pendingInviteHint,
+        sent
+            ? "${S.pendingInviteHint} · ${S.inviteEmailSentHint}"
+            : "${S.pendingInviteHint} · ${S.inviteEmailNotSentHint}",
         style: TextStyle(color: colors.textMuted, fontSize: 12),
       ),
-      trailing: IconButton(
-        onPressed: onCancel,
-        icon: const Icon(Icons.close),
-        iconSize: 18,
-        color: colors.textSecondary,
-        tooltip: S.cancelInvite,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            onPressed: onResend,
+            icon: const Icon(Icons.refresh),
+            iconSize: 18,
+            color: colors.textSecondary,
+            tooltip: S.resendInviteEmail,
+          ),
+          IconButton(
+            onPressed: onCancel,
+            icon: const Icon(Icons.close),
+            iconSize: 18,
+            color: colors.textSecondary,
+            tooltip: S.cancelInvite,
+          ),
+        ],
       ),
     );
   }
