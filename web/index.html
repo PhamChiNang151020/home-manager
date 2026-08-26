@@ -263,6 +263,18 @@
   <div id="flutter-host"></div>
   <script src="flutter_bootstrap.js" async></script>
   <script>
+    // Relative path respects <base href> (e.g. /home-manager/ on GitHub Pages).
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function () {
+        navigator.serviceWorker
+          .register("firebase-messaging-sw.js")
+          .catch(function (err) {
+            console.warn("firebase-messaging-sw register skipped:", err);
+          });
+      });
+    }
+  </script>
+  <script>
     function removeSplash() {
       const el = document.getElementById('splash');
       if (!el || el.classList.contains('removing')) return;

@@ -5,6 +5,7 @@ import "package:home_manager/core/models/home.dart";
 import "package:home_manager/core/navigation/app_page_route.dart";
 import "package:home_manager/core/services/home_service.dart";
 import "package:home_manager/core/services/invite_service.dart";
+import "package:home_manager/core/services/notification_service.dart";
 import "package:home_manager/core/state/lock_controller.dart";
 import "package:home_manager/core/state/theme_controller.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
@@ -295,8 +296,111 @@ class PersonalSettingsPage extends StatelessWidget {
                     AppPageRoute<void>(page: const InstallHomeScreenPage()),
                   ),
             ),
+            const _NotificationTestTile(),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Phase 1: request permission + show FCM token for manual Firebase Console tests.
+class _NotificationTestTile extends StatefulWidget {
+  const _NotificationTestTile();
+
+  @override
+  State<_NotificationTestTile> createState() => _NotificationTestTileState();
+}
+
+class _NotificationTestTileState extends State<_NotificationTestTile> {
+  final _notifications = const NotificationService();
+  bool _busy = false;
+  String? _token;
+  String? _message;
+
+  Future<void> _onTap() async {
+    if (_busy) return;
+    setState(() {
+      _busy = true;
+      _message = null;
+      _token = null;
+    });
+    try {
+      if (!_notifications.isAvailable) {
+        setState(() => _message = S.settingsNotifyNotConfigured);
+        return;
+      }
+      final status = await _notifications.requestPermission();
+      if (status != NotificationPermissionStatus.granted) {
+        setState(() => _message = S.settingsNotifyDenied);
+        return;
+      }
+      final token = await _notifications.getToken();
+      if (token == null || token.isEmpty) {
+        setState(() => _message = S.settingsNotifyTokenFailed);
+        return;
+      }
+      setState(() => _token = token);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          AppCard(
+            onTap: _busy ? null : _onTap,
+            padding: EdgeInsets.zero,
+            child: ListTile(
+              leading: Icon(
+                Icons.notifications_outlined,
+                color: colors.accent,
+              ),
+              title: const Text(S.settingsNotifyTest),
+              subtitle: Text(
+                _busy ? "…" : S.settingsNotifyTestDesc,
+              ),
+              trailing:
+                  _busy
+                      ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                      : Icon(Icons.chevron_right, color: colors.textMuted),
+            ),
+          ),
+          if (_message != null)
+            Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.sm),
+              child: Text(
+                _message!,
+                style: TextStyle(color: colors.warning),
+              ),
+            ),
+          if (_token != null) ...[
+            Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.sm),
+              child: Text(
+                S.settingsNotifyTokenLabel,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  color: colors.textSecondary,
+                ),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            SelectableText(
+              _token!,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ],
+        ],
       ),
     );
   }

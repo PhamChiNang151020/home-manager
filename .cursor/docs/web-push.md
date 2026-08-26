@@ -1,21 +1,32 @@
-# Web Push (after V1 core)
+# Web Push / FCM (Phase 1+)
 
-Do this only when electricity + photos + PWA install already work on iPhone.
+Phase 1 (infra only): Firebase Cloud Messaging on Flutter Web — permission + FCM
+token. No scheduled send yet.
 
-## Why later
+## Local setup
 
-iOS Safari delivers Web Push **only** for apps added to the Home Screen (iOS 16.4+). Needs HTTPS, a service worker, VAPID keys, user permission, and a **server cron** to send.
+1. Copy `.vscode/firebase.local.example.json` → `.vscode/firebase.local.json` and fill values.
+2. Copy `web/firebase-config.example.json` → `web/firebase-config.json` (no VAPID; SW only).
+3. Chrome launch configs already pass `--dart-define-from-file=.vscode/firebase.local.json`.
 
-## Outline
+## Deploy
 
-1. Flutter Web service worker (beyond default Flutter cache SW) to handle `push`.
-2. Store subscription endpoint in Supabase (`push_subscriptions`: `user_id`, keys).
-3. VAPID public key in the app; **private** key only in Edge Function secrets.
-4. Daily schedule (pg_cron or GitHub Action) → Edge Function:
-   - For each home, if today is `photo_due_day` / `payday_day` / `remind_day`
-   - Notify members
-5. Copy: “Hôm nay chụp hoá đơn điện — Nhà ba mẹ”, etc.
+GitHub Actions (`deploy-pages.yml`) injects `FIREBASE_*` dart-defines and writes
+`build/web/firebase-config.json` from repository secrets.
 
-## Not in this repo yet
+## Secrets (Actions)
 
-No VAPID, no Edge Function, no custom SW. In-app banner + `.ics` cover V1 reminders.
+`FIREBASE_API_KEY`, `FIREBASE_AUTH_DOMAIN`, `FIREBASE_PROJECT_ID`,
+`FIREBASE_STORAGE_BUCKET`, `FIREBASE_MESSAGING_SENDER_ID`, `FIREBASE_APP_ID`,
+`FIREBASE_VAPID_KEY`.
+
+## Why later (send)
+
+iOS Safari delivers Web Push **only** for apps added to the Home Screen (iOS 16.4+).
+Needs HTTPS, service worker, VAPID, user permission, and a **server cron** to send.
+
+Outline for later phases:
+
+1. Store FCM tokens in Supabase.
+2. Edge Function / cron for remind days.
+3. Copy: “Hôm nay chụp hoá đơn điện — Nhà ba mẹ”, etc.

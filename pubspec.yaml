@@ -45,6 +45,13 @@ dependencies:
   app_links: ^6.4.1
   url_launcher: ^6.3.2
   custom_refresh_indicator: ^4.0.2
+  # Firebase packages pinned exact — firebase_core_web 3.11.0+ uses
+  # dart:js_interop Object.isA which fails to compile on Dart 3.7.2 /
+  # Flutter 3.29.2 (project-pinned). Do not flutter pub upgrade these
+  # without testing web compile first.
+  firebase_core: 4.13.0
+  firebase_core_web: 3.10.0
+  firebase_messaging: 16.5.0
 
 dev_dependencies:
   flutter_test:

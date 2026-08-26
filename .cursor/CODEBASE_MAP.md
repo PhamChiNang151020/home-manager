@@ -6,7 +6,7 @@ Consult this file before grepping the repo. Update when adding modules under `li
 
 | Item | Path |
 |------|------|
-| Process entry | `lib/main.dart` (Supabase init + `AppServices` + session + lock) |
+| Process entry | `lib/main.dart` (Supabase init + soft Firebase/FCM web init + `AppServices` + session + lock) |
 | Root widget | `lib/app.dart` → `HomeManagerApp` / `MissingConfigApp` |
 | Auth gate | `lib/app.dart` + `lib/features/auth/sign_in_page.dart` |
 | PIN gate | `lib/app.dart` + `lib/features/lock/lock_screen.dart` (after Google auth) |
@@ -18,6 +18,9 @@ Consult this file before grepping the repo. Update when adding modules under `li
 | Lock | `lib/core/state/lock_controller.dart` + `lib/core/services/lock_service.dart` (local SHA-256 PIN) |
 | Reminders badge | `lib/core/state/reminder_controller.dart` + `lib/core/domain/reminder_aggregator.dart` |
 | Services locator | `lib/core/services/app_services.dart` |
+| FCM (web Phase 1) | `lib/core/config/firebase_web_config.dart` + `lib/core/services/notification_service.dart` + `web/firebase-messaging-sw.js` |
+
+**Firebase pin (do not upgrade casually):** `firebase_core` **4.13.0**, `firebase_core_web` **3.10.0**, `firebase_messaging` **16.5.0** — `firebase_core_web` 3.11.0+ requires `dart:js_interop` `Object.isA` not supported on Dart **3.7.2** / Flutter **3.29.2** (project-pinned). Do not `flutter pub upgrade` these without testing web compile first.
 
 ## Feature screens
 

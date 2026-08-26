@@ -7,6 +7,8 @@
 .DS_Store
 .env
 .vscode/supabase.local.json
+.vscode/firebase.local.json
+web/firebase-config.json
 .atom/
 .build/
 .buildlog/

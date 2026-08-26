@@ -1,6 +1,9 @@
+import "package:firebase_core/firebase_core.dart";
+import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 import "package:home_manager/app.dart";
 import "package:home_manager/core/config/app_config.dart";
+import "package:home_manager/core/config/firebase_web_config.dart";
 import "package:home_manager/core/logging/app_log.dart";
 import "package:home_manager/core/services/app_services.dart";
 import "package:home_manager/core/services/auth_service.dart";
@@ -28,6 +31,7 @@ Future<void> main() async {
     url: AppConfig.supabaseUrl,
     publishableKey: AppConfig.supabaseAnonKey,
   );
+  await _initFirebaseMessagingIfConfigured();
   final client = Supabase.instance.client;
   final services = AppServices(client);
   final session = SessionController(
@@ -44,4 +48,31 @@ Future<void> main() async {
       services: services,
     ),
   );
+}
+
+/// Soft init: FCM is optional. Never blocks app start; web-only in Phase 1.
+Future<void> _initFirebaseMessagingIfConfigured() async {
+  if (!kIsWeb) return;
+  if (!FirebaseWebConfig.isConfigured) {
+    AppLog.w(
+      "Firebase web config incomplete; push notifications disabled "
+      "(set FIREBASE_* via --dart-define)",
+    );
+    return;
+  }
+  try {
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+        apiKey: FirebaseWebConfig.apiKey,
+        authDomain: FirebaseWebConfig.authDomain,
+        projectId: FirebaseWebConfig.projectId,
+        storageBucket: FirebaseWebConfig.storageBucket,
+        messagingSenderId: FirebaseWebConfig.messagingSenderId,
+        appId: FirebaseWebConfig.appId,
+      ),
+    );
+    AppLog.i("Firebase initialized for Cloud Messaging (web)");
+  } catch (e, st) {
+    AppLog.e("Firebase init failed; continuing without FCM", error: e, stackTrace: st);
+  }
 }
