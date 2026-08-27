@@ -8,6 +8,7 @@ import "package:home_manager/core/logging/app_log.dart";
 import "package:home_manager/core/services/app_services.dart";
 import "package:home_manager/core/services/auth_service.dart";
 import "package:home_manager/core/services/home_service.dart";
+import "package:home_manager/core/services/join_link_store.dart";
 import "package:home_manager/core/state/lock_controller.dart";
 import "package:home_manager/core/state/session_controller.dart";
 import "package:home_manager/core/state/theme_controller.dart";
@@ -17,6 +18,8 @@ import "package:supabase_flutter/supabase_flutter.dart";
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  AppLog.bindFlutterErrors();
+  await JoinLinkStore.captureFrom(Uri.base);
   await initializeDateFormatting("vi");
   Intl.defaultLocale = "vi";
   AppLog.i("Starting home_manager");
@@ -73,6 +76,10 @@ Future<void> _initFirebaseMessagingIfConfigured() async {
     );
     AppLog.i("Firebase initialized for Cloud Messaging (web)");
   } catch (e, st) {
-    AppLog.e("Firebase init failed; continuing without FCM", error: e, stackTrace: st);
+    AppLog.e(
+      "Firebase init failed; continuing without FCM",
+      error: e,
+      stackTrace: st,
+    );
   }
 }

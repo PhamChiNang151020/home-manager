@@ -31,4 +31,4 @@ Sign-in gradient: `#0B0D10` → `#151A21` + subtle amber glow.
 - Home switch: tap AppBar title → bottom sheet
 - Electricity: summary + 6-month chart + period cards + sticky CTA
 - Settings: iOS-style hub → sub-pages
-- Logging: `AppLog` / `dart:developer`, debug only
+- Logging: `AppLog` (`debugPrint` + `dart:developer`), debug only

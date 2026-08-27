@@ -36,6 +36,30 @@
 
   <title>Tổ Ấm</title>
   <link rel="manifest" href="manifest.json">
+  <script>
+    // Capture ?join= (and hash #/?join=) before Flutter rewrites the URL.
+    // Dart JoinLinkStore reads the same key: toam_pending_join_token.
+    (function captureJoinToken() {
+      var KEY = "toam_pending_join_token";
+      function fromSearch(search) {
+        try {
+          return (new URLSearchParams(search).get("join") || "").trim();
+        } catch (e) {
+          return "";
+        }
+      }
+      var join = fromSearch(location.search);
+      if (!join && location.hash) {
+        var hash = location.hash.charAt(0) === "#" ? location.hash.slice(1) : location.hash;
+        var q = hash.indexOf("?");
+        join = q >= 0 ? fromSearch(hash.slice(q)) : fromSearch(hash);
+      }
+      if (!join) return;
+      try {
+        localStorage.setItem(KEY, join);
+      } catch (e) {}
+    })();
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script>
     // iOS home-screen: paint + hit-test must share one box. Flutter is embedded

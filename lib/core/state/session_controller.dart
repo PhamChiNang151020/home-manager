@@ -84,8 +84,9 @@ class SessionController extends ChangeNotifier {
     try {
       await homesApi.acceptPendingInvites();
       String? joinError;
+      String? joinedHomeId;
       try {
-        await _acceptPendingJoinToken();
+        joinedHomeId = await _acceptPendingJoinToken();
       } catch (e, st) {
         AppLog.e("accept join token failed", error: e, stackTrace: st);
         joinError = "$e";
@@ -98,13 +99,14 @@ class SessionController extends ChangeNotifier {
         homes: homes,
         current: selected,
         persistedId: prefs.getString(selectedHomeKey),
+        preferId: joinedHomeId,
       );
       if (selected != null) {
         await prefs.setString(selectedHomeKey, selected!.id);
       } else {
         await prefs.remove(selectedHomeKey);
       }
-      if (joinError != null && selected == null) {
+      if (joinError != null) {
         error = joinError;
       }
     } catch (e, st) {
@@ -122,14 +124,25 @@ class SessionController extends ChangeNotifier {
     }
   }
 
-  Future<void> _acceptPendingJoinToken() async {
+  Future<String?> _acceptPendingJoinToken() async {
     final token = await JoinLinkStore.read();
-    if (token == null) return;
+    if (token == null) return null;
     try {
-      await invites.acceptJoinToken(token);
-    } finally {
+      final homeId = await invites.acceptJoinToken(token);
       await JoinLinkStore.clear();
+      return homeId;
+    } catch (e) {
+      if (_isFatalJoinError(e)) {
+        await JoinLinkStore.clear();
+      }
+      rethrow;
     }
+  }
+
+  bool _isFatalJoinError(Object e) {
+    final message = e.toString().toLowerCase();
+    return message.contains("invalid or expired") ||
+        message.contains("invalid join");
   }
 
   bool _isClosedClientError(Object e) {

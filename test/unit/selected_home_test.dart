@@ -59,4 +59,16 @@ void main() {
       "h1",
     );
   });
+
+  test("preferId wins so a just-joined home is selected", () {
+    expect(
+      resolveSelectedHome(
+        homes: [first, second],
+        current: first,
+        persistedId: "h1",
+        preferId: "h2",
+      )?.id,
+      "h2",
+    );
+  });
 }

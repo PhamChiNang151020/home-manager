@@ -1,4 +1,5 @@
 import "package:flutter/foundation.dart";
+import "package:home_manager/core/domain/join_link.dart";
 
 class AppConfig {
   static const supabaseUrl = String.fromEnvironment("SUPABASE_URL");
@@ -16,7 +17,7 @@ class AppConfig {
     }
     final uri = Uri.base;
     if (uri.scheme == "http" || uri.scheme == "https") {
-      return uri.origin + uri.path;
+      return JoinLink.appBaseUrl(uri);
     }
     return "http://localhost:8080/";
   }

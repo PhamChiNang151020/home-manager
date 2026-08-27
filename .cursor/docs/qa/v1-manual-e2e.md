@@ -217,7 +217,7 @@ Format: **Precondition → Steps → Expected → Browser**
 ### TC-INV-03: Owner đưa QR, người nhà scan rồi login
 
 - Precondition: User A là owner của một nhà. User B chưa là thành viên, Google khác A.
-- Steps: A → Cá nhân → Chia sẻ → hiện mã QR mời. B quét mã (hoặc mở `?join=<token>`), đăng nhập Google.
+- Steps: A → Cá nhân → Chia sẻ → hiện mã QR mời. B quét mã (hoặc mở `join.html?join=<token>`), đăng nhập Google.
 - Expected: B thấy nhà của A (không bị màn “Chưa có nhà / Tạo nhà”). QR **Cài đặt / Thêm ra Màn hình chính** không thêm thành viên.
 - Browser: Chrome · Safari/iPhone [PWA] · iOS Simulator
 

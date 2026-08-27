@@ -20,7 +20,7 @@ void main() {
         ),
         home: Scaffold(
           body: JoinQrSection(
-            joinUrl: "https://example.test/home-manager/?join=abc123",
+            joinUrl: "https://example.test/home-manager/join.html?join=abc123",
             expiresAt: DateTime(2026, 9, 8),
             busy: false,
             onCopy: () => copied = true,
@@ -34,7 +34,7 @@ void main() {
     expect(find.text(S.joinQrHint), findsOneWidget);
     expect(find.byType(QrImageView), findsOneWidget);
     expect(
-      find.text("https://example.test/home-manager/?join=abc123"),
+      find.text("https://example.test/home-manager/join.html?join=abc123"),
       findsNothing,
     );
 

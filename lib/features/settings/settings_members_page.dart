@@ -1,5 +1,6 @@
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
+import "package:home_manager/core/domain/invite_email.dart";
 import "package:home_manager/core/domain/join_link.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/models/home.dart";
@@ -82,7 +83,15 @@ class _SettingsMembersPageState extends State<SettingsMembersPage> {
 
   Future<void> _sendInvite() async {
     final email = _inviteEmail.text.trim();
-    if (email.isEmpty) return;
+    final reject = InviteEmail.reject(
+      email: email,
+      memberEmails: _members.map((m) => m.email),
+      pendingEmails: _pending.map((i) => i.email),
+    );
+    if (reject != null) {
+      setState(() => _error = _inviteRejectMessage(reject));
+      return;
+    }
     setState(() {
       _sending = true;
       _error = null;
@@ -111,10 +120,35 @@ class _SettingsMembersPageState extends State<SettingsMembersPage> {
         }
       }
     } catch (e) {
-      if (mounted) setState(() => _error = "$e");
+      if (mounted) setState(() => _error = _rpcInviteError("$e"));
     } finally {
       if (mounted) setState(() => _sending = false);
     }
+  }
+
+  String _inviteRejectMessage(InviteEmailReject reject) {
+    return switch (reject) {
+      InviteEmailReject.empty ||
+      InviteEmailReject.invalid => S.inviteInvalidEmail,
+      InviteEmailReject.alreadyMember => S.inviteAlreadyMember,
+      InviteEmailReject.alreadyPending => S.inviteAlreadyPending,
+    };
+  }
+
+  String _rpcInviteError(String raw) {
+    final lower = raw.toLowerCase();
+    if (lower.contains("already a member") ||
+        lower.contains("cannot invite yourself")) {
+      return S.inviteAlreadyMember;
+    }
+    if (lower.contains("home_invites_pending_email") ||
+        lower.contains("duplicate")) {
+      return S.inviteAlreadyPending;
+    }
+    if (lower.contains("invalid email")) {
+      return S.inviteInvalidEmail;
+    }
+    return raw;
   }
 
   Future<void> _resendInviteEmail(HomeInvite invite) async {

@@ -44,7 +44,8 @@ class InviteService {
       final detail = _errorDetail(data) ?? "status ${response.status}";
       throw Exception(detail);
     } on FunctionException catch (e) {
-      final detail = _errorDetail(e.details) ?? e.reasonPhrase ?? "HTTP ${e.status}";
+      final detail =
+          _errorDetail(e.details) ?? e.reasonPhrase ?? "HTTP ${e.status}";
       throw Exception(detail);
     }
   }
@@ -95,7 +96,11 @@ class InviteService {
       "accept_invite_token",
       params: {"p_token": token},
     );
-    return result as String;
+    final id = "$result".trim();
+    if (id.isEmpty || id == "null") {
+      throw Exception("accept_invite_token không trả về id");
+    }
+    return id;
   }
 
   Future<void> revokeJoinLink(String homeId) async {

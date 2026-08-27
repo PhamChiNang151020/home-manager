@@ -51,12 +51,14 @@ Cập nhật khi thêm test file. Agent dùng bảng này để phát hiện gap
 | UI-02 | period detail stacked rows + unpaid badge | `test/widget/period_detail_view_test.dart` | done |
 | REM-02 | same-day reminder order photo → payday → remind | `test/widget/reminder_banner_test.dart` | done |
 | ELEC-M05 | upsert omits is_paid when null | `test/integration/electricity_service_test.dart` | done |
+| INV-01 | reject self / existing member email | `test/unit/invite_email_test.dart` | done |
 | INV-01 | HomeInvite email_sent_at parse | `test/unit/home_invite_test.dart` | done |
 | INV-01 | invite RPC returns invite id | `test/integration/invite_service_test.dart` | done |
 | WAL-01 | Wallet model parse | `test/unit/wallet_model_test.dart` | done |
 | WAL-02 | transfer / applyExpense RPC | `test/integration/wallet_service_test.dart` | done |
 | WAL-01 | wallet hub copy | `test/widget/wallet_hub_page_test.dart` | done |
 | INV-03 | Home.fromJson parses fields | `test/unit/models_test.dart` | planned |
+| INV-04 | prefer just-joined home after QR accept | `test/unit/selected_home_test.dart` | done |
 | INV-04 | parse ?join= and native scheme | `test/unit/join_link_test.dart` | done |
 | INV-04 | persist pending join token | `test/unit/join_link_store_test.dart` | done |
 | INV-04 | owner join QR actions | `test/widget/settings_members_page_test.dart` | done |
@@ -65,6 +67,7 @@ Cập nhật khi thêm test file. Agent dùng bảng này để phát hiện gap
 | UI-05 | tab change fires haptic, same tab does not | `test/widget/app_bottom_nav_test.dart` | done |
 | UI-06 | bill photo preview, constraint hint, remove | `test/widget/bill_photo_pick_field_test.dart` | done |
 | SET-03 | isFormDirty gates the save button | `test/unit/form_dirty_test.dart` | done |
+| LOG-01 | AppLog formats time, level, name, error | `test/unit/app_log_test.dart` | done |
 | A11Y-01 | text ramp clears 4.5:1 on every surface, both themes, all 4 accents | `test/unit/color_contrast_test.dart` | done |
 | A11Y-02 | status colours and accent fills clear 4.5:1 | `test/unit/color_contrast_test.dart` | done |
 | A11Y-03 | selected tab is never fainter than an unselected one | `test/unit/color_contrast_test.dart` | done |

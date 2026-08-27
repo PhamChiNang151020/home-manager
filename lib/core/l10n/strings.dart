@@ -181,6 +181,10 @@ abstract final class S {
   static const inviteScopeHint =
       "App gửi email kèm liên kết vào nhà. Người nhận mở link, đăng nhập Google — sẽ xem và ghi điện, nước, chi tiêu. Chỉ chủ nhà đổi được cài đặt và mời thêm người.";
   static const inviteEmail = "Email Google";
+  static const inviteInvalidEmail = "Nhập email Google hợp lệ.";
+  static const inviteAlreadyMember =
+      "Email này đã là thành viên của nhà — không cần mời lại.";
+  static const inviteAlreadyPending = "Đã có lời mời đang chờ cho email này.";
   static const sendInvite = "Gửi lời mời";
   static const members = "Thành viên";
   static const owner = "Chủ nhà";
@@ -226,8 +230,7 @@ abstract final class S {
   static const settingsSecurity = "Bảo mật";
   static const settingsInstall = "Thêm ra Màn hình chính";
   static const settingsNotifyTitle = "Bật thông báo";
-  static const settingsNotifyDesc =
-      "Nhắc lịch nhà và khi có bản cập nhật app";
+  static const settingsNotifyDesc = "Nhắc lịch nhà và khi có bản cập nhật app";
   static const settingsNotifyIosHint =
       "iPhone: thêm Tổ Ấm ra Màn hình chính rồi bật thông báo trong app.";
   static const settingsNotifyNotConfigured =

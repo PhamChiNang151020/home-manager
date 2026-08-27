@@ -103,16 +103,23 @@ Deno.serve(async (req) => {
       .eq("id", invite.invited_by)
       .maybeSingle();
 
-    const { data: joinLink, error: joinError } = await userClient.rpc(
+    const { data: joinLinkRaw, error: joinError } = await userClient.rpc(
       "create_or_get_join_link",
       { p_home_id: invite.home_id, p_rotate: false },
     );
-    if (joinError || !joinLink?.token) {
+    const joinToken = await resolveJoinToken({
+      rpcData: joinLinkRaw,
+      rpcError: joinError,
+      admin,
+      homeId: invite.home_id as string,
+      userId: user.id,
+    });
+    if (!joinToken) {
       await markEmailError(admin, inviteId, joinError?.message ?? "join link failed");
       return json({ error: "could not create join link" }, 502);
     }
 
-    const joinUrl = buildJoinUrl(appPublicUrl, joinLink.token as string);
+    const joinUrl = buildJoinUrl(appPublicUrl, joinToken);
     const homeName = (home?.name as string | undefined) ?? "nhà";
     const inviterName =
       (inviter?.display_name as string | undefined)?.trim() ||
@@ -175,8 +182,68 @@ Deno.serve(async (req) => {
 
 function buildJoinUrl(baseUrl: string, token: string): string {
   const url = new URL(baseUrl);
+  if (!url.pathname.endsWith("join.html")) {
+    const path = url.pathname.endsWith("/") ? url.pathname : `${url.pathname}/`;
+    url.pathname = `${path}join.html`;
+  }
   url.searchParams.set("join", token);
   return url.toString();
+}
+
+function parseJoinLink(data: unknown): string | null {
+  if (data == null) return null;
+  if (typeof data === "string") {
+    const trimmed = data.trim();
+    if (!trimmed) return null;
+    try {
+      return parseJoinLink(JSON.parse(trimmed));
+    } catch {
+      return trimmed.includes("@") ? null : trimmed;
+    }
+  }
+  if (typeof data === "object" && data !== null && "token" in data) {
+    const token = (data as { token?: unknown }).token;
+    return typeof token === "string" && token.trim() ? token.trim() : null;
+  }
+  return null;
+}
+
+async function resolveJoinToken(args: {
+  rpcData: unknown;
+  rpcError: { message?: string } | null;
+  admin: ReturnType<typeof createClient>;
+  homeId: string;
+  userId: string;
+}): Promise<string | null> {
+  const fromRpc = parseJoinLink(args.rpcData);
+  if (fromRpc) return fromRpc;
+
+  const { data: existing } = await args.admin
+    .from("home_join_links")
+    .select("token")
+    .eq("home_id", args.homeId)
+    .is("revoked_at", null)
+    .gt("expires_at", new Date().toISOString())
+    .maybeSingle();
+  if (typeof existing?.token === "string" && existing.token.trim()) {
+    return existing.token.trim();
+  }
+
+  await args.admin
+    .from("home_join_links")
+    .update({ revoked_at: new Date().toISOString() })
+    .eq("home_id", args.homeId)
+    .is("revoked_at", null);
+
+  const { data: created, error } = await args.admin
+    .from("home_join_links")
+    .insert({ home_id: args.homeId, created_by: args.userId })
+    .select("token")
+    .single();
+  if (error || typeof created?.token !== "string") {
+    return null;
+  }
+  return created.token;
 }
 
 async function markEmailError(

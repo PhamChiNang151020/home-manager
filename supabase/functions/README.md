@@ -20,6 +20,8 @@ Sends a real invite email through [Resend](https://resend.com) after the owner c
    - **Deploy function**.
 6. Trong app: mời bằng đúng email Resend của bạn → kiểm tra inbox.
 
+Email chứa `join.html?join=<token>`. Owner không mời được email đã là thành viên (kể cả chính mình).
+
 ### CLI (tuỳ chọn)
 
 ```bash

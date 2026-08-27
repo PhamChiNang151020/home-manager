@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0B0D10">
+  <title>Tổ Ấm — Vào nhà</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: #0B0D10;
+      color: #E8EDF5;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    .wrap {
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+    }
+    p { margin: 8px 0 0; color: #94A3B8; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <strong>Tổ Ấm</strong>
+    <p>Đang mở nhà…</p>
+  </div>
+  <script>
+    (function () {
+      var KEY = "toam_pending_join_token";
+      function fromSearch(search) {
+        try {
+          return (new URLSearchParams(search).get("join") || "").trim();
+        } catch (e) {
+          return "";
+        }
+      }
+      var join = fromSearch(location.search);
+      if (!join && location.hash) {
+        var hash = location.hash.charAt(0) === "#" ? location.hash.slice(1) : location.hash;
+        var q = hash.indexOf("?");
+        join = q >= 0 ? fromSearch(hash.slice(q)) : fromSearch(hash);
+      }
+      if (join) {
+        try { localStorage.setItem(KEY, join); } catch (e) {}
+      }
+      var dest = new URL("./", location.href);
+      dest.search = location.search;
+      dest.hash = location.hash;
+      location.replace(dest.href);
+    })();
+  </script>
+</body>
+</html>

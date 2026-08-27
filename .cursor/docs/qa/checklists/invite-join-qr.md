@@ -12,7 +12,8 @@ Owner shows a join QR on Chia sẻ; family scans, signs in with Google, and sees
   - `ios/` platform (Simulator, no App Store submit)
   - Launch config for iPhone 17 Pro
   - `home_join_links` token (join without matching email)
-  - Members page QR; persist `?join=` until after Google login
+  - Members page QR; persist `join.html?join=` until after Google login
+  - `web/join.html` + `toam_pending_join_token` so Flutter cannot drop the token
   - Clarify PWA install QR is not a home invite
   - Email invite sends real mail via Resend Edge Function (`send-home-invite`) with join URL
 - Out of scope:
