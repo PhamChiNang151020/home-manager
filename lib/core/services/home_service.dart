@@ -26,7 +26,8 @@ class HomeService {
     final memberships = await _client
         .from("home_members")
         .select("home_id, role, homes(*)")
-        .eq("user_id", uid);
+        .eq("user_id", uid)
+        .isFilter("left_at", null);
     return (memberships as List).map((row) {
       final map = Map<String, dynamic>.from(row as Map);
       final homeJson = Map<String, dynamic>.from(map["homes"] as Map);
@@ -83,11 +84,22 @@ class HomeService {
     return _client.rpc("delete_home", params: {"p_home_id": homeId});
   }
 
+  Future<void> leaveHome({required String homeId, String? newOwnerId}) async {
+    await _client.rpc(
+      "leave_home",
+      params: {
+        "p_home_id": homeId,
+        if (newOwnerId != null) "p_new_owner_id": newOwnerId,
+      },
+    );
+  }
+
   Future<List<HomeMember>> listMembers(String homeId) async {
     final rows = await _client
         .from("home_members")
         .select("user_id, role, profiles(email, display_name)")
-        .eq("home_id", homeId);
+        .eq("home_id", homeId)
+        .isFilter("left_at", null);
     return (rows as List).map((row) {
       final map = Map<String, dynamic>.from(row as Map);
       final profile = map["profiles"] as Map?;

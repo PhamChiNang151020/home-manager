@@ -44,6 +44,13 @@ Format: **Precondition → Steps → Expected → Browser**
 - Expected: Hiện thông báo lỗi, không crash
 - Browser: Chrome
 
+### TC-AUTH-05: Login từ link mời GitHub Pages không về localhost
+
+- Precondition: Mở `https://phamchinang151020.github.io/home-manager/join.html?join=<token>` khi chưa đăng nhập. Supabase Site URL = Pages origin.
+- Steps: Bấm Đăng nhập bằng Google, hoàn tất OAuth
+- Expected: Quay về `phamchinang151020.github.io/home-manager/`, không `localhost:8080` / ERR_CONNECTION_REFUSED; thấy nhà được mời
+- Browser: Chrome
+
 ---
 
 ## Homes
@@ -74,6 +81,20 @@ Format: **Precondition → Steps → Expected → Browser**
 - Precondition: Có ≥ 2 nhà
 - Steps: Mở home picker → chọn nhà khác
 - Expected: Dashboard hiển thị data đúng nhà
+- Browser: Chrome
+
+### TC-HOME-05: Thành viên rời nhà — giữ lịch sử
+
+- Precondition: User B là member; đã ghi ít nhất một chi tiêu `paid_by` = B
+- Steps: B → Cá nhân → Rời khỏi nhà này → xác nhận
+- Expected: B không còn thấy nhà. Owner vẫn thấy chi tiêu của B kèm tên. Điện / nước không đổi.
+- Browser: Chrome
+
+### TC-HOME-06: Chủ nhà chuyển quyền rồi rời
+
+- Precondition: Owner A, member B
+- Steps: A → Cá nhân → Rời khỏi nhà này → chọn B làm chủ mới → xác nhận
+- Expected: A mất nhà. B thành chủ nhà, vẫn thấy sổ. A một mình (không có member khác) thì nút rời bị tắt, gợi ý Xóa nhà.
 - Browser: Chrome
 
 ---
@@ -200,11 +221,11 @@ Format: **Precondition → Steps → Expected → Browser**
 - Expected: Hướng dẫn Mở bằng Safari / Chrome, không bảo là đã cài được từ Zalo
 - Browser: iPhone / Android in-app, [PWA]
 
-### TC-INV-01: Owner mời email
+### TC-INV-01: Owner mời bằng Gmail (không gửi mail)
 
 - Precondition: User là owner
-- Steps: Settings → Members → invite email
-- Expected: Pending invite xuất hiện
+- Steps: Cá nhân → Chia sẻ → nhập Gmail → Mời vào nhà
+- Expected: Overlay loading toàn trang. Pending hiện email + «Đang chờ chấp nhận». Không có Gửi lại / «Chưa gửi được email». Toast: đã lưu lời mời.
 - Browser: Chrome
 
 ### TC-INV-02: User được mời login

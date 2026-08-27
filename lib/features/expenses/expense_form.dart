@@ -253,7 +253,11 @@ class _ExpenseFormSheetState extends State<_ExpenseFormSheet> {
               value: _paidBy,
               items: [
                 if (widget.members.every((member) => member.userId != _paidBy))
-                  SelectOption(value: _paidBy, builder: (_) => Text(_paidBy)),
+                  SelectOption(
+                    value: _paidBy,
+                    builder:
+                        (_) => Text(widget.existing?.paidByName ?? _paidBy),
+                  ),
                 for (final member in widget.members)
                   SelectOption(
                     value: member.userId,
@@ -300,9 +304,7 @@ class _ExpenseFormSheetState extends State<_ExpenseFormSheet> {
                 ],
                 onChanged: (value) {
                   if (value == null) return;
-                  setState(
-                    () => _walletId = value.isEmpty ? null : value,
-                  );
+                  setState(() => _walletId = value.isEmpty ? null : value);
                 },
               ),
             if (widget.wallets.isNotEmpty)

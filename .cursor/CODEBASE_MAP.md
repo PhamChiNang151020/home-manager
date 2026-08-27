@@ -32,7 +32,7 @@ Consult this file before grepping the repo. Update when adding modules under `li
 | Overview dashboard | `lib/features/overview/overview_page.dart` — hero net worth + `overview_income_spend_chart.dart` + category donut + compact quick-access grid; legacy `overview_summary_card.dart`, `overview_shortcut_grid.dart`, `overview_spend_trend_chart.dart` |
 | Transactions hub | `lib/features/transactions/transactions_hub_page.dart` (sub-tabs: Điện·Nước / Hàng ngày / Tín dụng·Nợ / Tiết kiệm) |
 | Notifications | `lib/features/notifications/notifications_page.dart` |
-| Personal hub | `lib/features/personal/personal_hub_page.dart` (Thông tin / Chia sẻ / Cài đặt / Đăng xuất) |
+| Personal hub | `lib/features/personal/personal_hub_page.dart` (Thông tin / Chia sẻ / Cài đặt / Rời nhà / Đăng xuất); `leave_home_sheet.dart` |
 | Electricity | `lib/features/electricity/` (page, form, summary, chart, cards, reminder) |
 | Water | `lib/features/water/` (mirror of electricity) |
 | Expenses / quick-add | `lib/features/expenses/` (list, form, `quick_add_sheet.dart`, presets, OCR) |
@@ -73,7 +73,7 @@ Consult this file before grepping the repo. Update when adding modules under `li
 | Theme | `lib/core/theme/app_theme.dart` (Nunito, `glass:`), `app_color_scheme.dart` (glass tokens + ambient), `app_spacing.dart`, `safe_bottom_padding.dart` |
 | Theme state | `lib/core/state/theme_controller.dart` — mode, accent, glass |
 | Fonts | `assets/fonts/Nunito/static/` (Regular 400 · Medium 500 · SemiBold 600 · Bold 700) |
-| Domain | `electricity_validation.dart`, `water_validation.dart`, `meter_math.dart`, `month_balance.dart`, `month_clamp.dart`, `expense_totals.dart`, `net_worth.dart`, `reminder_aggregator.dart`, `receipt_amount_parser.dart`, `selected_home.dart`, `period_history_filter.dart`, `pwa_install.dart`, `bank_brand.dart`, `join_link.dart`, `invite_email.dart`, `oauth_launch.dart`, `safe_bottom_inset.dart`, `form_dirty.dart` |
+| Domain | `electricity_validation.dart`, `water_validation.dart`, `meter_math.dart`, `month_balance.dart`, `month_clamp.dart`, `expense_totals.dart`, `net_worth.dart`, `reminder_aggregator.dart`, `receipt_amount_parser.dart`, `selected_home.dart`, `period_history_filter.dart`, `pwa_install.dart`, `bank_brand.dart`, `join_link.dart`, `invite_email.dart`, `oauth_launch.dart`, `oauth_redirect.dart`, `safe_bottom_inset.dart`, `form_dirty.dart` |
 | Models | `home.dart`, `electricity_period.dart`, `water_period.dart`, `expense.dart`, `expense_preset.dart`, `income.dart`, `tracking_mode.dart`, `lock_settings.dart`, `bank_account.dart`, `personal_debt.dart`, `savings.dart`, `reminder_item.dart` |
 | Services | `home_service.dart`, `invite_service.dart`, `join_link_store.dart`, `electricity_service.dart` (`BillPhotoService`), `water_service.dart`, `expense_service.dart`, `income_service.dart`, `overview_service.dart`, `ocr_service.dart`, `lock_service.dart`, `bank_account_service.dart`, `personal_debt_service.dart`, `savings_service.dart`, `wallet_service.dart` |
 
@@ -95,9 +95,9 @@ Consult this file before grepping the repo. Update when adding modules under `li
 | Delete home RPC | `20260821120000_delete_home_rpc.sql` |
 | Join QR token | `20260825090000_home_join_links.sql` |
 | Invite reject existing member | `20260827090000_invite_reject_existing.sql` |
-| Invite email status | `20260826140000_home_invite_email_status.sql` |
+| Leave home RPC | `20260827100000_leave_home.sql` (`left_at`, `leave_home`) |
+| Invite email status (unused; mail send removed) | `20260826140000_home_invite_email_status.sql` |
 | Wallets + ledger | `20260826160000_wallets.sql` (`wallet_adjust` / `transfer` / expense RPCs) |
-| Edge: send invite email | `supabase/functions/send-home-invite/` (Resend) |
 | Seed (elec/water/expense/income) | `supabase/seeds/seed_home_testing.sql` |
 | Seed (finance) | `supabase/seeds/seed_finance_testing.sql` |
 

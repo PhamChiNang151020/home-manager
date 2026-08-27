@@ -15,7 +15,7 @@ Owner shows a join QR on Chia sẻ; family scans, signs in with Google, and sees
   - Members page QR; persist `join.html?join=` until after Google login
   - `web/join.html` + `toam_pending_join_token` so Flutter cannot drop the token
   - Clarify PWA install QR is not a home invite
-  - Email invite sends real mail via Resend Edge Function (`send-home-invite`) with join URL
+  - Email invite records a pending Google address (join on login). Share QR / link for immediate access. No Resend.
 - Out of scope:
   - Apple Developer signing, TestFlight, App Store listing
   - Native OCR (web Tesseract only)

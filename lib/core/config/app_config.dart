@@ -1,5 +1,9 @@
 import "package:flutter/foundation.dart";
-import "package:home_manager/core/domain/join_link.dart";
+import "package:home_manager/core/domain/oauth_redirect.dart";
+
+import "page_uri_stub.dart"
+    if (dart.library.html) "page_uri_web.dart"
+    if (dart.library.js_interop) "page_uri_web.dart";
 
 class AppConfig {
   static const supabaseUrl = String.fromEnvironment("SUPABASE_URL");
@@ -15,10 +19,6 @@ class AppConfig {
     if (!kIsWeb) {
       return iosOauthRedirect;
     }
-    final uri = Uri.base;
-    if (uri.scheme == "http" || uri.scheme == "https") {
-      return JoinLink.appBaseUrl(uri);
-    }
-    return "http://localhost:8080/";
+    return OauthRedirect.webFromPage(currentPageUri());
   }
 }

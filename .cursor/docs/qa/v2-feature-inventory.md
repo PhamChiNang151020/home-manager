@@ -21,6 +21,7 @@ See also [v1-feature-inventory.md](v1-feature-inventory.md) for electricity/auth
 | UI-02 | Shared | Period detail view (điện/nước) | `period_detail_view.dart` | | x | | [x] |
 | REM-02 | Reminders | Same-day order photo → payday → remind | `reminder_banner.dart` | | x | | [x] |
 | HOME-03 | Homes | Persist selected home | `selected_home.dart` | x | | | [x] |
+| HOME-05 | Homes | Leave home keep history | `leave_home_sheet.dart` | | x | x | [x] |
 | ELEC-M05 | Electricity | upsert omits is_paid | `electricity_service.dart` | | | x | [x] |
 | PWA-01 | PWA | Install surface + share URL | `pwa_install.dart` | x | | | [x] |
 | PWA-02 | PWA | Install banner + QR page | `install_home_screen_banner.dart` | | x | | [x] |
