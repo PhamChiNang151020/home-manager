@@ -94,14 +94,8 @@ abstract final class S {
   static const toastHomeDeleted = "Đã xóa nhà";
   static const toastHomeCreated = "Đã tạo nhà";
   static const toastScheduleSaved = "Đã lưu lịch nhắc";
-  static const toastInviteSent = "Đã gửi lời mời";
-  static String toastInviteEmailSent(String email) =>
-      "Đã gửi email mời tới $email";
-  static const toastInviteEmailFailed =
-      "Đã lưu lời mời nhưng gửi email thất bại. Thử Gửi lại.";
-  static const resendInviteEmail = "Gửi lại";
-  static const inviteEmailSentHint = "Đã gửi email";
-  static const inviteEmailNotSentHint = "Chưa gửi được email";
+  static const toastInviteSent =
+      "Đã lưu lời mời. Họ vào nhà khi đăng nhập Google đúng email này.";
   static const toastInviteCancelled = "Đã huỷ lời mời";
   static const toastPinSaved = "Đã lưu mã PIN";
   static const readingReceiptAmount = "Đang đọc số tiền...";
@@ -179,13 +173,13 @@ abstract final class S {
       "Bấm + ở thanh dưới để thêm kỳ nước đầu tiên.";
   static const invite = "Mời thành viên";
   static const inviteScopeHint =
-      "App gửi email kèm liên kết vào nhà. Người nhận mở link, đăng nhập Google — sẽ xem và ghi điện, nước, chi tiêu. Chỉ chủ nhà đổi được cài đặt và mời thêm người.";
+      "Nhập Gmail họ dùng để đăng nhập. Khi họ mở app và đăng nhập đúng email, sẽ vào nhà này. Muốn vào ngay: đưa mã QR hoặc copy link phía trên. App không gửi email.";
   static const inviteEmail = "Email Google";
   static const inviteInvalidEmail = "Nhập email Google hợp lệ.";
   static const inviteAlreadyMember =
       "Email này đã là thành viên của nhà — không cần mời lại.";
   static const inviteAlreadyPending = "Đã có lời mời đang chờ cho email này.";
-  static const sendInvite = "Gửi lời mời";
+  static const sendInvite = "Mời vào nhà";
   static const members = "Thành viên";
   static const owner = "Chủ nhà";
   static const member = "Thành viên";
@@ -220,6 +214,19 @@ abstract final class S {
       "Xóa nhà này và toàn bộ dữ liệu (điện, nước, chi tiêu, …)? Không thể hoàn tác.";
   static const deleteHomeHint = "Chỉ chủ nhà mới được xóa.";
   static const deletingHome = "Đang xóa…";
+  static const leaveHome = "Rời khỏi nhà này";
+  static const leaveHomeConfirmTitle = "Rời khỏi nhà?";
+  static const leaveHomeConfirmHint =
+      "Chi tiêu, thu nhập và hoá đơn điện / nước bạn đã ghi vẫn thuộc nhà này. Bạn sẽ không còn xem hay sửa được.";
+  static const leaveHomeConfirm = "Rời nhà";
+  static const leavingHome = "Đang rời…";
+  static const toastLeftHome = "Đã rời nhà";
+  static const leaveHomeNewOwner = "Người nhận quyền chủ nhà";
+  static const leaveHomeNewOwnerHint =
+      "Chọn thành viên sẽ thành chủ nhà trước khi bạn rời.";
+  static const leaveHomePickOwner = "Chọn thành viên";
+  static const leaveHomeSoleOwnerHint =
+      "Bạn là chủ nhà duy nhất. Xóa nhà trong Cài đặt → Nhà, hoặc mời thành viên rồi chuyển quyền.";
   static const settingsSchedule = "Lịch nhắc";
   static const settingsMembers = "Thành viên";
   static const settingsAccount = "Tài khoản";
@@ -245,7 +252,7 @@ abstract final class S {
   static const settingsNotifyOff = "Đã tắt thông báo.";
   static const settingsHomeDesc = "Tên nhà, đơn giá điện / nước";
   static const settingsScheduleDesc = "Ngày chụp, lương, nhắc · xuất .ics";
-  static const settingsMembersDesc = "QR mời vào nhà · thành viên · email";
+  static const settingsMembersDesc = "QR mời vào nhà · thành viên";
   static const settingsAccountDesc = "Đăng xuất";
   static const settingsAppearanceDesc = "Sáng / tối, màu nhấn, hiệu ứng kính";
   static const settingsSecurityDesc = "Khoá ứng dụng bằng PIN";

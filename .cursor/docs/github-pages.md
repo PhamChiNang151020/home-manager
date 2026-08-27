@@ -14,7 +14,7 @@ CI: `.github/workflows/deploy-pages.yml` (Flutter 3.29.2, analyze, test, upload 
 
 **iOS Web Clip (unsigned):** `web/to-am.mobileconfig` — see [ios-web-clip.md](ios-web-clip.md).
 
-Enable: repo Settings → Pages → Source = GitHub Actions. Add secrets `SUPABASE_URL` and `SUPABASE_ANON_KEY`. Add the Pages origin to Supabase Auth redirect URLs.
+Enable: repo Settings → Pages → Source = GitHub Actions. Add secrets `SUPABASE_URL` and `SUPABASE_ANON_KEY`. In Supabase Auth, set **Site URL** to this Pages origin (not localhost) and add `https://phamchinang151020.github.io/home-manager/**` to Redirect URLs.
 
 ## Private repo
 

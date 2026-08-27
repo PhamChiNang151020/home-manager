@@ -21,7 +21,7 @@ Track electricity for two family homes on iPhone (PWA or iOS Simulator) with Goo
 
 - `profiles` — `id` = `auth.users.id`
 - `homes` — name, `tracking_mode`, `kwh_rate`, `m3_rate`, calendar days, `created_by`
-- `home_members` — `owner` \| `member`
+- `home_members` — `owner` \| `member`; `left_at` set when a member leaves (history stays)
 - `home_invites` — pending email until Google email matches
 - `home_join_links` — reusable QR token (14 days); scan then Google login, no email match
 - `wallets` / `wallet_transactions` — liquid cash/bank/ewallet balances + ledger (adjust / transfer / expense)
@@ -38,10 +38,10 @@ Storage: bucket `bill-photos`. Electricity `homes/{id}/{yyyy-mm}.jpg`; water `ho
 2. Trigger upserts `profiles`.
 3. RPC `accept_pending_invites` attaches memberships for matching email.
 4. Owner shows a **join QR** (`create_or_get_join_link`); invitee opens `join.html?join=<token>` (token saved to localStorage before Flutter boots) and after login RPC `accept_invite_token` attaches membership (email ignored). Session then selects that home.
-5. Owner may also call `invite_to_home(home_id, email)`; app then invokes Edge Function `send-home-invite` (Resend) with the join URL.
-6. RLS: only members read/write that home’s rows and photos.
+5. Owner may also call `invite_to_home(home_id, email)`; the invitee joins when they sign in with that Google email (`accept_pending_invites`). Share the QR / join URL for immediate access. No outbound email.
+6. RLS: only **active** members (`left_at` is null) read/write that home’s rows and photos. A member may `leave_home` (owner must pass a successor). Former members’ names still resolve on expenses via `shares_home_with`. Rejoin (QR / email) clears `left_at` and sets role to `member`.
 
-OAuth redirect: web page origin; iOS `com.pcn.home-manager://login-callback`.
+OAuth redirect: web **page origin only** (no `?join=` — token is in localStorage; a query string fails the GoTrue allow-list and falls back to Site URL). iOS `com.pcn.home-manager://login-callback`. Site URL in the dashboard must be the Pages origin, not localhost.
 
 ## Reminders
 
@@ -57,7 +57,7 @@ flutter build web --base-href /home-manager/ \
   --dart-define=SUPABASE_ANON_KEY=...
 ```
 
-OAuth redirect URLs: `http://localhost:*`, the Pages origin, and `com.pcn.home-manager://login-callback` (iOS).
+OAuth redirect URLs: `http://localhost:8080/**`, `https://phamchinang151020.github.io/home-manager/**`, and `com.pcn.home-manager://login-callback` (iOS). Site URL = Pages origin.
 
 ## Error cases
 

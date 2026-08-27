@@ -162,7 +162,8 @@ Deno.serve(async (req) => {
       const { data: members, error: membersError } = await admin
         .from("home_members")
         .select("user_id")
-        .eq("home_id", job.home.id);
+        .eq("home_id", job.home.id)
+        .is("left_at", null);
       if (membersError) {
         failed += 1;
         details.push({ home_id: job.home.id, error: membersError.message });

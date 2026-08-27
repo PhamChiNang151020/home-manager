@@ -31,9 +31,12 @@ Cập nhật khi thêm test file. Agent dùng bảng này để phát hiện gap
 | FMT-01 | compact k and tr labels | `test/unit/vnd_format_test.dart` | done |
 | AUTH-03 | auth gate loading state | `test/widget/auth_gate_test.dart` | planned |
 | AUTH-02 | native OAuth uses system browser | `test/unit/oauth_launch_mode_test.dart` | done |
+| AUTH-01 / INV-04 | web OAuth redirectTo has no `?join=` | `test/unit/oauth_redirect_test.dart` | done |
 | UI-03 | iOS bottom nav home-indicator inset | `test/unit/safe_bottom_inset_test.dart`, `test/widget/app_bottom_nav_test.dart` | done |
 | HOME-03 | selectHome updates selected | `test/integration/session_controller_test.dart` | planned |
 | HOME-03 | resolveSelectedHome prefers persisted id | `test/unit/selected_home_test.dart` | done |
+| HOME-05 | member / owner / sole-owner leave sheet | `test/widget/leave_home_sheet_test.dart` | done |
+| HOME-05 | leaveHome RPC params | `test/integration/home_service_test.dart` | done |
 | WAT-01 | water meter validation | `test/unit/water_validation_test.dart` | done |
 | WAT-02 | water upsert is_paid / month change | `test/integration/water_service_test.dart` | done |
 | WAT-03 | pathFor water subfolder | `test/unit/bill_photo_service_test.dart` | done |
@@ -54,6 +57,8 @@ Cập nhật khi thêm test file. Agent dùng bảng này để phát hiện gap
 | INV-01 | reject self / existing member email | `test/unit/invite_email_test.dart` | done |
 | INV-01 | HomeInvite email_sent_at parse | `test/unit/home_invite_test.dart` | done |
 | INV-01 | invite RPC returns invite id | `test/integration/invite_service_test.dart` | done |
+| INV-01 | send invite uses full-page overlay | `test/widget/settings_members_page_test.dart` | done |
+| INV-01 | pending invite has no resend mail | `test/widget/settings_members_page_test.dart` | done |
 | WAL-01 | Wallet model parse | `test/unit/wallet_model_test.dart` | done |
 | WAL-02 | transfer / applyExpense RPC | `test/integration/wallet_service_test.dart` | done |
 | WAL-01 | wallet hub copy | `test/widget/wallet_hub_page_test.dart` | done |

@@ -63,22 +63,9 @@ abstract final class JoinLink {
     ).toString();
   }
 
-  /// App origin + path with `?join=`, used as Google OAuth `redirectTo`.
-  static String appUrlWithJoin({
-    required String baseUrl,
-    required String token,
-  }) {
-    final base = Uri.parse(baseUrl);
-    return Uri(
-      scheme: base.scheme.isEmpty ? "https" : base.scheme,
-      host: base.host,
-      port: base.hasPort ? base.port : null,
-      path: _appPath(base.path),
-      queryParameters: {queryKey: token},
-    ).toString();
-  }
-
-  /// Strips `join.html` so OAuth returns to the Flutter app, not the landing.
+  /// Strips `join.html` / `index.html` so OAuth returns to the Flutter app.
+  /// No query string — GoTrue allow-list is exact; `?join=` falls back to
+  /// Site URL (often localhost).
   static String appBaseUrl(Uri pageUri) {
     return "${pageUri.origin}${_appPath(pageUri.path)}";
   }
@@ -88,7 +75,11 @@ abstract final class JoinLink {
     if (result.endsWith(landingFile)) {
       result = result.substring(0, result.length - landingFile.length);
     }
+    if (result.endsWith("index.html")) {
+      result = result.substring(0, result.length - "index.html".length);
+    }
     if (result.isEmpty) return "/";
+    if (!result.endsWith("/")) return "$result/";
     return result;
   }
 

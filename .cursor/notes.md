@@ -20,8 +20,8 @@ Locked decisions. Do not change without discussion.
 ## Auth and data
 
 - **Source of truth:** Supabase (Postgres + RLS + Storage). Online-first for family sync.
-- **Auth:** Google via Supabase OAuth. Web uses page origin; iOS uses `com.pcn.home-manager://login-callback`.
-- **Owner invites** per home by **join QR token** (scan → Google login) or Google email.
+- **Auth:** Google via Supabase OAuth. Web uses page origin (no `?join=` on `redirectTo`); iOS uses `com.pcn.home-manager://login-callback`. Dashboard Site URL must be the Pages origin.
+- **Owner invites** per home by **join QR token** (scan → Google login) or Google email (pending until that account signs in). No invite email is sent.
 - Anon key + project URL are public (RLS protects rows). Never commit the **service role** key.
 - Do not log PII or bill photos to analytics.
 

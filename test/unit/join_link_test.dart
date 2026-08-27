@@ -91,18 +91,6 @@ void main() {
     });
   });
 
-  group("JoinLink.appUrlWithJoin", () {
-    test("keeps OAuth return on the Flutter app path", () {
-      expect(
-        JoinLink.appUrlWithJoin(
-          baseUrl: "https://phamchinang151020.github.io/home-manager/",
-          token: "abc123",
-        ),
-        "https://phamchinang151020.github.io/home-manager/?join=abc123",
-      );
-    });
-  });
-
   group("JoinLink.appBaseUrl", () {
     test("strips join.html so OAuth does not land on the landing page", () {
       expect(
@@ -110,6 +98,26 @@ void main() {
           Uri.parse(
             "https://phamchinang151020.github.io/home-manager/join.html?join=x",
           ),
+        ),
+        "https://phamchinang151020.github.io/home-manager/",
+      );
+    });
+
+    test("drops query and trailing index.html", () {
+      expect(
+        JoinLink.appBaseUrl(
+          Uri.parse(
+            "https://phamchinang151020.github.io/home-manager/index.html?join=x",
+          ),
+        ),
+        "https://phamchinang151020.github.io/home-manager/",
+      );
+    });
+
+    test("adds trailing slash so allow-list matches Pages base-href", () {
+      expect(
+        JoinLink.appBaseUrl(
+          Uri.parse("https://phamchinang151020.github.io/home-manager"),
         ),
         "https://phamchinang151020.github.io/home-manager/",
       );

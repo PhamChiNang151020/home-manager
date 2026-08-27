@@ -12,6 +12,7 @@ import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_icons.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/core/theme/mobile_viewport.dart";
+import "package:home_manager/features/personal/leave_home_sheet.dart";
 import "package:home_manager/features/pwa/install_home_screen_page.dart";
 import "package:home_manager/features/settings/settings_account_page.dart";
 import "package:home_manager/features/settings/settings_appearance_page.dart";
@@ -57,6 +58,7 @@ class PersonalHubPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = user;
     return ListView(
       padding: AppSpacing.shellListPadding,
       children: [
@@ -141,8 +143,21 @@ class PersonalHubPage extends StatelessWidget {
                 ),
           ),
         ),
+        if (currentUser != null)
+          AnimatedEntrance(
+            index: 4,
+            child: Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.md),
+              child: LeaveHomeButton(
+                home: home,
+                homesApi: homesApi,
+                currentUserId: currentUser.id,
+                onLeft: onChanged,
+              ),
+            ),
+          ),
         AnimatedEntrance(
-          index: 4,
+          index: 5,
           child: Padding(
             padding: const EdgeInsets.only(top: AppSpacing.md),
             child: OutlinedButton(
@@ -156,7 +171,7 @@ class PersonalHubPage extends StatelessWidget {
           ),
         ),
         AnimatedEntrance(
-          index: 5,
+          index: 6,
           child: Padding(
             padding: const EdgeInsets.only(top: AppSpacing.lg),
             child: Center(
@@ -429,9 +444,9 @@ class _NotificationSettingsTileState extends State<_NotificationSettingsTile> {
             padding: const EdgeInsets.only(top: AppSpacing.sm),
             child: Text(
               S.settingsNotifyIosHint,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: colors.textMuted,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: colors.textMuted),
             ),
           ),
           if (_message != null)

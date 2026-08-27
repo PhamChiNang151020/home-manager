@@ -97,27 +97,11 @@ class _SettingsMembersPageState extends State<SettingsMembersPage> {
       _error = null;
     });
     try {
-      final inviteId = await widget.invites.invite(
-        homeId: widget.home.id,
-        email: email,
-      );
+      await widget.invites.invite(homeId: widget.home.id, email: email);
       _inviteEmail.clear();
-      try {
-        await widget.invites.sendInviteEmail(inviteId);
-        await _load();
-        if (mounted) {
-          showAppToast(context, S.toastInviteEmailSent(email));
-        }
-      } catch (e) {
-        await _load();
-        if (mounted) {
-          setState(() => _error = "${S.toastInviteEmailFailed}\n$e");
-          showAppToast(
-            context,
-            S.toastInviteEmailFailed,
-            kind: AppToastKind.destructive,
-          );
-        }
+      await _load();
+      if (mounted) {
+        showAppToast(context, S.toastInviteSent);
       }
     } catch (e) {
       if (mounted) setState(() => _error = _rpcInviteError("$e"));
@@ -149,32 +133,6 @@ class _SettingsMembersPageState extends State<SettingsMembersPage> {
       return S.inviteInvalidEmail;
     }
     return raw;
-  }
-
-  Future<void> _resendInviteEmail(HomeInvite invite) async {
-    setState(() {
-      _sending = true;
-      _error = null;
-    });
-    try {
-      await widget.invites.sendInviteEmail(invite.id);
-      await _load();
-      if (mounted) {
-        showAppToast(context, S.toastInviteEmailSent(invite.email));
-      }
-    } catch (e) {
-      await _load();
-      if (mounted) {
-        setState(() => _error = "${S.toastInviteEmailFailed}\n$e");
-        showAppToast(
-          context,
-          S.toastInviteEmailFailed,
-          kind: AppToastKind.destructive,
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _sending = false);
-    }
   }
 
   Future<void> _rotateJoinLink() async {
@@ -272,78 +230,76 @@ class _SettingsMembersPageState extends State<SettingsMembersPage> {
               token: _joinLink!.token,
             );
 
-    return Scaffold(
-      appBar: AppBar(title: const Text(S.settingsMembers)),
-      body: MobileViewport(
-        child: ListView(
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-          children: [
-            const SectionHeader(title: S.members),
-            for (final member in _members) _MemberTile(member: member),
-            if (owner) ...[
-              const SectionHeader(title: S.joinQrTitle),
-              if (joinUrl != null)
-                JoinQrSection(
-                  joinUrl: joinUrl,
-                  expiresAt: _joinLink!.expiresAt,
-                  busy: _joinBusy,
-                  onCopy: () => _copyJoinUrl(joinUrl),
-                  onRegenerate: _rotateJoinLink,
-                  onRevoke: _revokeJoinLink,
-                )
-              else
+    return LoadingOverlay(
+      loading: _sending || _joinBusy,
+      child: Scaffold(
+        appBar: AppBar(title: const Text(S.settingsMembers)),
+        body: MobileViewport(
+          child: ListView(
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+            children: [
+              const SectionHeader(title: S.members),
+              for (final member in _members) _MemberTile(member: member),
+              if (owner) ...[
+                const SectionHeader(title: S.joinQrTitle),
+                if (joinUrl != null)
+                  JoinQrSection(
+                    joinUrl: joinUrl,
+                    expiresAt: _joinLink!.expiresAt,
+                    busy: _joinBusy,
+                    onCopy: () => _copyJoinUrl(joinUrl),
+                    onRegenerate: _rotateJoinLink,
+                    onRevoke: _revokeJoinLink,
+                  )
+                else
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                    child: OutlinedButton(
+                      onPressed: _joinBusy ? null : _rotateJoinLink,
+                      child: const Text(S.joinQrCreate),
+                    ),
+                  ),
+                const SectionHeader(title: S.invite),
                 Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                  child: OutlinedButton(
-                    onPressed: _joinBusy ? null : _rotateJoinLink,
-                    child: Text(_joinBusy ? S.sending : S.joinQrCreate),
+                  padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                  child: Text(
+                    S.inviteScopeHint,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: colors.textSecondary,
+                    ),
                   ),
                 ),
-              const SectionHeader(title: S.invite),
-              Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                child: Text(
-                  S.inviteScopeHint,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodySmall?.copyWith(color: colors.textSecondary),
+                LabeledTextField(
+                  label: S.inviteEmail,
+                  controller: _inviteEmail,
+                  keyboardType: TextInputType.emailAddress,
+                  hint: "example@gmail.com",
                 ),
-              ),
-              LabeledTextField(
-                label: S.inviteEmail,
-                controller: _inviteEmail,
-                keyboardType: TextInputType.emailAddress,
-                hint: "example@gmail.com",
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton.icon(
-                  onPressed: _sending ? null : _sendInvite,
-                  icon:
-                      _sending
-                          ? const AppLoader.compact(color: Colors.white)
-                          : const Icon(Icons.send_outlined, size: 18),
-                  label: Text(_sending ? S.sending : S.sendInvite),
-                ),
-              ),
-              if (_pending.isNotEmpty) ...[
-                const SectionHeader(title: S.pendingInvites),
-                for (final invite in _pending)
-                  _PendingInviteTile(
-                    invite: invite,
-                    onResend:
-                        _sending ? null : () => _resendInviteEmail(invite),
-                    onCancel: () => _cancelInvite(invite),
+                const SizedBox(height: AppSpacing.sm),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: _sending ? null : _sendInvite,
+                    icon: const Icon(Icons.send_outlined, size: 18),
+                    label: const Text(S.sendInvite),
                   ),
+                ),
+                if (_pending.isNotEmpty) ...[
+                  const SectionHeader(title: S.pendingInvites),
+                  for (final invite in _pending)
+                    _PendingInviteTile(
+                      invite: invite,
+                      onCancel: () => _cancelInvite(invite),
+                    ),
+                ],
               ],
+              if (_error != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: AppSpacing.sm),
+                  child: Text(_error!, style: TextStyle(color: colors.error)),
+                ),
             ],
-            if (_error != null)
-              Padding(
-                padding: const EdgeInsets.only(top: AppSpacing.sm),
-                child: Text(_error!, style: TextStyle(color: colors.error)),
-              ),
-          ],
+          ),
         ),
       ),
     );
@@ -482,58 +438,35 @@ class _MemberTile extends StatelessWidget {
 }
 
 class _PendingInviteTile extends StatelessWidget {
-  const _PendingInviteTile({
-    required this.invite,
-    required this.onCancel,
-    this.onResend,
-  });
+  const _PendingInviteTile({required this.invite, required this.onCancel});
 
   final HomeInvite invite;
   final VoidCallback onCancel;
-  final VoidCallback? onResend;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
-    final sent = invite.emailSent;
     return ListTile(
       contentPadding: EdgeInsets.zero,
       leading: CircleAvatar(
-        backgroundColor:
-            sent
-                ? colors.success.withValues(alpha: 0.2)
-                : colors.warningMuted(),
+        backgroundColor: colors.bgElevated,
         child: Icon(
-          sent ? Icons.mark_email_read_outlined : Icons.mail_outline,
-          color: sent ? colors.success : colors.warning,
+          Icons.hourglass_empty,
+          color: colors.textSecondary,
           size: 18,
         ),
       ),
       title: Text(invite.email),
       subtitle: Text(
-        sent
-            ? "${S.pendingInviteHint} · ${S.inviteEmailSentHint}"
-            : "${S.pendingInviteHint} · ${S.inviteEmailNotSentHint}",
+        S.pendingInviteHint,
         style: TextStyle(color: colors.textMuted, fontSize: 12),
       ),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          IconButton(
-            onPressed: onResend,
-            icon: const Icon(Icons.refresh),
-            iconSize: 18,
-            color: colors.textSecondary,
-            tooltip: S.resendInviteEmail,
-          ),
-          IconButton(
-            onPressed: onCancel,
-            icon: const Icon(Icons.close),
-            iconSize: 18,
-            color: colors.textSecondary,
-            tooltip: S.cancelInvite,
-          ),
-        ],
+      trailing: IconButton(
+        onPressed: onCancel,
+        icon: const Icon(Icons.close),
+        iconSize: 18,
+        color: colors.textSecondary,
+        tooltip: S.cancelInvite,
       ),
     );
   }

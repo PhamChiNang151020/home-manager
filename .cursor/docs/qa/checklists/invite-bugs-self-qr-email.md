@@ -27,7 +27,6 @@ Owner cannot invite an existing member (including themselves). Scanning the join
 - `lib/features/settings/settings_members_page.dart`
 - `web/join.html`, `web/index.html`
 - `supabase/migrations/20260827090000_invite_reject_existing.sql`
-- `supabase/functions/send-home-invite/index.ts`
 
 ## Functional checklist
 
@@ -49,7 +48,7 @@ Owner cannot invite an existing member (including themselves). Scanning the join
 | Type | File | Cases |
 |------|------|-------|
 | Unit | `test/unit/invite_email_test.dart` | self / member / pending / valid |
-| Unit | `test/unit/join_link_test.dart` | join.html URL, hash, OAuth app URL |
+| Unit | `test/unit/join_link_test.dart` | join.html URL, hash, appBaseUrl |
 | Unit | `test/unit/selected_home_test.dart` | preferId |
 | Unit | `test/unit/join_link_store_test.dart` | hash capture |
 | Widget | `test/widget/settings_members_page_test.dart` | QR still renders |

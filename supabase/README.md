@@ -4,10 +4,17 @@ Run this SQL in the Supabase SQL editor (or `supabase db push` if the CLI is lin
 
 1. Create a project at [supabase.com](https://supabase.com).
 2. **Authentication → Providers → Google**: enable, add Client ID/secret from Google Cloud.
-3. **Authentication → URL configuration**: add
-   - `http://localhost:8080` and `http://localhost:8080/` (Flutter web debug)
-   - `https://phamchinang151020.github.io/home-manager/` (Pages)
-   - `com.pcn.home-manager://login-callback` (iOS Simulator / native)
+3. **Authentication → URL configuration**:
+   - **Site URL** (production, not localhost):
+     `https://phamchinang151020.github.io/home-manager/`
+   - **Redirect URLs** — add all of:
+     - `http://localhost:8080` and `http://localhost:8080/` (Flutter web debug)
+     - `http://localhost:8080/**`
+     - `https://phamchinang151020.github.io/home-manager/`
+     - `https://phamchinang151020.github.io/home-manager/**`
+     - `com.pcn.home-manager://login-callback` (iOS Simulator / native)
+
+   If Site URL is `http://localhost:8080` and a `redirectTo` (for example `?join=` on a join link) is **not** in Redirect URLs, Google login on Pages ends at `localhost refused to connect`.
 
 ## iOS Google login (Simulator)
 
@@ -46,9 +53,9 @@ Không đổi **Authentication → Providers → Google** trên Supabase. Luồn
 4. Execute [`migrations/20260819000000_init.sql`](migrations/20260819000000_init.sql) (and later migrations in order, including invite email status and **wallets** `20260826160000_wallets.sql`).
 5. Copy **Project URL** (Overview → **Copy**, do not type) and **anon** key. Never use the service role in the Flutter app.
 
-### Invite email (Resend)
+### Invite by Google email
 
-See [`functions/README.md`](functions/README.md). Deploy `send-home-invite` and set secrets `RESEND_API_KEY`, `INVITE_FROM_EMAIL`, `APP_PUBLIC_URL` before testing “Gửi lời mời”.
+Owner records a Google address (`invite_to_home`). The invitee joins on login (`accept_pending_invites`). Share QR / join URL for immediate access. Outbound mail was removed (no Resend / `send-home-invite`).
 
 ### Wallets
 
