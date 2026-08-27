@@ -13,7 +13,7 @@ Consult this file before grepping the repo. Update when adding modules under `li
 | Main shell | `lib/features/shell/app_shell.dart` — bottom nav 5 slots: Tổng quan / Sổ giao dịch / (+) / Thông báo / Cá nhân; AppBar shows tab title (home picker moved to Personal) |
 | Custom bottom nav | `lib/features/shell/app_bottom_nav.dart` |
 | Quick-add picker | `lib/features/shell/quick_add_picker_sheet.dart` → Chi tiêu / Điện / Nước / Thẻ·hạn mức / Nợ / Tiết kiệm (Global FAB); no sticky add bars on transaction sub-pages |
-| Home picker sheet | `lib/features/shell/home_picker_sheet.dart` (opened from Personal hub “Nhà đang quản lý”) |
+| Home picker sheet | `lib/features/shell/home_picker_sheet.dart` (`HomePickerList`; Personal → Nhà đang quản lý) |
 | Session | `lib/core/state/session_controller.dart` (persists `selected_home_id`) |
 | Lock | `lib/core/state/lock_controller.dart` + `lib/core/services/lock_service.dart` (local SHA-256 PIN) |
 | Reminders badge | `lib/core/state/reminder_controller.dart` + `lib/core/domain/reminder_aggregator.dart` |
@@ -32,7 +32,7 @@ Consult this file before grepping the repo. Update when adding modules under `li
 | Overview dashboard | `lib/features/overview/overview_page.dart` — hero net worth + `overview_income_spend_chart.dart` + category donut + compact quick-access grid; legacy `overview_summary_card.dart`, `overview_shortcut_grid.dart`, `overview_spend_trend_chart.dart` |
 | Transactions hub | `lib/features/transactions/transactions_hub_page.dart` (sub-tabs: Điện·Nước / Hàng ngày / Tín dụng·Nợ / Tiết kiệm) |
 | Notifications | `lib/features/notifications/notifications_page.dart` |
-| Personal hub | `lib/features/personal/personal_hub_page.dart` (Thông tin / Chia sẻ / Cài đặt / Rời nhà / Đăng xuất); `leave_home_sheet.dart` |
+| Personal hub | `lib/features/personal/personal_hub_page.dart` (Thông tin / Chia sẻ / Cài đặt / Đăng xuất); `managed_home_page.dart` (đổi nhà + rời nhà); `leave_home_sheet.dart` |
 | Electricity | `lib/features/electricity/` (page, form, summary, chart, cards, reminder) |
 | Water | `lib/features/water/` (mirror of electricity) |
 | Expenses / quick-add | `lib/features/expenses/` (list, form, `quick_add_sheet.dart`, presets, OCR) |
@@ -96,6 +96,7 @@ Consult this file before grepping the repo. Update when adding modules under `li
 | Join QR token | `20260825090000_home_join_links.sql` |
 | Invite reject existing member | `20260827090000_invite_reject_existing.sql` |
 | Leave home RPC | `20260827100000_leave_home.sql` (`left_at`, `leave_home`) |
+| Remove member RPC | `20260827110000_remove_home_member.sql` |
 | Invite email status (unused; mail send removed) | `20260826140000_home_invite_email_status.sql` |
 | Wallets + ledger | `20260826160000_wallets.sql` (`wallet_adjust` / `transfer` / expense RPCs) |
 | Seed (elec/water/expense/income) | `supabase/seeds/seed_home_testing.sql` |

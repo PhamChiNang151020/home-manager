@@ -86,15 +86,22 @@ Format: **Precondition → Steps → Expected → Browser**
 ### TC-HOME-05: Thành viên rời nhà — giữ lịch sử
 
 - Precondition: User B là member; đã ghi ít nhất một chi tiêu `paid_by` = B
-- Steps: B → Cá nhân → Rời khỏi nhà này → xác nhận
+- Steps: B → Cá nhân → Nhà đang quản lý → Rời khỏi nhà này → xác nhận
 - Expected: B không còn thấy nhà. Owner vẫn thấy chi tiêu của B kèm tên. Điện / nước không đổi.
 - Browser: Chrome
 
 ### TC-HOME-06: Chủ nhà chuyển quyền rồi rời
 
 - Precondition: Owner A, member B
-- Steps: A → Cá nhân → Rời khỏi nhà này → chọn B làm chủ mới → xác nhận
+- Steps: A → Cá nhân → Nhà đang quản lý → Rời khỏi nhà này → chọn B làm chủ mới → xác nhận
 - Expected: A mất nhà. B thành chủ nhà, vẫn thấy sổ. A một mình (không có member khác) thì nút rời bị tắt, gợi ý Xóa nhà.
+- Browser: Chrome
+
+### TC-HOME-07: Chủ nhà xoá thành viên
+
+- Precondition: Owner A, member B; B đã ghi ít nhất một chi tiêu
+- Steps: A → Cá nhân → Chia sẻ → nút xoá cạnh B → xác nhận Xoá khỏi nhà
+- Expected: B không còn trong danh sách. Chi tiêu của B vẫn còn với tên B. B login không còn thấy nhà (trừ khi quét QR lại).
 - Browser: Chrome
 
 ---
@@ -221,18 +228,11 @@ Format: **Precondition → Steps → Expected → Browser**
 - Expected: Hướng dẫn Mở bằng Safari / Chrome, không bảo là đã cài được từ Zalo
 - Browser: iPhone / Android in-app, [PWA]
 
-### TC-INV-01: Owner mời bằng Gmail (không gửi mail)
+### TC-INV-01: Owner mời bằng Gmail — đã gỡ khỏi UI
 
-- Precondition: User là owner
-- Steps: Cá nhân → Chia sẻ → nhập Gmail → Mời vào nhà
-- Expected: Overlay loading toàn trang. Pending hiện email + «Đang chờ chấp nhận». Không có Gửi lại / «Chưa gửi được email». Toast: đã lưu lời mời.
-- Browser: Chrome
-
-### TC-INV-02: User được mời login
-
-- Precondition: Invite pending cho email user
-- Steps: User login Google đúng email
-- Expected: Thấy nhà được mời
+- Precondition: —
+- Steps: Cá nhân → Chia sẻ
+- Expected: Không có ô Email Google / Mời vào nhà / lời mời đang chờ. Chỉ danh sách thành viên + mã QR.
 - Browser: Chrome
 
 ### TC-INV-03: Owner đưa QR, người nhà scan rồi login
@@ -241,6 +241,13 @@ Format: **Precondition → Steps → Expected → Browser**
 - Steps: A → Cá nhân → Chia sẻ → hiện mã QR mời. B quét mã (hoặc mở `join.html?join=<token>`), đăng nhập Google.
 - Expected: B thấy nhà của A (không bị màn “Chưa có nhà / Tạo nhà”). QR **Cài đặt / Thêm ra Màn hình chính** không thêm thành viên.
 - Browser: Chrome · Safari/iPhone [PWA] · iOS Simulator
+
+### TC-INV-05: Chia sẻ hiện khung chờ khi QR chưa sẵn
+
+- Precondition: Owner, mạng chậm hoặc lần đầu tạo mã
+- Steps: Cá nhân → Chia sẻ
+- Expected: Ô QR (nền trắng + loader) và chữ «Đang tạo mã mời…» hiện ngay. Không để trang trống. Khi có mã thì QR thay placeholder.
+- Browser: Chrome
 
 ---
 

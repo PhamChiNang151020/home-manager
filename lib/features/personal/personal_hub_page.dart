@@ -12,7 +12,7 @@ import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_icons.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/core/theme/mobile_viewport.dart";
-import "package:home_manager/features/personal/leave_home_sheet.dart";
+import "package:home_manager/features/personal/managed_home_page.dart";
 import "package:home_manager/features/pwa/install_home_screen_page.dart";
 import "package:home_manager/features/settings/settings_account_page.dart";
 import "package:home_manager/features/settings/settings_appearance_page.dart";
@@ -23,7 +23,6 @@ import "package:home_manager/features/settings/settings_security_page.dart";
 import "package:home_manager/features/shared/animated_entrance.dart";
 import "package:home_manager/features/shared/app_asset_icon.dart";
 import "package:home_manager/features/shared/app_card.dart";
-import "package:home_manager/features/shell/home_picker_sheet.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
 
 class PersonalHubPage extends StatelessWidget {
@@ -67,14 +66,20 @@ class PersonalHubPage extends StatelessWidget {
           child: _HubTile(
             leading: Icon(Icons.home_outlined, color: context.appColors.accent),
             title: S.managedHome,
-            subtitle: home.name,
             onTap:
-                () => showHomePickerSheet(
-                  context: context,
-                  homes: homes,
-                  selected: home,
-                  onSelected: onSelectHome,
-                  onAddHome: onAddHome,
+                () => Navigator.push(
+                  context,
+                  AppPageRoute<void>(
+                    page: ManagedHomePage(
+                      home: home,
+                      homes: homes,
+                      homesApi: homesApi,
+                      currentUserId: currentUser?.id ?? "",
+                      onSelectHome: onSelectHome,
+                      onAddHome: onAddHome,
+                      onLeft: onChanged,
+                    ),
+                  ),
                 ),
           ),
         ),
@@ -86,12 +91,15 @@ class PersonalHubPage extends StatelessWidget {
               color: context.appColors.accent,
             ),
             title: S.personalInfo,
-            subtitle: user?.email ?? S.settingsAccountDesc,
             onTap:
                 () => Navigator.push(
                   context,
                   AppPageRoute<void>(
-                    page: SettingsAccountPage(user: user, onSignOut: onSignOut),
+                    page: SettingsAccountPage(
+                      user: user,
+                      home: home,
+                      onSignOut: onSignOut,
+                    ),
                   ),
                 ),
           ),
@@ -104,7 +112,6 @@ class PersonalHubPage extends StatelessWidget {
               color: context.appColors.accent,
             ),
             title: S.personalShare,
-            subtitle: S.settingsMembersDesc,
             onTap:
                 () => Navigator.push(
                   context,
@@ -113,6 +120,7 @@ class PersonalHubPage extends StatelessWidget {
                       home: home,
                       homesApi: homesApi,
                       invites: invites,
+                      currentUserId: currentUser?.id,
                     ),
                   ),
                 ),
@@ -126,7 +134,6 @@ class PersonalHubPage extends StatelessWidget {
               color: context.appColors.accent,
             ),
             title: S.personalSettings,
-            subtitle: S.personalSettingsDesc,
             onTap:
                 () => Navigator.push(
                   context,
@@ -143,21 +150,8 @@ class PersonalHubPage extends StatelessWidget {
                 ),
           ),
         ),
-        if (currentUser != null)
-          AnimatedEntrance(
-            index: 4,
-            child: Padding(
-              padding: const EdgeInsets.only(top: AppSpacing.md),
-              child: LeaveHomeButton(
-                home: home,
-                homesApi: homesApi,
-                currentUserId: currentUser.id,
-                onLeft: onChanged,
-              ),
-            ),
-          ),
         AnimatedEntrance(
-          index: 5,
+          index: 4,
           child: Padding(
             padding: const EdgeInsets.only(top: AppSpacing.md),
             child: OutlinedButton(
@@ -171,7 +165,7 @@ class PersonalHubPage extends StatelessWidget {
           ),
         ),
         AnimatedEntrance(
-          index: 6,
+          index: 5,
           child: Padding(
             padding: const EdgeInsets.only(top: AppSpacing.lg),
             child: Center(
@@ -469,13 +463,13 @@ class _HubTile extends StatelessWidget {
   const _HubTile({
     required this.leading,
     required this.title,
-    required this.subtitle,
+    this.subtitle,
     required this.onTap,
   });
 
   final Widget leading;
   final String title;
-  final String subtitle;
+  final String? subtitle;
   final VoidCallback onTap;
 
   @override
@@ -489,7 +483,7 @@ class _HubTile extends StatelessWidget {
         child: ListTile(
           leading: leading,
           title: Text(title),
-          subtitle: Text(subtitle),
+          subtitle: subtitle == null ? null : Text(subtitle!),
           trailing: Icon(Icons.chevron_right, color: colors.textMuted),
         ),
       ),

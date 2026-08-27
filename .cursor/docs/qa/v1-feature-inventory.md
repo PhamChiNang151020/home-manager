@@ -13,7 +13,8 @@ Status: `[ ]` chưa có automated test · `[x]` đã có · `[~]` một phần
 | HOME-02 | Homes | Create home (invoice) | same | tracking_mode | | | x | x | [ ] |
 | HOME-03 | Homes | List homes + select | `session_controller.dart`, `home_picker_sheet.dart` | list + select | | x | x | x | [ ] |
 | HOME-04 | Homes | Accept pending invites on refresh | `home_service.dart` | RPC | | | x | x | [ ] |
-| HOME-05 | Homes | Member leave home (keep history) | `leave_home_sheet.dart`, `home_service.dart` | RPC + sheet | | x | x | x | [x] |
+| HOME-05 | Homes | Member leave home (keep history) | `leave_home_sheet.dart`, `managed_home_page.dart` | RPC + sheet | | x | x | x | [x] |
+| HOME-06 | Homes | Owner remove member (keep history) | `settings_members_page.dart`, `home_service.dart` | RPC + confirm | | x | x | x | [x] |
 | ELEC-M01 | Electricity | Meter: consumption × rate | `meter_math.dart` | pure math | x | | | | [x] |
 | ELEC-M02 | Electricity | Meter: validate missing kWh | `electricity_validation.dart` | pure validation | x | x | | x | [x] |
 | ELEC-M03 | Electricity | Meter: new kWh < previous | `electricity_validation.dart` | pure validation | x | x | | x | [x] |
@@ -31,8 +32,8 @@ Status: `[ ]` chưa có automated test · `[x]` đã có · `[~]` một phần
 | REM-01 | Reminders | Banner on matching day | `reminder_banner.dart`, `DayOfMonth` | isToday + clamp | x | x | | x | [x] |
 | SET-01 | Settings | Update home name / rate / days | `settings_home_page.dart` | RPC | | | x | x | [ ] |
 | SET-02 | Settings | ICS export (3 events) | `ics_export_service.dart` | buildCalendar | x | | | x | [x] |
-| SET-03 | Settings | Theme / appearance | `theme_controller.dart` | prefs | | x | | x | [ ] |
-| INV-01 | Invites | Invite by Google email (pending on login) | `invite_service.dart`, `invite_email.dart` | RPC + reject | x | x | x | x | [x] |
+| SET-04 | Settings | Account facts (Google + current home) | `settings_account_page.dart` | render | | x | | x | [x] |
+| INV-01 | Invites | Invite by Google email (UI removed; RPC leftover) | `invite_service.dart`, `invite_email.dart` | RPC + reject | x | | x | | [~] |
 | WAL-01 | Wallets | Liquid wallets CRUD + ledger | `wallet_service.dart`, `wallet_hub_page.dart` | table + RPC | | | x | x | [ ] |
 | WAL-02 | Wallets | Transfer + expense debit | `wallet_transfer`, `wallet_apply_expense` | RPC | | | x | x | [ ] |
 | INV-02 | Invites | List pending invites | `invite_service.dart` | query parse | | | x | x | [ ] |

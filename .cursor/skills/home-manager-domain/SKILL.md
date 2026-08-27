@@ -17,7 +17,7 @@ Vietnamese UI. Electricity, water, expenses, income.
 - **Nhà tôi (`meter`):** enter new kWh / m³; previous from last period; amount = delta × rate (`kwh_rate` default 3500, `m3_rate` default 10000).
 - **Nhà ba mẹ (`invoice`):** enter bill amount + photo. No meter math.
 - Shell: Tổng quan · Chi tiêu · Cài đặt. Điện / Nước / Thu nhập from Tổng quan.
-- Owner invites per home by join QR (token) or Google email (pending until that account signs in). No invite email is sent.
+- Owner invites per home by join QR (token) / copy link. No email invite. An owner may remove a member (`left_at`); history stays.
 - Calendar days: photo due, payday, remind (shared for điện + nước).
 
 ## Storage

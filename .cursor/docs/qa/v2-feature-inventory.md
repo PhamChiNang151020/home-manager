@@ -21,7 +21,8 @@ See also [v1-feature-inventory.md](v1-feature-inventory.md) for electricity/auth
 | UI-02 | Shared | Period detail view (điện/nước) | `period_detail_view.dart` | | x | | [x] |
 | REM-02 | Reminders | Same-day order photo → payday → remind | `reminder_banner.dart` | | x | | [x] |
 | HOME-03 | Homes | Persist selected home | `selected_home.dart` | x | | | [x] |
-| HOME-05 | Homes | Leave home keep history | `leave_home_sheet.dart` | | x | x | [x] |
+| HOME-05 | Homes | Leave home keep history | `leave_home_sheet.dart`, `managed_home_page.dart` | | x | x | [x] |
+| HOME-06 | Homes | Owner remove member | `settings_members_page.dart` | | x | x | [x] |
 | ELEC-M05 | Electricity | upsert omits is_paid | `electricity_service.dart` | | | x | [x] |
 | PWA-01 | PWA | Install surface + share URL | `pwa_install.dart` | x | | | [x] |
 | PWA-02 | PWA | Install banner + QR page | `install_home_screen_banner.dart` | | x | | [x] |
@@ -30,6 +31,7 @@ See also [v1-feature-inventory.md](v1-feature-inventory.md) for electricity/auth
 | UI-05 | Shell | Haptic khi đổi tab | `app_bottom_nav.dart` | | x | | [x] |
 | UI-06 | Shared | Ảnh hoá đơn: preview, giới hạn file, bỏ ảnh | `bill_photo_pick_field.dart` | | x | | [x] |
 | SET-03 | Settings | Nút Lưu chỉ bật khi có thay đổi | `form_dirty.dart` | x | | | [x] |
+| SET-04 | Settings | Trang tài khoản có thông tin Google / nhà | `settings_account_page.dart` | | x | | [x] |
 | A11Y-01 | Theme | Màu nhấn có biến thể riêng cho chế độ sáng | `app_accent.dart` | x | | | [x] |
 | A11Y-02 | Theme | Bậc chữ và màu trạng thái đạt 4.5:1 | `app_color_scheme.dart` | x | | | [x] |
 | FMT-02 | Format | Rút gọn số âm | `vnd_format.dart` | x | | | [x] |

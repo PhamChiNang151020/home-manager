@@ -37,6 +37,9 @@ Cập nhật khi thêm test file. Agent dùng bảng này để phát hiện gap
 | HOME-03 | resolveSelectedHome prefers persisted id | `test/unit/selected_home_test.dart` | done |
 | HOME-05 | member / owner / sole-owner leave sheet | `test/widget/leave_home_sheet_test.dart` | done |
 | HOME-05 | leaveHome RPC params | `test/integration/home_service_test.dart` | done |
+| HOME-05 | leave lives on managed home page | `test/widget/managed_home_page_test.dart` | done |
+| HOME-06 | owner remove member confirm | `test/widget/settings_members_page_test.dart` | done |
+| HOME-06 | removeMember RPC params | `test/integration/home_service_test.dart` | done |
 | WAT-01 | water meter validation | `test/unit/water_validation_test.dart` | done |
 | WAT-02 | water upsert is_paid / month change | `test/integration/water_service_test.dart` | done |
 | WAT-03 | pathFor water subfolder | `test/unit/bill_photo_service_test.dart` | done |
@@ -57,8 +60,8 @@ Cập nhật khi thêm test file. Agent dùng bảng này để phát hiện gap
 | INV-01 | reject self / existing member email | `test/unit/invite_email_test.dart` | done |
 | INV-01 | HomeInvite email_sent_at parse | `test/unit/home_invite_test.dart` | done |
 | INV-01 | invite RPC returns invite id | `test/integration/invite_service_test.dart` | done |
-| INV-01 | send invite uses full-page overlay | `test/widget/settings_members_page_test.dart` | done |
-| INV-01 | pending invite has no resend mail | `test/widget/settings_members_page_test.dart` | done |
+| INV-01 | send invite uses full-page overlay | `test/widget/settings_members_page_test.dart` | removed |
+| INV-01 | pending invite has no resend mail | `test/widget/settings_members_page_test.dart` | removed |
 | WAL-01 | Wallet model parse | `test/unit/wallet_model_test.dart` | done |
 | WAL-02 | transfer / applyExpense RPC | `test/integration/wallet_service_test.dart` | done |
 | WAL-01 | wallet hub copy | `test/widget/wallet_hub_page_test.dart` | done |
@@ -67,11 +70,14 @@ Cập nhật khi thêm test file. Agent dùng bảng này để phát hiện gap
 | INV-04 | parse ?join= and native scheme | `test/unit/join_link_test.dart` | done |
 | INV-04 | persist pending join token | `test/unit/join_link_store_test.dart` | done |
 | INV-04 | owner join QR actions | `test/widget/settings_members_page_test.dart` | done |
+| INV-04 | QR placeholder while join link loads | `test/widget/settings_members_page_test.dart` | done |
+| INV-04 | members page has no email invite form | `test/widget/settings_members_page_test.dart` | done |
 | INV-04 | create / accept / revoke join RPCs | `test/integration/invite_service_test.dart` | done |
 | UI-04 | empty state description + primary action | `test/widget/empty_state_view_test.dart` | done |
 | UI-05 | tab change fires haptic, same tab does not | `test/widget/app_bottom_nav_test.dart` | done |
 | UI-06 | bill photo preview, constraint hint, remove | `test/widget/bill_photo_pick_field_test.dart` | done |
 | SET-03 | isFormDirty gates the save button | `test/unit/form_dirty_test.dart` | done |
+| SET-04 | account page lists Google facts and home | `test/widget/settings_account_page_test.dart` | done |
 | LOG-01 | AppLog formats time, level, name, error | `test/unit/app_log_test.dart` | done |
 | A11Y-01 | text ramp clears 4.5:1 on every surface, both themes, all 4 accents | `test/unit/color_contrast_test.dart` | done |
 | A11Y-02 | status colours and accent fills clear 4.5:1 | `test/unit/color_contrast_test.dart` | done |

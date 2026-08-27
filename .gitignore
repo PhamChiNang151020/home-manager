@@ -8,6 +8,7 @@
 .env
 .vscode/supabase.local.json
 .vscode/firebase.local.json
+.chrome-profile/
 .vscode/*-firebase-adminsdk-*.json
 **/*-firebase-adminsdk-*.json
 web/firebase-config.json

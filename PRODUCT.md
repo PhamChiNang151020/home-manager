@@ -40,7 +40,7 @@ Apple Developer account exists.
   per member, overview, in-app reminder banners, `.ics` export.
 - Shell: Tổng quan · sổ giao dịch · quick-add · thông báo · cá nhân.
   Điện / Nước / Thu nhập open from Tổng quan.
-- Owner invites by join QR token or Google email. RLS: members only.
+- Owner invites by join QR token. RLS: members only.
 - Do **not** add Android, shopping list, or App Store submit without approval.
 - Widgets do not call Supabase; services do. No service-role key in the client.
 - Flutter 3.29 / Dart 3.7; Material 3; package `home_manager`.
