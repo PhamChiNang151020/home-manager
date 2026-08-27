@@ -53,9 +53,9 @@ Không đổi **Authentication → Providers → Google** trên Supabase. Luồn
 4. Execute [`migrations/20260819000000_init.sql`](migrations/20260819000000_init.sql) (and later migrations in order, including invite email status and **wallets** `20260826160000_wallets.sql`).
 5. Copy **Project URL** (Overview → **Copy**, do not type) and **anon** key. Never use the service role in the Flutter app.
 
-### Invite by Google email
+### Invite by join QR
 
-Owner records a Google address (`invite_to_home`). The invitee joins on login (`accept_pending_invites`). Share QR / join URL for immediate access. Outbound mail was removed (no Resend / `send-home-invite`).
+Owner shares a join QR / link (`create_or_get_join_link`). The invitee scans, signs in with Google, and `accept_invite_token` attaches membership. Email invite UI was removed. Apply `20260827110000_remove_home_member.sql` so the owner can remove a member (`remove_home_member`).
 
 ### Wallets
 

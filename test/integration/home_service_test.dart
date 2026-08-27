@@ -44,4 +44,19 @@ void main() {
       ),
     ).called(1);
   });
+
+  test("removeMember sends home and user ids", () async {
+    when(
+      () => client.rpc(any(), params: any(named: "params")),
+    ).thenAnswer((_) => ImmediateRpcResult(null));
+
+    await service.removeMember(homeId: "h1", userId: "u2");
+
+    verify(
+      () => client.rpc(
+        "remove_home_member",
+        params: {"p_home_id": "h1", "p_user_id": "u2"},
+      ),
+    ).called(1);
+  });
 }

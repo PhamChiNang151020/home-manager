@@ -173,7 +173,7 @@ abstract final class S {
       "Bấm + ở thanh dưới để thêm kỳ nước đầu tiên.";
   static const invite = "Mời thành viên";
   static const inviteScopeHint =
-      "Nhập Gmail họ dùng để đăng nhập. Khi họ mở app và đăng nhập đúng email, sẽ vào nhà này. Muốn vào ngay: đưa mã QR hoặc copy link phía trên. App không gửi email.";
+      "Đưa mã QR hoặc copy liên kết mời. App không gửi email.";
   static const inviteEmail = "Email Google";
   static const inviteInvalidEmail = "Nhập email Google hợp lệ.";
   static const inviteAlreadyMember =
@@ -181,6 +181,18 @@ abstract final class S {
   static const inviteAlreadyPending = "Đã có lời mời đang chờ cho email này.";
   static const sendInvite = "Mời vào nhà";
   static const members = "Thành viên";
+  static const removeMember = "Xoá khỏi nhà";
+  static const removeMemberTitle = "Xoá thành viên?";
+  static String removeMemberConfirmHint(String name) =>
+      "$name sẽ không còn xem nhà này. Chi tiêu, thu nhập và hoá đơn họ đã ghi vẫn giữ.";
+  static const toastMemberRemoved = "Đã xoá thành viên";
+  static const removeMemberOwner =
+      "Không xoá được chủ nhà. Họ tự rời hoặc chuyển quyền trước.";
+  static const removeMemberSelf = "Muốn ra khỏi nhà, dùng Rời khỏi nhà này.";
+  static const accountEmail = "Email";
+  static const accountSignIn = "Đăng nhập";
+  static const accountGoogle = "Google";
+  static const managedHomeOthers = "Nhà khác";
   static const owner = "Chủ nhà";
   static const member = "Thành viên";
   static const pendingInvites = "Lời mời đang chờ";
@@ -199,7 +211,7 @@ abstract final class S {
   static const firstWaterPeriodHint = "Kỳ nước đầu: nhập cả số cũ và số mới.";
   static const invalidReadings = "Số mới phải lớn hơn hoặc bằng số cũ.";
   static const invalidAmount = "Nhập số tiền hợp lệ.";
-  static const roleOwnerOnly = "Chỉ chủ nhà mới sửa cài đặt và mời người.";
+  static const roleOwnerOnly = "Chỉ chủ nhà mới sửa cài đặt.";
   static const switchHome = "Chọn nhà";
   static const lastPeriod = "Kỳ gần nhất";
   static const avgSixMonths = "TB 6 tháng";
@@ -226,13 +238,14 @@ abstract final class S {
       "Chọn thành viên sẽ thành chủ nhà trước khi bạn rời.";
   static const leaveHomePickOwner = "Chọn thành viên";
   static const leaveHomeSoleOwnerHint =
-      "Bạn là chủ nhà duy nhất. Xóa nhà trong Cài đặt → Nhà, hoặc mời thành viên rồi chuyển quyền.";
+      "Bạn là chủ nhà duy nhất. Xóa nhà trong Cài đặt → Nhà, hoặc mời thành viên bằng mã QR rồi chuyển quyền.";
   static const settingsSchedule = "Lịch nhắc";
   static const settingsMembers = "Thành viên";
   static const settingsAccount = "Tài khoản";
   static const linkedGoogleAccount = "Đang liên kết tài khoản Google";
   static const accountEmailManagedHint =
       "Tên và email lấy từ Google. Muốn đổi thì đổi trong tài khoản Google.";
+  static const accountRole = "Vai trò";
   static const settingsAppearance = "Giao diện";
   static const settingsSecurity = "Bảo mật";
   static const settingsInstall = "Thêm ra Màn hình chính";
@@ -313,7 +326,8 @@ abstract final class S {
   static const sending = "Đang gửi…";
   static const joinQrTitle = "Mã QR mời vào nhà";
   static const joinQrHint =
-      "Người nhà quét mã, đăng nhập Google — sẽ thấy nhà này. Không cần nhập email trước.";
+      "Người nhà quét mã, đăng nhập Google — sẽ thấy nhà này.";
+  static const joinQrLoading = "Đang tạo mã mời…";
   static const joinQrExpiryHint = "Mã có hạn 14 ngày. Tạo mã mới nếu cần.";
   static const joinQrCopy = "Sao chép liên kết mời";
   static const joinQrCopied = "Đã sao chép liên kết mời";

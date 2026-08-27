@@ -10,7 +10,6 @@ import "package:home_manager/core/services/invite_service.dart";
 import "package:home_manager/core/theme/app_accent.dart";
 import "package:home_manager/core/theme/app_theme.dart";
 import "package:home_manager/features/settings/settings_members_page.dart";
-import "package:home_manager/features/shared/app_loading.dart";
 import "package:mocktail/mocktail.dart";
 import "package:qr_flutter/qr_flutter.dart";
 
@@ -27,6 +26,22 @@ const _home = Home(
   myRole: "owner",
 );
 
+final _joinLink = HomeJoinLink(
+  token: "tok",
+  homeId: "h1",
+  expiresAt: DateTime(2026, 9, 8),
+);
+
+Widget _wrap(Widget child) {
+  return MaterialApp(
+    theme: AppTheme.build(
+      brightness: Brightness.light,
+      accent: AppAccent.amber,
+    ),
+    home: child,
+  );
+}
+
 void main() {
   setUpAll(() {
     registerFallbackValue("");
@@ -38,12 +53,8 @@ void main() {
     var revoked = false;
 
     await tester.pumpWidget(
-      MaterialApp(
-        theme: AppTheme.build(
-          brightness: Brightness.light,
-          accent: AppAccent.amber,
-        ),
-        home: Scaffold(
+      _wrap(
+        Scaffold(
           body: JoinQrSection(
             joinUrl: "https://example.test/home-manager/join.html?join=abc123",
             expiresAt: DateTime(2026, 9, 8),
@@ -76,27 +87,16 @@ void main() {
     expect(revoked, isTrue);
   });
 
-  testWidgets("sending invite shows full-page overlay, not button spinner", (
+  testWidgets("owner sees QR placeholder while join link loads", (
     tester,
   ) async {
     final homes = MockHomeService();
     final invites = MockInviteService();
-    final gate = Completer<String>();
+    final gate = Completer<HomeJoinLink>();
 
     when(() => homes.listMembers(any())).thenAnswer((_) async => const []);
-    when(() => invites.listPending(any())).thenAnswer((_) async => []);
-    when(() => invites.createOrGetJoinLink(any())).thenAnswer(
-      (_) async => HomeJoinLink(
-        token: "tok",
-        homeId: "h1",
-        expiresAt: DateTime(2026, 9, 8),
-      ),
-    );
     when(
-      () => invites.invite(
-        homeId: any(named: "homeId"),
-        email: any(named: "email"),
-      ),
+      () => invites.createOrGetJoinLink(any()),
     ).thenAnswer((_) => gate.future);
 
     tester.view.physicalSize = const Size(390, 2000);
@@ -104,74 +104,89 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
-      MaterialApp(
-        theme: AppTheme.build(
-          brightness: Brightness.light,
-          accent: AppAccent.amber,
-        ),
-        home: SettingsMembersPage(
+      _wrap(
+        SettingsMembersPage(
           home: _home,
           homesApi: homes,
           invites: invites,
+          currentUserId: "u1",
           joinShareUrl: "https://example.test/home-manager/",
         ),
       ),
     );
-    await tester.pumpAndSettle();
-
-    await tester.enterText(find.byType(TextField), "family@gmail.com");
-    await tester.tap(find.text(S.sendInvite));
     await tester.pump();
 
-    expect(find.byType(AppLoadingScrim), findsOneWidget);
-    expect(find.text(S.sending), findsNothing);
-    expect(find.text(S.sendInvite), findsOneWidget);
-    expect(tester.widget<AppLoader>(find.byType(AppLoader)).size, 88);
+    expect(find.byType(JoinQrPlaceholder), findsOneWidget);
+    expect(find.text(S.joinQrLoading), findsOneWidget);
+    expect(find.byType(QrImageView), findsNothing);
+    expect(find.text(S.sendInvite), findsNothing);
+    expect(find.text(S.invite), findsNothing);
 
-    await tester.pumpWidget(const SizedBox());
+    gate.complete(_joinLink);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(JoinQrPlaceholder), findsNothing);
+    expect(find.byType(QrImageView), findsOneWidget);
   });
 
-  testWidgets("pending invite has no resend mail action", (tester) async {
+  testWidgets("owner can remove a member, not themselves", (tester) async {
     final homes = MockHomeService();
     final invites = MockInviteService();
 
-    when(() => homes.listMembers(any())).thenAnswer((_) async => const []);
-    when(() => invites.listPending(any())).thenAnswer(
+    when(() => homes.listMembers(any())).thenAnswer(
       (_) async => const [
-        HomeInvite(id: "inv-1", email: "family@gmail.com", status: "pending"),
+        HomeMember(
+          userId: "u1",
+          role: "owner",
+          displayName: "An",
+          email: "an@example.com",
+        ),
+        HomeMember(
+          userId: "u2",
+          role: "member",
+          displayName: "Bình",
+          email: "binh@example.com",
+        ),
       ],
     );
-    when(() => invites.createOrGetJoinLink(any())).thenAnswer(
-      (_) async => HomeJoinLink(
-        token: "tok",
-        homeId: "h1",
-        expiresAt: DateTime(2026, 9, 8),
+    when(
+      () => invites.createOrGetJoinLink(any()),
+    ).thenAnswer((_) async => _joinLink);
+    when(
+      () => homes.removeMember(
+        homeId: any(named: "homeId"),
+        userId: any(named: "userId"),
       ),
-    );
+    ).thenAnswer((_) async {});
 
     tester.view.physicalSize = const Size(390, 2000);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
-      MaterialApp(
-        theme: AppTheme.build(
-          brightness: Brightness.light,
-          accent: AppAccent.amber,
-        ),
-        home: SettingsMembersPage(
+      _wrap(
+        SettingsMembersPage(
           home: _home,
           homesApi: homes,
           invites: invites,
+          currentUserId: "u1",
           joinShareUrl: "https://example.test/home-manager/",
         ),
       ),
     );
     await tester.pumpAndSettle();
 
-    expect(find.text("family@gmail.com"), findsOneWidget);
-    expect(find.text(S.pendingInviteHint), findsOneWidget);
-    expect(find.byIcon(Icons.refresh), findsNothing);
-    expect(find.byIcon(Icons.close), findsOneWidget);
+    expect(find.byTooltip(S.removeMember), findsOneWidget);
+
+    await tester.tap(find.byTooltip(S.removeMember));
+    await tester.pumpAndSettle();
+
+    expect(find.text(S.removeMemberTitle), findsOneWidget);
+    expect(find.text(S.removeMemberConfirmHint("Bình")), findsOneWidget);
+
+    await tester.tap(find.widgetWithText(FilledButton, S.removeMember));
+    await tester.pumpAndSettle();
+
+    verify(() => homes.removeMember(homeId: "h1", userId: "u2")).called(1);
   });
 }

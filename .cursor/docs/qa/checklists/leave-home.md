@@ -8,15 +8,15 @@ Thành viên tự rời nhà; giữ chi tiêu / thu nhập / hoá đơn. Chủ n
 
 ## Scope
 
-- In scope: RPC `leave_home`, soft-delete `left_at`, sheet trên Cá nhân, rejoin = member, reminder push bỏ người đã rời.
-- Out of scope: chủ nhà đuổi thành viên; chuyển quyền mà không rời; xóa/gán lại chi tiêu.
+- In scope: RPC `leave_home`, soft-delete `left_at`, sheet trên Nhà đang quản lý, rejoin = member, reminder push bỏ người đã rời.
+- Out of scope: chuyển quyền mà không rời; xóa/gán lại chi tiêu.
 
 ## Files (from CODEBASE_MAP)
 
 - `supabase/migrations/20260827100000_leave_home.sql`
 - `lib/core/services/home_service.dart`
+- `lib/features/personal/managed_home_page.dart`
 - `lib/features/personal/leave_home_sheet.dart`
-- `lib/features/personal/personal_hub_page.dart`
 - `supabase/functions/send-reminder-push/index.ts`
 
 ## Functional checklist

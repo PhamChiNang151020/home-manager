@@ -1,6 +1,5 @@
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
-import "package:home_manager/core/domain/invite_email.dart";
 import "package:home_manager/core/domain/join_link.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/models/home.dart";
@@ -12,7 +11,6 @@ import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/core/theme/mobile_viewport.dart";
 import "package:home_manager/features/shared/app_loading.dart";
 import "package:home_manager/features/shared/app_toast.dart";
-import "package:home_manager/features/shared/labeled_text_field.dart";
 import "package:home_manager/features/shared/section_header.dart";
 import "package:qr_flutter/qr_flutter.dart";
 
@@ -22,12 +20,14 @@ class SettingsMembersPage extends StatefulWidget {
     required this.home,
     required this.homesApi,
     required this.invites,
+    this.currentUserId,
     this.joinShareUrl,
   });
 
   final Home home;
   final HomeService homesApi;
   final InviteService invites;
+  final String? currentUserId;
   final String? joinShareUrl;
 
   @override
@@ -35,102 +35,69 @@ class SettingsMembersPage extends StatefulWidget {
 }
 
 class _SettingsMembersPageState extends State<SettingsMembersPage> {
-  final _inviteEmail = TextEditingController();
   List<HomeMember> _members = [];
-  List<HomeInvite> _pending = [];
   HomeJoinLink? _joinLink;
   String? _error;
-  bool _sending = false;
+  bool _joinLoading = false;
   bool _joinBusy = false;
+  bool _removing = false;
 
   @override
   void initState() {
     super.initState();
+    _joinLoading = widget.home.isOwner;
     _load();
-  }
-
-  @override
-  void dispose() {
-    _inviteEmail.dispose();
-    super.dispose();
   }
 
   String get _shareBase => widget.joinShareUrl ?? currentPwaShareUrl();
 
   Future<void> _load() async {
+    final membersTask = widget.homesApi.listMembers(widget.home.id);
+    final joinTask =
+        widget.home.isOwner
+            ? widget.invites.createOrGetJoinLink(widget.home.id)
+            : Future<HomeJoinLink?>.value(null);
+
     try {
-      final members = await widget.homesApi.listMembers(widget.home.id);
-      final pending =
-          widget.home.isOwner
-              ? await widget.invites.listPending(widget.home.id)
-              : <HomeInvite>[];
-      HomeJoinLink? joinLink;
-      if (widget.home.isOwner) {
-        joinLink = await widget.invites.createOrGetJoinLink(widget.home.id);
-      }
+      final members = await membersTask;
       if (mounted) {
         setState(() {
           _members = members;
-          _pending = pending;
-          _joinLink = joinLink;
           _error = null;
         });
       }
     } catch (e) {
       if (mounted) setState(() => _error = "$e");
     }
-  }
 
-  Future<void> _sendInvite() async {
-    final email = _inviteEmail.text.trim();
-    final reject = InviteEmail.reject(
-      email: email,
-      memberEmails: _members.map((m) => m.email),
-      pendingEmails: _pending.map((i) => i.email),
-    );
-    if (reject != null) {
-      setState(() => _error = _inviteRejectMessage(reject));
-      return;
-    }
-    setState(() {
-      _sending = true;
-      _error = null;
-    });
     try {
-      await widget.invites.invite(homeId: widget.home.id, email: email);
-      _inviteEmail.clear();
-      await _load();
+      final joinLink = await joinTask;
       if (mounted) {
-        showAppToast(context, S.toastInviteSent);
+        setState(() {
+          _joinLink = joinLink;
+          _joinLoading = false;
+        });
       }
     } catch (e) {
-      if (mounted) setState(() => _error = _rpcInviteError("$e"));
-    } finally {
-      if (mounted) setState(() => _sending = false);
+      if (mounted) {
+        setState(() {
+          _joinLoading = false;
+          _error = "$e";
+        });
+      }
     }
   }
 
-  String _inviteRejectMessage(InviteEmailReject reject) {
-    return switch (reject) {
-      InviteEmailReject.empty ||
-      InviteEmailReject.invalid => S.inviteInvalidEmail,
-      InviteEmailReject.alreadyMember => S.inviteAlreadyMember,
-      InviteEmailReject.alreadyPending => S.inviteAlreadyPending,
-    };
-  }
-
-  String _rpcInviteError(String raw) {
+  String _removeError(String raw) {
     final lower = raw.toLowerCase();
-    if (lower.contains("already a member") ||
-        lower.contains("cannot invite yourself")) {
-      return S.inviteAlreadyMember;
+    if (lower.contains("cannot remove yourself")) {
+      return S.removeMemberSelf;
     }
-    if (lower.contains("home_invites_pending_email") ||
-        lower.contains("duplicate")) {
-      return S.inviteAlreadyPending;
+    if (lower.contains("cannot remove") && lower.contains("owner")) {
+      return S.removeMemberOwner;
     }
-    if (lower.contains("invalid email")) {
-      return S.inviteInvalidEmail;
+    if (lower.contains("only owner")) {
+      return S.roleOwnerOnly;
     }
     return raw;
   }
@@ -180,13 +147,14 @@ class _SettingsMembersPageState extends State<SettingsMembersPage> {
     showAppToast(context, S.joinQrCopied);
   }
 
-  Future<void> _cancelInvite(HomeInvite invite) async {
+  Future<void> _removeMember(HomeMember member) async {
+    final label = member.displayName ?? member.email ?? member.userId;
     final confirmed = await showDialog<bool>(
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text(S.cancelInvite),
-            content: Text("${S.cancelInviteConfirm} ${invite.email}?"),
+            title: const Text(S.removeMemberTitle),
+            content: Text(S.removeMemberConfirmHint(label)),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
@@ -197,24 +165,34 @@ class _SettingsMembersPageState extends State<SettingsMembersPage> {
                 style: FilledButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.error,
                 ),
-                child: const Text(S.delete),
+                child: const Text(S.removeMember),
               ),
             ],
           ),
     );
     if (confirmed != true || !mounted) return;
+    setState(() {
+      _removing = true;
+      _error = null;
+    });
     try {
-      await widget.invites.cancel(invite.id);
-      await _load();
+      await widget.homesApi.removeMember(
+        homeId: widget.home.id,
+        userId: member.userId,
+      );
+      final members = await widget.homesApi.listMembers(widget.home.id);
       if (mounted) {
+        setState(() => _members = members);
         showAppToast(
           context,
-          S.toastInviteCancelled,
+          S.toastMemberRemoved,
           kind: AppToastKind.destructive,
         );
       }
     } catch (e) {
-      if (mounted) setState(() => _error = "$e");
+      if (mounted) setState(() => _error = _removeError("$e"));
+    } finally {
+      if (mounted) setState(() => _removing = false);
     }
   }
 
@@ -231,7 +209,7 @@ class _SettingsMembersPageState extends State<SettingsMembersPage> {
             );
 
     return LoadingOverlay(
-      loading: _sending || _joinBusy,
+      loading: _joinBusy || _removing,
       child: Scaffold(
         appBar: AppBar(title: const Text(S.settingsMembers)),
         body: MobileViewport(
@@ -239,10 +217,20 @@ class _SettingsMembersPageState extends State<SettingsMembersPage> {
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
             children: [
               const SectionHeader(title: S.members),
-              for (final member in _members) _MemberTile(member: member),
+              for (final member in _members)
+                _MemberTile(
+                  member: member,
+                  canRemove:
+                      owner &&
+                      member.userId != widget.currentUserId &&
+                      member.role != "owner",
+                  onRemove: () => _removeMember(member),
+                ),
               if (owner) ...[
                 const SectionHeader(title: S.joinQrTitle),
-                if (joinUrl != null)
+                if (_joinLoading)
+                  const JoinQrPlaceholder()
+                else if (joinUrl != null)
                   JoinQrSection(
                     joinUrl: joinUrl,
                     expiresAt: _joinLink!.expiresAt,
@@ -259,39 +247,6 @@ class _SettingsMembersPageState extends State<SettingsMembersPage> {
                       child: const Text(S.joinQrCreate),
                     ),
                   ),
-                const SectionHeader(title: S.invite),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                  child: Text(
-                    S.inviteScopeHint,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: colors.textSecondary,
-                    ),
-                  ),
-                ),
-                LabeledTextField(
-                  label: S.inviteEmail,
-                  controller: _inviteEmail,
-                  keyboardType: TextInputType.emailAddress,
-                  hint: "example@gmail.com",
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    onPressed: _sending ? null : _sendInvite,
-                    icon: const Icon(Icons.send_outlined, size: 18),
-                    label: const Text(S.sendInvite),
-                  ),
-                ),
-                if (_pending.isNotEmpty) ...[
-                  const SectionHeader(title: S.pendingInvites),
-                  for (final invite in _pending)
-                    _PendingInviteTile(
-                      invite: invite,
-                      onCancel: () => _cancelInvite(invite),
-                    ),
-                ],
               ],
               if (_error != null)
                 Padding(
@@ -302,6 +257,48 @@ class _SettingsMembersPageState extends State<SettingsMembersPage> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class JoinQrPlaceholder extends StatelessWidget {
+  const JoinQrPlaceholder({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          S.joinQrHint,
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: colors.textSecondary),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        Center(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+            ),
+            child: const SizedBox(
+              width: 220 + AppSpacing.md * 2,
+              height: 220 + AppSpacing.md * 2,
+              child: Center(child: AppLoader.compact()),
+            ),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        Text(
+          S.joinQrLoading,
+          textAlign: TextAlign.center,
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: colors.textMuted),
+        ),
+      ],
     );
   }
 }
@@ -391,8 +388,15 @@ class JoinQrSection extends StatelessWidget {
 }
 
 class _MemberTile extends StatelessWidget {
-  const _MemberTile({required this.member});
+  const _MemberTile({
+    required this.member,
+    required this.canRemove,
+    required this.onRemove,
+  });
+
   final HomeMember member;
+  final bool canRemove;
+  final VoidCallback onRemove;
 
   @override
   Widget build(BuildContext context) {
@@ -415,58 +419,35 @@ class _MemberTile extends StatelessWidget {
       ),
       title: Text(label),
       subtitle: sub != null ? Text(sub) : null,
-      trailing: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.sm,
-          vertical: AppSpacing.xs,
-        ),
-        decoration: BoxDecoration(
-          color: isOwner ? colors.accentMuted() : colors.bgElevated,
-          borderRadius: BorderRadius.circular(AppSpacing.sm),
-        ),
-        child: Text(
-          isOwner ? S.owner : S.member,
-          style: TextStyle(
-            color: isOwner ? colors.accent : colors.textSecondary,
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (canRemove)
+            IconButton(
+              onPressed: onRemove,
+              icon: const Icon(Icons.person_remove_rounded),
+              tooltip: S.removeMember,
+              color: colors.error,
+            ),
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: AppSpacing.xs,
+            ),
+            decoration: BoxDecoration(
+              color: isOwner ? colors.accentMuted() : colors.bgElevated,
+              borderRadius: BorderRadius.circular(AppSpacing.sm),
+            ),
+            child: Text(
+              isOwner ? S.owner : S.member,
+              style: TextStyle(
+                color: isOwner ? colors.accent : colors.textSecondary,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _PendingInviteTile extends StatelessWidget {
-  const _PendingInviteTile({required this.invite, required this.onCancel});
-
-  final HomeInvite invite;
-  final VoidCallback onCancel;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.appColors;
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: CircleAvatar(
-        backgroundColor: colors.bgElevated,
-        child: Icon(
-          Icons.hourglass_empty,
-          color: colors.textSecondary,
-          size: 18,
-        ),
-      ),
-      title: Text(invite.email),
-      subtitle: Text(
-        S.pendingInviteHint,
-        style: TextStyle(color: colors.textMuted, fontSize: 12),
-      ),
-      trailing: IconButton(
-        onPressed: onCancel,
-        icon: const Icon(Icons.close),
-        iconSize: 18,
-        color: colors.textSecondary,
-        tooltip: S.cancelInvite,
+        ],
       ),
     );
   }

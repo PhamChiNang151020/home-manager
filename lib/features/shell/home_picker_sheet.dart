@@ -16,7 +16,6 @@ Future<void> showHomePickerSheet({
     context: context,
     isScrollControlled: false,
     builder: (context) {
-      final colors = context.appColors;
       return SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(
@@ -31,30 +30,14 @@ Future<void> showHomePickerSheet({
             children: [
               Text(S.switchHome, style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: AppSpacing.md),
-              for (final home in homes)
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: Icon(
-                    home.id == selected?.id
-                        ? Icons.radio_button_checked
-                        : Icons.radio_button_off,
-                    color:
-                        home.id == selected?.id
-                            ? colors.accent
-                            : colors.textMuted,
-                  ),
-                  title: Text(home.name),
-                  onTap: () {
-                    Navigator.pop(context);
-                    onSelected(home);
-                  },
-                ),
-              const Divider(),
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: Icon(Icons.add_home_outlined, color: colors.accent),
-                title: const Text(S.addHome),
-                onTap: () {
+              HomePickerList(
+                homes: homes,
+                selected: selected,
+                onSelected: (home) {
+                  Navigator.pop(context);
+                  onSelected(home);
+                },
+                onAddHome: () {
                   Navigator.pop(context);
                   onAddHome();
                 },
@@ -65,4 +48,49 @@ Future<void> showHomePickerSheet({
       );
     },
   );
+}
+
+class HomePickerList extends StatelessWidget {
+  const HomePickerList({
+    super.key,
+    required this.homes,
+    required this.selected,
+    required this.onSelected,
+    required this.onAddHome,
+  });
+
+  final List<Home> homes;
+  final Home? selected;
+  final ValueChanged<Home> onSelected;
+  final VoidCallback onAddHome;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (final home in homes)
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: Icon(
+              home.id == selected?.id
+                  ? Icons.radio_button_checked
+                  : Icons.radio_button_off,
+              color: home.id == selected?.id ? colors.accent : colors.textMuted,
+            ),
+            title: Text(home.name),
+            onTap: () => onSelected(home),
+          ),
+        if (homes.isNotEmpty) const Divider(),
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: Icon(Icons.add_home_outlined, color: colors.accent),
+          title: const Text(S.addHome),
+          onTap: onAddHome,
+        ),
+      ],
+    );
+  }
 }
