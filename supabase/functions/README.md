@@ -29,14 +29,28 @@ Dashboard → Deploy function named **`send-reminder-push`** from
 [`send-reminder-push/index.ts`](send-reminder-push/index.ts), or:
 
 ```bash
-supabase functions deploy send-reminder-push
+supabase functions deploy send-reminder-push --no-verify-jwt
 ```
+
+`supabase/config.toml` sets `verify_jwt = false` for this function. GitHub
+Actions still send the **anon JWT** in `Authorization` plus `x-cron-secret`,
+so a leftover Verify JWT toggle does not 401 the cron.
 
 ### GitHub Actions secrets
 
 - `SUPABASE_URL` (already present)
+- `SUPABASE_ANON_KEY` (already used by Pages deploy)
 - `CRON_SECRET` (must match Edge secret)
 
 ### Manual run
 
-Actions → **Daily reminder push** → Run workflow, or `curl` with `Authorization: Bearer $CRON_SECRET`.
+Actions → **Daily reminder push** → Run workflow, or:
+
+```bash
+curl -X POST "$SUPABASE_URL/functions/v1/send-reminder-push" \
+  -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+  -H "apikey: $SUPABASE_ANON_KEY" \
+  -H "x-cron-secret: $CRON_SECRET" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
