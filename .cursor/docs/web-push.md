@@ -55,12 +55,14 @@ Token không hiện trên UI người dùng.
 | Secret | Purpose |
 |--------|---------|
 | `SUPABASE_URL` | Already used by Pages deploy |
-| `CRON_SECRET` | Same value as Supabase Edge `CRON_SECRET` |
+| `SUPABASE_ANON_KEY` | Gateway JWT (`Authorization` + `apikey`) |
+| `CRON_SECRET` | Same value as Supabase Edge `CRON_SECRET` (`x-cron-secret`) |
 
 ### Deploy function
 
 Dashboard → Edge Functions → create **`send-reminder-push`** → paste `index.ts` → Deploy.
-Or: `supabase functions deploy send-reminder-push`
+Turn **Verify JWT** off (or deploy with `--no-verify-jwt`).
+Or: `supabase functions deploy send-reminder-push --no-verify-jwt`
 
 ### Manual test
 
@@ -68,9 +70,13 @@ GitHub Actions → **Daily reminder push** → Run workflow. Or:
 
 ```bash
 curl -X POST "$SUPABASE_URL/functions/v1/send-reminder-push" \
-  -H "Authorization: Bearer $CRON_SECRET" \
+  -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+  -H "apikey: $SUPABASE_ANON_KEY" \
+  -H "x-cron-secret: $CRON_SECRET" \
   -H "Content-Type: application/json" \
   -d '{}'
 ```
+
+If the function returns **401** with `Invalid JWT`, the gateway is still verifying JWT and the request used `CRON_SECRET` as Bearer. Use the anon key as above, or Dashboard → Edge Functions → `send-reminder-push` → turn **Verify JWT** off, then redeploy.
 
 Set a home’s schedule day to **today (VN)** and ensure the user saved an FCM token first.

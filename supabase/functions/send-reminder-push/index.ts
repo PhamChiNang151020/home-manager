@@ -1,5 +1,7 @@
 // Reminder push (daily cron) + broadcast push (e.g. new app version after deploy).
-// Auth: Authorization Bearer CRON_SECRET
+// Auth: Bearer CRON_SECRET, or x-cron-secret (GitHub Actions also sends the
+// anon JWT in Authorization so the gateway accepts the call when Verify JWT
+// is on).
 // Secrets: CRON_SECRET, FIREBASE_SERVICE_ACCOUNT_JSON, FIREBASE_PROJECT_ID
 // (plus auto SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY).
 //
@@ -14,7 +16,7 @@ import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.49.1
 const corsHeaders: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+    "authorization, x-client-info, apikey, content-type, x-cron-secret",
 };
 
 type ServiceAccount = {
@@ -38,11 +40,7 @@ Deno.serve(async (req) => {
 
   try {
     const cronSecret = Deno.env.get("CRON_SECRET") ?? "";
-    const authHeader = req.headers.get("Authorization") ?? "";
-    const bearer = authHeader.startsWith("Bearer ")
-      ? authHeader.slice("Bearer ".length).trim()
-      : "";
-    if (!cronSecret || bearer !== cronSecret) {
+    if (!isCronAuthorized(req, cronSecret)) {
       return json({ error: "unauthorized" }, 401);
     }
 
@@ -354,6 +352,16 @@ async function sendFcm(
     const text = await res.text();
     throw new Error(`FCM ${res.status}: ${text}`);
   }
+}
+
+function isCronAuthorized(req: Request, cronSecret: string): boolean {
+  if (!cronSecret) return false;
+  const authHeader = req.headers.get("Authorization") ?? "";
+  const bearer = authHeader.startsWith("Bearer ")
+    ? authHeader.slice("Bearer ".length).trim()
+    : "";
+  const headerSecret = (req.headers.get("x-cron-secret") ?? "").trim();
+  return bearer === cronSecret || headerSecret === cronSecret;
 }
 
 function json(body: unknown, status = 200): Response {

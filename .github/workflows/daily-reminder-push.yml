@@ -13,15 +13,26 @@ jobs:
       - name: Invoke send-reminder-push
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
           set -euo pipefail
-          if [ -z "${SUPABASE_URL}" ] || [ -z "${CRON_SECRET}" ]; then
-            echo "Missing SUPABASE_URL or CRON_SECRET"
+          if [ -z "${SUPABASE_URL}" ] || [ -z "${SUPABASE_ANON_KEY}" ] || [ -z "${CRON_SECRET}" ]; then
+            echo "Missing SUPABASE_URL, SUPABASE_ANON_KEY, or CRON_SECRET"
             exit 1
           fi
           BASE="${SUPABASE_URL%/}"
-          curl -fsS -X POST "${BASE}/functions/v1/send-reminder-push" \
-            -H "Authorization: Bearer ${CRON_SECRET}" \
+          HTTP_CODE=$(curl -sS -o /tmp/push-body.txt -w "%{http_code}" \
+            -X POST "${BASE}/functions/v1/send-reminder-push" \
+            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}" \
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
+            -H "x-cron-secret: ${CRON_SECRET}" \
             -H "Content-Type: application/json" \
-            --data '{}'
+            --data '{}')
+          echo "HTTP ${HTTP_CODE}"
+          cat /tmp/push-body.txt
+          echo
+          case "${HTTP_CODE}" in
+            2??) ;;
+            *) exit 1 ;;
+          esac

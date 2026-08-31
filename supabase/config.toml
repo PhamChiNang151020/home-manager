@@ -1,0 +1,5 @@
+# Minimal config so `supabase functions deploy` can turn off gateway JWT
+# verification. The function still requires CRON_SECRET.
+
+[functions.send-reminder-push]
+verify_jwt = false
