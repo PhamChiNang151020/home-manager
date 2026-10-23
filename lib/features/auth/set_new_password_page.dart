@@ -169,7 +169,7 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                             color: colors.textPrimary,
                           ),
                         ),
-                        Container(height: AppSpacing.xs),
+                        Container(height: 8),
                         FittedBox(
                           fit: BoxFit.scaleDown,
                           child: RichText(
@@ -191,11 +191,11 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                             ),
                           ),
                         ),
-                        Container(height: AppSpacing.md),
+                        Container(height: 17),
                         _buildPasswordField(colors),
-                        Container(height: AppSpacing.md),
+                        Container(height: 15),
                         _buildConfirmPasswordField(colors),
-                        Container(height: 12),
+                        Container(height: 0),
                         if (_generalError != null) ...[
                           Container(height: AppSpacing.sm),
                           Text(
@@ -334,11 +334,12 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
           alignment: Alignment.centerLeft,
           child: _passwordError != null
               ? Padding(
-                  padding: const EdgeInsets.only(top: 4),
+                  padding: EdgeInsets.zero,
                   child: Text(
                     _passwordError!,
                     style: TextStyle(
                       fontSize: 12,
+                      height: 1.33,
                       color: colors.error,
                     ),
                   ),
@@ -428,11 +429,12 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
           alignment: Alignment.centerLeft,
           child: _confirmPasswordError != null
               ? Padding(
-                  padding: const EdgeInsets.only(top: 4),
+                  padding: EdgeInsets.zero,
                   child: Text(
                     _confirmPasswordError!,
                     style: TextStyle(
                       fontSize: 12,
+                      height: 1.33,
                       color: colors.error,
                     ),
                   ),

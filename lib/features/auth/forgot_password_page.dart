@@ -179,9 +179,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             letterSpacing: 0,
           ),
         ),
-        Container(height: AppSpacing.md),
+        Container(height: 14),
         _buildEmailField(colors),
-        Container(height: 20),
+        Container(height: 8),
         ConstrainedBox(
           constraints: const BoxConstraints(minHeight: 48, maxHeight: 48),
           child: FilledButton(
@@ -215,6 +215,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
+        Container(height: 8),
         Center(
           child: Container(
             width: 56,
@@ -230,7 +231,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             ),
           ),
         ),
-        Container(height: AppSpacing.md),
+        Container(height: 14),
         Text(
           S.resetLinkSentTitle,
           textAlign: TextAlign.center,
@@ -254,7 +255,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             children: _buildResetMessageSpans(colors),
           ),
         ),
-        Container(height: AppSpacing.lg),
+        Container(height: 8),
         ConstrainedBox(
           constraints: const BoxConstraints(minHeight: 48, maxHeight: 48),
           child: FilledButton(
@@ -300,7 +301,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
         style: TextButton.styleFrom(
           padding: EdgeInsets.zero,
-          minimumSize: const Size(0, 24),
+          minimumSize: const Size(0, 49),
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
         child: const Text(S.backToSignIn),
@@ -374,7 +375,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           alignment: Alignment.centerLeft,
           child: _emailError != null
               ? Padding(
-                  padding: const EdgeInsets.only(top: 4),
+                  padding: EdgeInsets.zero,
                   child: Text(
                     _emailError!,
                     style: TextStyle(

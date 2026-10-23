@@ -186,13 +186,13 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                             color: colors.textPrimary,
                           ),
                         ),
-                        Container(height: AppSpacing.md),
+                        Container(height: 14),
                         _buildEmailField(colors),
-                        Container(height: AppSpacing.md),
+                        Container(height: 15),
                         _buildPasswordField(colors),
-                        Container(height: AppSpacing.md),
+                        Container(height: 15),
                         _buildConfirmPasswordField(colors),
-                        Container(height: 12),
+                        Container(height: 8),
                         FilledButton(
                           onPressed: _isLoading ? null : _handleCreateAccount,
                           style: authButtonStyle(context),
@@ -215,8 +215,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                                 )
                               : const Text(S.createAccount),
                         ),
-                        Container(height: AppSpacing.md),
-                        _buildSignInFooter(colors),
+                        Container(height: 8),
+                        SizedBox(height: 48, child: Center(child: _buildSignInFooter(colors))),
                       ],
                     ),
                   ),
@@ -236,7 +236,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
         style: TextButton.styleFrom(
           padding: EdgeInsets.zero,
-          minimumSize: const Size(0, 24),
+          minimumSize: const Size(0, 49),
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
         child: const Text(S.backToSignIn),
@@ -310,11 +310,12 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           alignment: Alignment.centerLeft,
           child: _emailError != null
               ? Padding(
-                  padding: const EdgeInsets.only(top: 4),
+                  padding: EdgeInsets.zero,
                   child: Text(
                     _emailError!,
                     style: TextStyle(
                       fontSize: 12,
+                      height: 1.33,
                       color: colors.error,
                     ),
                   ),
@@ -405,11 +406,12 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           alignment: Alignment.centerLeft,
           child: _passwordError != null
               ? Padding(
-                  padding: const EdgeInsets.only(top: 4),
+                  padding: EdgeInsets.zero,
                   child: Text(
                     _passwordError!,
                     style: TextStyle(
                       fontSize: 12,
+                      height: 1.33,
                       color: colors.error,
                     ),
                   ),
@@ -499,11 +501,12 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           alignment: Alignment.centerLeft,
           child: _confirmPasswordError != null
               ? Padding(
-                  padding: const EdgeInsets.only(top: 4),
+                  padding: EdgeInsets.zero,
                   child: Text(
                     _confirmPasswordError!,
                     style: TextStyle(
                       fontSize: 12,
+                      height: 1.33,
                       color: colors.error,
                     ),
                   ),

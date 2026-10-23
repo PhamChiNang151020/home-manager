@@ -123,7 +123,7 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
-        SizedBox(height: AppSpacing.md),
+        SizedBox(height: 8),
         Text(
           S.signInHint,
           textAlign: TextAlign.center,
@@ -133,9 +133,9 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
             height: 1.4,
           ),
         ),
-        SizedBox(height: 20),
+        SizedBox(height: 16),
         _buildEmailField(colors),
-        SizedBox(height: AppSpacing.md),
+        SizedBox(height: 15),
         _buildPasswordField(colors),
         SizedBox(
           height: 36,
@@ -183,8 +183,8 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
           child: Center(child: _buildDivider(colors)),
         ),
         _buildGoogleButton(colors),
-        SizedBox(height: AppSpacing.md),
-        _buildCreateAccountFooter(colors),
+        SizedBox(height: 8),
+        SizedBox(height: 48, child: Center(child: _buildCreateAccountFooter(colors))),
       ],
     );
   }
