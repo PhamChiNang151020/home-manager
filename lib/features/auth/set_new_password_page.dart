@@ -5,8 +5,8 @@ import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/core/theme/mobile_viewport.dart";
 import "package:home_manager/features/shared/app_brand_logo.dart";
-import "package:home_manager/features/shared/app_card.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
+import "package:home_manager/features/shared/auth_card.dart";
 
 class SetNewPasswordPage extends StatefulWidget {
   const SetNewPasswordPage({
@@ -50,7 +50,9 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
 
     setState(() {
       _passwordError = null;
+      _passwordFocusNode.requestFocus();
       _confirmPasswordError = null;
+      _confirmPasswordFocusNode.requestFocus();
       _generalError = null;
     });
 
@@ -59,6 +61,7 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
     if (password.length < 8) {
       setState(() {
         _passwordError = S.errorPasswordTooShort;
+      _passwordFocusNode.requestFocus();
       });
       hasError = true;
     }
@@ -66,6 +69,7 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
     if (password != confirmPassword) {
       setState(() {
         _confirmPasswordError = S.errorPasswordMismatch;
+      _confirmPasswordFocusNode.requestFocus();
       });
       hasError = true;
     }
@@ -87,6 +91,7 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
         } else if (e.message.contains("weak_password") ||
             e.message.contains("Password")) {
           _passwordError = S.errorPasswordTooShort;
+      _passwordFocusNode.requestFocus();
         } else if (e.message.contains("expired") ||
             e.message.contains("invalid") ||
             e.statusCode == "401") {
@@ -133,7 +138,7 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 child: MobileViewport(
-                  child: AppCard(
+                  child: AuthCard(
                     padding: const EdgeInsets.all(AppSpacing.lg),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -279,6 +284,7 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
             if (_passwordError != null) {
               setState(() {
                 _passwordError = null;
+      _passwordFocusNode.requestFocus();
               });
             }
           },
@@ -374,6 +380,7 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
             if (_confirmPasswordError != null) {
               setState(() {
                 _confirmPasswordError = null;
+      _confirmPasswordFocusNode.requestFocus();
               });
             }
           },

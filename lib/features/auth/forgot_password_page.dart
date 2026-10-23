@@ -5,8 +5,8 @@ import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/core/theme/mobile_viewport.dart";
 import "package:home_manager/features/shared/app_brand_logo.dart";
-import "package:home_manager/features/shared/app_card.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
+import "package:home_manager/features/shared/auth_card.dart";
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({
@@ -118,7 +118,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 child: MobileViewport(
-                  child: AppCard(
+                  child: AuthCard(
                     padding: const EdgeInsets.all(AppSpacing.lg),
                     child: _emailSent
                         ? _buildSuccessView(colors)

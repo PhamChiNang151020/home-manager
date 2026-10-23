@@ -169,11 +169,12 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
               : const Text(S.signIn),
         ),
         ),
-        SizedBox(height: AppSpacing.lg),
-        _buildDivider(colors),
-        SizedBox(height: AppSpacing.lg),
+        SizedBox(
+          height: 40,
+          child: Center(child: _buildDivider(colors)),
+        ),
         _buildGoogleButton(colors),
-        SizedBox(height: AppSpacing.sm),
+        SizedBox(height: AppSpacing.md),
         _buildCreateAccountFooter(colors),
       ],
     );
