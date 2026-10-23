@@ -1,16 +1,24 @@
 import "package:flutter/material.dart";
 import "package:home_manager/core/l10n/strings.dart";
+import "package:home_manager/core/services/auth_service.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/core/theme/mobile_viewport.dart";
+import "package:home_manager/features/auth/create_account_page.dart";
+import "package:home_manager/features/auth/email_password_sign_in_form.dart";
+import "package:home_manager/features/auth/forgot_password_page.dart";
 import "package:home_manager/features/pwa/install_home_screen_banner.dart";
 import "package:home_manager/features/shared/app_brand_logo.dart";
 import "package:home_manager/features/shared/app_card.dart";
 
 class SignInPage extends StatelessWidget {
-  const SignInPage({super.key, required this.onGoogle, this.error});
+  const SignInPage({
+    super.key,
+    required this.authService,
+    this.error,
+  });
 
-  final VoidCallback onGoogle;
+  final AuthService authService;
   final String? error;
 
   @override
@@ -61,12 +69,6 @@ class SignInPage extends StatelessWidget {
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-                            const SizedBox(height: AppSpacing.sm),
-                            Text(
-                              S.signInHint,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(color: colors.textSecondary),
-                            ),
                             if (error != null) ...[
                               const SizedBox(height: AppSpacing.md),
                               Text(
@@ -75,11 +77,26 @@ class SignInPage extends StatelessWidget {
                                 style: TextStyle(color: colors.error),
                               ),
                             ],
-                            const SizedBox(height: AppSpacing.lg),
-                            FilledButton.icon(
-                              onPressed: onGoogle,
-                              icon: const Icon(Icons.login),
-                              label: const Text(S.signInGoogle),
+                            EmailPasswordSignInForm(
+                              authService: authService,
+                              onForgotPassword: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute<void>(
+                                    builder: (_) => ForgotPasswordPage(
+                                      authService: authService,
+                                    ),
+                                  ),
+                                );
+                              },
+                              onCreateAccount: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute<void>(
+                                    builder: (_) => CreateAccountPage(
+                                      authService: authService,
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
                           ],
                         ),

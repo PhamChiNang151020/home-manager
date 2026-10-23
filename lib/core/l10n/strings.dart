@@ -2,10 +2,62 @@ abstract final class S {
   static const appName = "Tổ Ấm";
   static const appTagline = "Giữ ấm tổ ấm, giữ vững chi tiêu";
   static const signInGoogle = "Đăng nhập bằng Google";
-  static const signInHint =
-      "Dùng tài khoản Google để đồng bộ điện với gia đình.";
+  static const signInHint = "Đăng nhập để đồng bộ dữ liệu với gia đình.";
   static const missingConfig =
       "Chưa cấu hình Supabase. Chạy với --dart-define=SUPABASE_URL và SUPABASE_ANON_KEY.";
+  
+  // Email/Password Auth
+  static const emailLabel = "Email";
+  static const emailPlaceholder = "ví dụ: ban@email.com";
+  static const passwordLabel = "Mật khẩu";
+  static const passwordPlaceholder = "••••••••";
+  static const passwordPlaceholder8 = "Ít nhất 8 ký tự";
+  static const passwordNewLabel = "Mật khẩu mới";
+  static const passwordConfirmLabel = "Nhập lại mật khẩu";
+  static const passwordConfirmPlaceholder = "Nhập lại mật khẩu mới";
+  static const forgotPassword = "Quên mật khẩu?";
+  static const signIn = "Đăng nhập";
+  static const signInLoading = "Đang đăng nhập…";
+  static const createAccount = "Tạo tài khoản";
+  static const createAccountLoading = "Đang tạo tài khoản…";
+  static const noAccount = "Chưa có tài khoản?";
+  static const hasAccount = "Đã có tài khoản?";
+  static const backToSignIn = "‹ Đăng nhập";
+  static const orDivider = "hoặc";
+  static const showPassword = "Hiện mật khẩu";
+  static const hidePassword = "Ẩn mật khẩu";
+  
+  // Error messages
+  static const errorInvalidEmail = "Email chưa đúng định dạng.";
+  static const errorInvalidCredentials = "Email hoặc mật khẩu chưa đúng.";
+  static const errorEmailExists =
+      "Email này đã có tài khoản. Hãy đăng nhập.";
+  static const errorPasswordTooShort = "Mật khẩu cần ít nhất 8 ký tự.";
+  static const errorPasswordMismatch = "Hai mật khẩu chưa khớp.";
+  static const errorNetwork =
+      "Không kết nối được. Kiểm tra mạng rồi thử lại.";
+  static const errorRateLimit = "Thử lại sau ít phút.";
+  static const errorGeneric = "Có lỗi xảy ra. Vui lòng thử lại.";
+  
+  // Forgot password
+  static const forgotPasswordTitle = "Quên mật khẩu";
+  static const forgotPasswordHint =
+      "Nhập email đã dùng để tạo tài khoản. Mình sẽ gửi link đặt lại mật khẩu.";
+  static const sendResetLink = "Gửi link đặt lại";
+  static const sendResetLinkLoading = "Đang gửi…";
+  static const resetLinkSentTitle = "Đã gửi link";
+  static String resetLinkSentMessage(String email) =>
+      "Nếu $email có tài khoản Tổ Ấm, link đặt lại mật khẩu sẽ tới trong vài phút.";
+  static const backToSignInButton = "Về Đăng nhập";
+  
+  // Set new password
+  static const setPasswordTitle = "Đặt mật khẩu mới";
+  static String setPasswordFor(String email) => "Cho tài khoản $email";
+  static const setPasswordButton = "Đặt mật khẩu";
+  static const setPasswordLoading = "Đang lưu…";
+  static const errorLinkExpired =
+      "Link đã hết hạn. Hãy gửi lại link đặt lại mật khẩu.";
+  static const errorSamePassword = "Mật khẩu mới phải khác mật khẩu cũ.";
   static const electricity = "Điện";
   static const water = "Nước";
   static const overview = "Tổng quan";
