@@ -66,6 +66,7 @@ class SignInPage extends StatelessWidget {
                                 context,
                               ).textTheme.titleSmall?.copyWith(
                                 color: colors.textSecondary,
+            letterSpacing: 0,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),

@@ -171,6 +171,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                             context,
                           ).textTheme.titleSmall?.copyWith(
                             color: colors.textSecondary,
+            letterSpacing: 0,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -202,13 +203,12 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                                       height: 18,
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2,
-                                        valueColor: AlwaysStoppedAnimation<Color>(
-                                          colors.bgBase,
+                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white,
                                         ),
                                       ),
                                     ),
                                     Container(width: 8),
-                                    Text(S.createAccountLoading),
+                                    Text(S.createAccountLoading, style: const TextStyle(color: Colors.white)),
                                   ],
                                 )
                               : const Text(S.createAccount),
@@ -253,6 +253,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             fontSize: 12,
             fontWeight: FontWeight.w600,
             color: colors.textSecondary,
+            letterSpacing: 0,
           ),
         ),
         Container(height: 4),
@@ -333,6 +334,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             fontSize: 12,
             fontWeight: FontWeight.w600,
             color: colors.textSecondary,
+            letterSpacing: 0,
           ),
         ),
         Container(height: 4),
@@ -427,6 +429,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             fontSize: 12,
             fontWeight: FontWeight.w600,
             color: colors.textSecondary,
+            letterSpacing: 0,
           ),
         ),
         Container(height: 4),
@@ -518,14 +521,17 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           style: TextStyle(
             fontSize: 14,
             color: colors.textSecondary,
+            letterSpacing: 0,
           ),
         ),
         Container(width: 4),
         TextButton(
-          onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
+          onPressed: _isLoading ? () {} : () => Navigator.of(context).pop(),
           style: TextButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: 8),
           ),
+            overlayColor: Colors.transparent,
+            splashFactory: NoSplash.splashFactory,
           child: const Text(S.signIn),
         ),
       ],

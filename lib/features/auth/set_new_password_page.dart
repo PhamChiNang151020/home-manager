@@ -154,6 +154,7 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                             context,
                           ).textTheme.titleSmall?.copyWith(
                             color: colors.textSecondary,
+            letterSpacing: 0,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -168,13 +169,24 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                           ),
                         ),
                         Container(height: AppSpacing.xs),
-                        Text(
-                          "Cho tài khoản ${widget.email}",
+                        RichText(
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontFamily: 'Nunito',
-                            color: colors.textSecondary,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          text: TextSpan(
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontFamily: 'Nunito',
+                              color: colors.textSecondary,
+                              letterSpacing: 0,
+                            ),
+                            children: [
+                              const TextSpan(text: "Cho tài khoản "),
+                              TextSpan(
+                                text: widget.email,
+                                style: const TextStyle(fontWeight: FontWeight.w700),
+                              ),
+                            ],
                           ),
                         ),
                         Container(height: AppSpacing.md),
@@ -216,13 +228,12 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                                       height: 18,
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2,
-                                        valueColor: AlwaysStoppedAnimation<Color>(
-                                          colors.bgBase,
+                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white,
                                         ),
                                       ),
                                     ),
                                     Container(width: 8),
-                                    Text(S.setPasswordLoading),
+                                    Text(S.setPasswordLoading, style: const TextStyle(color: Colors.white)),
                                   ],
                                 )
                               : const Text(S.setPasswordButton),
@@ -249,6 +260,7 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
             fontSize: 12,
             fontWeight: FontWeight.w600,
             color: colors.textSecondary,
+            letterSpacing: 0,
           ),
         ),
         Container(height: 4),
@@ -343,6 +355,7 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
             fontSize: 12,
             fontWeight: FontWeight.w600,
             color: colors.textSecondary,
+            letterSpacing: 0,
           ),
         ),
         Container(height: 4),

@@ -125,6 +125,7 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: colors.textSecondary,
+            letterSpacing: 0,
           ),
         ),
         SizedBox(height: AppSpacing.md),
@@ -155,13 +156,12 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
                       height: 18,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          colors.bgBase,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white,
                         ),
                       ),
                     ),
                     const SizedBox(width: 8),
-                    Text(S.signInLoading),
+                    Text(S.signInLoading, style: const TextStyle(color: Colors.white)),
                   ],
                 )
               : const Text(S.signIn),
@@ -186,6 +186,7 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
             fontSize: 12,
             fontWeight: FontWeight.w600,
             color: colors.textSecondary,
+            letterSpacing: 0,
           ),
         ),
         SizedBox(height: 4),
@@ -263,6 +264,7 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
             fontSize: 12,
             fontWeight: FontWeight.w600,
             color: colors.textSecondary,
+            letterSpacing: 0,
           ),
         ),
         SizedBox(height: 4),
@@ -396,6 +398,7 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
           style: TextStyle(
             fontSize: 14,
             color: colors.textSecondary,
+            letterSpacing: 0,
           ),
         ),
         const SizedBox(width: 4),

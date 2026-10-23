@@ -154,6 +154,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             context,
           ).textTheme.titleSmall?.copyWith(
             color: colors.textSecondary,
+            letterSpacing: 0,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -174,6 +175,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           style: TextStyle(
             fontSize: 14,
             color: colors.textSecondary,
+            letterSpacing: 0,
           ),
         ),
         Container(height: AppSpacing.md),
@@ -190,13 +192,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       height: 18,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          colors.bgBase,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white,
                         ),
                       ),
                     ),
                     Container(width: 8),
-                    Text(S.sendResetLinkLoading),
+                    Text(S.sendResetLinkLoading, style: const TextStyle(color: Colors.white)),
                   ],
                 )
               : const Text(S.sendResetLink),
@@ -244,6 +245,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               fontSize: 14,
               fontFamily: 'Nunito',
               color: colors.textSecondary,
+            letterSpacing: 0,
             ),
             children: _buildResetMessageSpans(colors),
           ),
@@ -310,6 +312,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             fontSize: 12,
             fontWeight: FontWeight.w600,
             color: colors.textSecondary,
+            letterSpacing: 0,
           ),
         ),
         Container(height: 4),
