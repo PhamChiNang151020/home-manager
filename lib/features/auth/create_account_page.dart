@@ -151,7 +151,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 child: MobileViewport(
                   child: AuthCard(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    padding: const EdgeInsets.fromLTRB(24, 17, 24, 24),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       mainAxisSize: MainAxisSize.min,
@@ -236,7 +236,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
         style: TextButton.styleFrom(
           padding: EdgeInsets.zero,
-          minimumSize: const Size(0, 49),
+          minimumSize: const Size(0, 48),
+          visualDensity: VisualDensity.standard,
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
         child: const Text(S.backToSignIn),

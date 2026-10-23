@@ -120,7 +120,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 child: MobileViewport(
                   child: AuthCard(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    padding: _emailSent ? const EdgeInsets.all(AppSpacing.lg) : const EdgeInsets.fromLTRB(24, 17, 24, 24),
                     child: _emailSent
                         ? _buildSuccessView(colors)
                         : _buildFormView(colors),
@@ -301,7 +301,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
         style: TextButton.styleFrom(
           padding: EdgeInsets.zero,
-          minimumSize: const Size(0, 49),
+          minimumSize: const Size(0, 48),
+          visualDensity: VisualDensity.standard,
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
         child: const Text(S.backToSignIn),
