@@ -309,8 +309,9 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
                 : null,
             suffixIcon: IconButton(
               icon: Icon(
-                _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
                 size: 20,
+                color: const Color(0xFF475569),
               ),
               onPressed: () {
                 setState(() {

@@ -140,13 +140,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       children: [
         _buildBackButton(colors),
         const Center(child: AppBrandLogo(size: 64)),
-        const SizedBox(height: AppSpacing.md),
+        const Container(height: AppSpacing.md),
         Text(
           S.appName,
           style: Theme.of(context).textTheme.headlineMedium,
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: AppSpacing.xs),
+        const Container(height: AppSpacing.xs),
         Text(
           S.appTagline,
           textAlign: TextAlign.center,
@@ -157,7 +157,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(height: AppSpacing.md),
+        const Container(height: AppSpacing.md),
         Text(
           S.forgotPasswordTitle,
           textAlign: TextAlign.center,
@@ -167,7 +167,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             color: colors.textPrimary,
           ),
         ),
-        const SizedBox(height: AppSpacing.sm),
+        const Container(height: AppSpacing.sm),
         Text(
           S.forgotPasswordHint,
           textAlign: TextAlign.center,
@@ -176,16 +176,16 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             color: colors.textSecondary,
           ),
         ),
-        const SizedBox(height: AppSpacing.md),
+        const Container(height: AppSpacing.md),
         _buildEmailField(colors),
-        const SizedBox(height: AppSpacing.sm),
+        const Container(height: AppSpacing.sm),
         FilledButton(
           onPressed: _isLoading ? null : _handleSendResetLink,
           child: _isLoading
               ? Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(
+                    Container(
                       width: 18,
                       height: 18,
                       child: CircularProgressIndicator(
@@ -195,7 +195,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const Container(width: 8),
                     Text(S.sendResetLinkLoading),
                   ],
                 )
@@ -225,28 +225,30 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             ),
           ),
         ),
-        const SizedBox(height: AppSpacing.md),
+        const Container(height: AppSpacing.md),
         Text(
           S.resetLinkSentTitle,
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w700,
+            fontFamily: 'Nunito',
             color: colors.textPrimary,
           ),
         ),
-        const SizedBox(height: AppSpacing.sm),
+        const Container(height: AppSpacing.sm),
         RichText(
           textAlign: TextAlign.center,
           text: TextSpan(
             style: TextStyle(
               fontSize: 14,
+              fontFamily: 'Nunito',
               color: colors.textSecondary,
             ),
             children: _buildResetMessageSpans(colors),
           ),
         ),
-        const SizedBox(height: AppSpacing.lg),
+        const Container(height: AppSpacing.lg),
         FilledButton(
           onPressed: () {
             Navigator.of(context).pop();
@@ -310,7 +312,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             color: colors.textSecondary,
           ),
         ),
-        const SizedBox(height: 4),
+        const Container(height: 4),
         TextField(
           controller: _emailController,
           focusNode: _emailFocusNode,
@@ -356,8 +358,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 : null,
           ),
         ),
-        SizedBox(
-          height: 16,
+        Container(
+          constraints: const BoxConstraints(minHeight: 20),
+          padding: const EdgeInsets.only(top: 4),
+          alignment: Alignment.centerLeft,
           child: _emailError != null
               ? Padding(
                   padding: const EdgeInsets.only(top: 4),

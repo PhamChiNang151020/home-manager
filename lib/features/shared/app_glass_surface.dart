@@ -158,7 +158,7 @@ class _LightPanel extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: colors.textPrimary.withValues(alpha: 0.08),
+            color: const Color(0xFF0F172A).withValues(alpha: 0.08),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
