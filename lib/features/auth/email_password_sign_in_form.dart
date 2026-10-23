@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:flutter_svg/flutter_svg.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/services/auth_service.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
@@ -380,7 +381,11 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
       onPressed: _isLoading ? null : () async {
         await widget.authService.signInWithGoogle();
       },
-      icon: const Icon(Icons.g_mobiledata, size: 20),
+      icon: SvgPicture.asset(
+        'assets/brand/google_logo_18.svg',
+        width: 18,
+        height: 18,
+      ),
       label: const Text(S.signInGoogle),
     );
   }
