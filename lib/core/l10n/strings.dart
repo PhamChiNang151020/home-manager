@@ -2,19 +2,20 @@ abstract final class S {
   static const appName = "Tổ Ấm";
   static const appTagline = "Giữ ấm tổ ấm, giữ vững chi tiêu";
   static const signInGoogle = "Đăng nhập bằng Google";
-  static const signInHint = "Đăng nhập để đồng bộ dữ liệu với gia đình.";
+  static const signInHint = "Đăng nhập để đồng bộ dữ liệu với gia\u00A0đình.";
   static const missingConfig =
       "Chưa cấu hình Supabase. Chạy với --dart-define=SUPABASE_URL và SUPABASE_ANON_KEY.";
   
   // Email/Password Auth
   static const emailLabel = "Email";
-  static const emailPlaceholder = "ví dụ: ban@email.com";
+  static const emailPlaceholder = "ban@email.com";
   static const passwordLabel = "Mật khẩu";
   static const passwordPlaceholder = "••••••••";
   static const passwordPlaceholder8 = "Ít nhất 8 ký tự";
   static const passwordNewLabel = "Mật khẩu mới";
-  static const passwordConfirmLabel = "Nhập lại mật khẩu";
-  static const passwordConfirmPlaceholder = "Nhập lại mật khẩu mới";
+  static const passwordConfirmLabel = "Nhập lại";
+  static const passwordConfirmPlaceholder = "Nhập lại mật khẩu";
+  static const passwordNewPlaceholder = "Ít nhất 8 ký tự";
   static const forgotPassword = "Quên mật khẩu?";
   static const signIn = "Đăng nhập";
   static const signInLoading = "Đang đăng nhập…";

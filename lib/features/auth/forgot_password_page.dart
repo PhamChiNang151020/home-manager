@@ -210,36 +210,19 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Center(child: AppBrandLogo(size: 64)),
-        const SizedBox(height: AppSpacing.md),
-        Text(
-          S.appName,
-          style: Theme.of(context).textTheme.headlineMedium,
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: AppSpacing.xs),
-        Text(
-          S.appTagline,
-          textAlign: TextAlign.center,
-          style: Theme.of(
-            context,
-          ).textTheme.titleSmall?.copyWith(
-            color: colors.textSecondary,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        Container(
-          width: 56,
-          height: 56,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: colors.accent.withValues(alpha: 0.12),
-          ),
-          child: Icon(
-            Icons.check,
-            size: 28,
-            color: colors.accent,
+        Center(
+          child: Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: colors.accent.withValues(alpha: 0.12),
+            ),
+            child: Icon(
+              Icons.check,
+              size: 28,
+              color: colors.accent,
+            ),
           ),
         ),
         const SizedBox(height: AppSpacing.md),
@@ -304,13 +287,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       alignment: Alignment.centerLeft,
       child: Transform.translate(
         offset: const Offset(-8, -8),
-        child: TextButton.icon(
+        child: TextButton(
           onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
-          icon: const Icon(Icons.chevron_left, size: 20),
-          label: const Text(S.backToSignIn),
           style: TextButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: 8),
           ),
+          child: const Text(S.backToSignIn),
         ),
       ),
     );

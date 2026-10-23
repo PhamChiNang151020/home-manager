@@ -194,7 +194,6 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
           focusNode: _emailFocusNode,
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.next,
-          enabled: !_isLoading,
           autofillHints: const [AutofillHints.email],
           onChanged: (_) {
             if (_emailError != null) {
@@ -235,17 +234,17 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
                 : null,
           ),
         ),
-        SizedBox(
-          height: 16,
+        Container(
+          constraints: const BoxConstraints(minHeight: 20),
+          padding: const EdgeInsets.only(top: 4),
+          alignment: Alignment.centerLeft,
           child: _emailError != null
-              ? Padding(
-                  padding: const EdgeInsets.only(top: 4),
-                  child: Text(
-                    _emailError!,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: colors.error,
-                    ),
+              ? Text(
+                  _emailError!,
+                  style: TextStyle(
+                    fontSize: 12,
+                    height: 1.33,
+                    color: colors.error,
                   ),
                 )
               : null,
@@ -272,7 +271,6 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
           focusNode: _passwordFocusNode,
           obscureText: _obscurePassword,
           textInputAction: TextInputAction.done,
-          enabled: !_isLoading,
           autofillHints: const [AutofillHints.password],
           onChanged: (_) {
             if (_passwordError != null) {
@@ -314,28 +312,26 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
                 _obscurePassword ? Icons.visibility : Icons.visibility_off,
                 size: 20,
               ),
-              onPressed: _isLoading
-                  ? null
-                  : () {
-                      setState(() {
-                        _obscurePassword = !_obscurePassword;
-                      });
-                    },
+              onPressed: () {
+                setState(() {
+                  _obscurePassword = !_obscurePassword;
+                });
+              },
               tooltip: _obscurePassword ? S.showPassword : S.hidePassword,
             ),
           ),
         ),
-        SizedBox(
-          height: 16,
+        Container(
+          constraints: const BoxConstraints(minHeight: 20),
+          padding: const EdgeInsets.only(top: 4),
+          alignment: Alignment.centerLeft,
           child: _passwordError != null
-              ? Padding(
-                  padding: const EdgeInsets.only(top: 4),
-                  child: Text(
-                    _passwordError!,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: colors.error,
-                    ),
+              ? Text(
+                  _passwordError!,
+                  style: TextStyle(
+                    fontSize: 12,
+                    height: 1.33,
+                    color: colors.error,
                   ),
                 )
               : null,
@@ -350,7 +346,7 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
       child: Transform.translate(
         offset: const Offset(0, -12),
         child: TextButton(
-          onPressed: _isLoading ? null : widget.onForgotPassword,
+          onPressed: widget.onForgotPassword,
           child: Text(S.forgotPassword),
         ),
       ),
@@ -378,7 +374,7 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
 
   Widget _buildGoogleButton(AppColorScheme colors) {
     return OutlinedButton.icon(
-      onPressed: _isLoading ? null : () async {
+      onPressed: () async {
         await widget.authService.signInWithGoogle();
       },
       icon: SvgPicture.asset(
@@ -403,7 +399,7 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
         ),
         const SizedBox(width: 4),
         TextButton(
-          onPressed: _isLoading ? null : widget.onCreateAccount,
+          onPressed: widget.onCreateAccount,
           style: TextButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: 8),
           ),

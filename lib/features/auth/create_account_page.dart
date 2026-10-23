@@ -232,13 +232,12 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
       alignment: Alignment.centerLeft,
       child: Transform.translate(
         offset: const Offset(-8, -8),
-        child: TextButton.icon(
+        child: TextButton(
           onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
-          icon: const Icon(Icons.chevron_left, size: 20),
-          label: const Text(S.backToSignIn),
           style: TextButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: 8),
           ),
+          child: const Text(S.backToSignIn),
         ),
       ),
     );
