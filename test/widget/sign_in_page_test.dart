@@ -6,10 +6,10 @@ import "package:home_manager/core/theme/app_accent.dart";
 import "package:home_manager/core/theme/app_theme.dart";
 import "package:home_manager/features/auth/sign_in_page.dart";
 import "package:home_manager/features/shared/app_brand_logo.dart";
-import "package:supabase_flutter/supabase_flutter.dart";
+import "../support/mock_supabase.dart";
 
 class MockAuthService extends AuthService {
-  MockAuthService() : super(Supabase.instance.client);
+  MockAuthService() : super(MockSupabaseClient());
 }
 
 void main() {
@@ -22,6 +22,14 @@ void main() {
           brightness: Brightness.dark,
           accent: AppAccent.amber,
         ),
+        // Test font (Ahem) is wider than Nunito; scale text so the 313px card fits.
+        builder:
+            (context, child) => MediaQuery(
+              data: MediaQuery.of(
+                context,
+              ).copyWith(textScaler: const TextScaler.linear(0.8)),
+              child: child!,
+            ),
         home: SignInPage(authService: MockAuthService()),
       ),
     );
