@@ -51,6 +51,10 @@ flutter build web --base-href /home-manager/
 
 Develop with Flutter **3.29.2** (Dart 3.7.2).
 
-## Mobile only
+## Surface
 
-Tổ Ấm is ONLY a 390px phone webview. There is NO desktop version. Do not add desktop layouts, responsive breakpoints, or adaptive platform handling. Verify with mobile device emulation (390×844, isMobile, hasTouch, mobile user agent).
+The only device is iPhone 15. The only surface is a phone webview at 393x852. Design, QA, and code use that size. Do not add a desktop layout, another phone size, or responsive breakpoints. iOS Simulator is only a check at this same size.
+
+## Agent limits
+
+Do not edit files in .cursor/rules/ unless the task names the file and the exact line to add. UI changes must follow the numbered spec (px, font size, color, spacing). Do not infer spacing from a screenshot.
