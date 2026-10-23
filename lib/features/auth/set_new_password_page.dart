@@ -195,6 +195,7 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                         _buildPasswordField(colors),
                         Container(height: AppSpacing.md),
                         _buildConfirmPasswordField(colors),
+                        Container(height: 12),
                         if (_generalError != null) ...[
                           Container(height: AppSpacing.sm),
                           Text(

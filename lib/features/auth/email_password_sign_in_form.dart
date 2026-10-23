@@ -74,10 +74,8 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
       return;
     }
 
-    // Collapse selection before showing loading state
-    _passwordController.selection = TextSelection.collapsed(
-      offset: _passwordController.text.length,
-    );
+    // Unfocus to prevent text selection
+    FocusManager.instance.primaryFocus?.unfocus();
 
     setState(() {
       _isLoading = true;
@@ -132,13 +130,20 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: colors.textSecondary,
             letterSpacing: 0,
+            height: 1.4,
           ),
         ),
-        SizedBox(height: AppSpacing.md),
+        SizedBox(height: 20),
         _buildEmailField(colors),
         SizedBox(height: AppSpacing.md),
         _buildPasswordField(colors),
-        _buildForgotPasswordButton(colors),
+        SizedBox(
+          height: 36,
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: _buildForgotPasswordButton(colors),
+          ),
+        ),
         if (_generalError != null) ...[
           SizedBox(height: AppSpacing.sm),
           Text(
@@ -353,19 +358,16 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
   }
 
   Widget _buildForgotPasswordButton(AppColorScheme colors) {
-    return Align(
-      alignment: Alignment.centerRight,
-      child: TextButton(
-        onPressed: widget.onForgotPassword,
-        style: TextButton.styleFrom(
-          padding: EdgeInsets.zero,
-          minimumSize: const Size(0, 24),
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        ),
-        child: Text(
-          S.forgotPassword,
-          style: TextStyle(color: colors.accent),
-        ),
+    return TextButton(
+      onPressed: widget.onForgotPassword,
+      style: TextButton.styleFrom(
+        padding: EdgeInsets.zero,
+        minimumSize: const Size(0, 24),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
+      child: Text(
+        S.forgotPassword,
+        style: TextStyle(color: colors.accent),
       ),
     );
   }

@@ -192,7 +192,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                         _buildPasswordField(colors),
                         Container(height: AppSpacing.md),
                         _buildConfirmPasswordField(colors),
-                        Container(height: AppSpacing.sm),
+                        Container(height: 12),
                         FilledButton(
                           onPressed: _isLoading ? null : _handleCreateAccount,
                           style: authButtonStyle(context),

@@ -181,7 +181,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         ),
         Container(height: AppSpacing.md),
         _buildEmailField(colors),
-        Container(height: AppSpacing.sm),
+        Container(height: 20),
         ConstrainedBox(
           constraints: const BoxConstraints(minHeight: 48, maxHeight: 48),
           child: FilledButton(
