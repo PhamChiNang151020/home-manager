@@ -1,0 +1,56 @@
+---
+description: >
+  home_manager — Flutter Web PWA and iOS Simulator app for family electricity tracking. Load when
+  working on this repo. Trigger on: home-manager, PWA, Supabase, Google auth,
+  meter, invoice, bill photo, Flutter Web, iOS.
+alwaysApply: false
+---
+
+# home_manager — project context
+
+Read `.cursor/notes.md` before changing platform, storage, or distribution.
+
+## Overview
+
+Flutter **Web** PWA + **iOS Simulator** (`com.pcn.home_manager`): family electricity for two homes (meter vs invoice), Google login, Supabase sync. iPhone via Safari Add to Home Screen or Simulator. App Store when an Apple Developer account exists.
+
+## Repo
+
+- Package: `home_manager`
+- Org: `com.pcn`
+- Remote: `https://github.com/PhamChiNang151020/home-manager.git` (private)
+- Branch: `main`
+- Path: `/Users/be011/Desktop/PCN/scr/client/home-manager`
+
+## Structure
+
+- `lib/core/` — models + services; no UI imports
+- `lib/features/` — screens and widgets
+- `lib/app.dart` — MaterialApp + auth gate
+- `supabase/migrations/` — schema, RLS, RPCs
+- `ios/` — native iOS Runner (Simulator)
+- `web/` — PWA manifest and icons
+
+## Rules
+
+1. Web + iOS Simulator. Do not add Android or App Store submit without approval.
+2. Supabase is the source of truth. Widgets do not call Supabase.
+3. V2 covers electricity, water, expenses, and income. Do not add shopping without approval.
+4. Match `flutter_lints`. Keep diffs small.
+5. Do not commit service role keys, `.env` secrets, or bill photos.
+6. Feature or bug fix → read `04-testing.mdc` and `skills/qa-testing/SKILL.md`.
+
+## Build
+
+```bash
+flutter pub get
+flutter run -d chrome --dart-define=SUPABASE_URL=... --dart-define=SUPABASE_ANON_KEY=...
+flutter run -d "iPhone 17 Pro" --dart-define-from-file=.vscode/supabase.local.json
+flutter build web --base-href /home-manager/
+```
+
+Develop with Flutter **3.29.2** (Dart 3.7.2).
+
+## Mobile only
+
+Tổ Ấm is ONLY a 390px phone webview. There is NO desktop version. Do not add desktop layouts, responsive breakpoints, or adaptive platform handling. Verify with mobile device emulation (390×844, isMobile, hasTouch, mobile user agent).
