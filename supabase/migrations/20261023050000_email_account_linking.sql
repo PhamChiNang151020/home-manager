@@ -1,0 +1,84 @@
+-- Email/Password + Google OAuth Account Linking Enforcement
+-- Ensures one email = one user across all auth providers
+--
+-- Context:
+-- - Email/password signUp creates user with unverified email (Confirm email OFF)
+-- - Google OAuth provides verified email
+-- - Supabase auto-links identities when email is verified on both
+-- - Problem: email/password email is unverified, so auto-linking may not work
+--
+-- Solution:
+-- This migration documents the required Supabase dashboard settings.
+-- Actual enforcement is handled by:
+-- 1. Supabase's built-in auth.users.email uniqueness (already enforced)
+-- 2. Dashboard setting: "Automatic account linking" (manual link identities)
+-- 3. Client-side error handling for user_already_exists
+--
+-- Required Supabase Dashboard Settings:
+-- ========================================
+--
+-- 1. Authentication → Providers → Email:
+--    - [x] Enable Email provider
+--    - [ ] Confirm email (MUST BE OFF - spec requirement)
+--    - [x] Secure email change (recommended)
+--
+-- 2. Authentication → Settings:
+--    - Minimum password length: 8
+--    - [x] Enable manual linking (if available)
+--       OR ensure "Automatic account linking" is enabled
+--
+-- 3. Authentication → URL Configuration:
+--    - Add password recovery redirect URL to Redirect URLs
+--
+-- How it works:
+-- =============
+--
+-- Scenario A: Email/password first, then Google
+-- ----------------------------------------------
+-- 1. User signs up with email/password
+--    -> Creates auth.users row with email (unverified)
+--    -> Creates auth.identities row with provider='email'
+-- 2. User later signs in with Google (same email)
+--    -> Supabase checks if email exists in auth.users
+--    -> If found: attempts to link OAuth identity to existing user
+--    -> Linking succeeds if security settings allow it
+--    -> Result: ONE user with TWO identities (email + google)
+--
+-- Scenario B: Google first, then email/password
+-- ----------------------------------------------
+-- 1. User signs in with Google
+--    -> Creates auth.users row with email (verified)
+--    -> Creates auth.identities row with provider='google'
+-- 2. User tries to sign up with email/password (same email)
+--    -> signUp fails with 'user_already_exists' error
+--    -> Client shows: "Email này đã có tài khoản. Hãy đăng nhập."
+--    -> User must use "Quên mật khẩu" to set password for existing account
+-- 3. User resets password via email link
+--    -> Adds password to existing Google account
+--    -> Result: ONE user with password capability + google identity
+--
+-- Database-level enforcement:
+-- ===========================
+--
+-- auth.users.email is already unique (Supabase built-in)
+-- No additional triggers needed - Supabase handles it
+
+-- This comment-only migration serves as documentation.
+-- The actual enforcement happens via:
+-- 1. Supabase built-in email uniqueness
+-- 2. Dashboard account linking settings
+-- 3. Client error handling in AuthService
+
+-- Verification queries (read-only, for debugging):
+-- ------------------------------------------------
+-- Check user's identities:
+-- SELECT u.email, i.provider, i.created_at
+-- FROM auth.users u
+-- JOIN auth.identities i ON u.id = i.user_id
+-- WHERE u.email = 'user@example.com';
+--
+-- Expected result after linking:
+-- | email            | provider | created_at          |
+-- |------------------|----------|---------------------|
+-- | user@example.com | email    | 2026-10-23 05:00:00 |
+-- | user@example.com | google   | 2026-10-23 05:05:00 |

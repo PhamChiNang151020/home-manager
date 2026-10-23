@@ -1,10 +1,16 @@
 import "package:flutter/material.dart";
 import "package:flutter_test/flutter_test.dart";
 import "package:home_manager/core/l10n/strings.dart";
+import "package:home_manager/core/services/auth_service.dart";
 import "package:home_manager/core/theme/app_accent.dart";
 import "package:home_manager/core/theme/app_theme.dart";
 import "package:home_manager/features/auth/sign_in_page.dart";
 import "package:home_manager/features/shared/app_brand_logo.dart";
+import "package:supabase_flutter/supabase_flutter.dart";
+
+class MockAuthService extends AuthService {
+  MockAuthService() : super(Supabase.instance.client);
+}
 
 void main() {
   testWidgets("SignInPage shows brand logo and tagline instead of bolt icon", (
@@ -16,7 +22,7 @@ void main() {
           brightness: Brightness.dark,
           accent: AppAccent.amber,
         ),
-        home: SignInPage(onGoogle: () {}),
+        home: SignInPage(authService: MockAuthService()),
       ),
     );
 

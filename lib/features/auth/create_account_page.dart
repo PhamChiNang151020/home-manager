@@ -100,13 +100,15 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
       setState(() {
         if (e.message.contains("User already registered") ||
             e.message.contains("user_already_exists") ||
-            e.message.contains("email_exists")) {
+            e.message.contains("email_exists") ||
+            e.message.contains("already been registered")) {
           _emailError = S.errorEmailExists;
         } else if (e.message.contains("weak_password") ||
             e.message.contains("Password")) {
           _passwordError = S.errorPasswordTooShort;
         } else if (e.message.contains("rate_limit") ||
-            e.message.contains("over_request_rate_limit")) {
+            e.message.contains("over_request_rate_limit") ||
+            e.message.contains("over_email_send_rate_limit")) {
           _passwordError = S.errorRateLimit;
         } else {
           _passwordError = S.errorGeneric;

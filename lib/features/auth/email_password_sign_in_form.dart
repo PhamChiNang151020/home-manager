@@ -47,18 +47,6 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
     return RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(email);
   }
 
-  void _validateEmail() {
-    setState(() {
-      if (_emailController.text.trim().isEmpty) {
-        _emailError = null;
-      } else if (!_isValidEmail(_emailController.text.trim())) {
-        _emailError = S.errorInvalidEmail;
-      } else {
-        _emailError = null;
-      }
-    });
-  }
-
   Future<void> _handleSignIn() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
