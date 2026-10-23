@@ -171,14 +171,22 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                         Container(height: AppSpacing.xs),
                         FittedBox(
                           fit: BoxFit.scaleDown,
-                          child: Text(
-                            "Cho tài khoản \${widget.email}",
+                          child: RichText(
                             textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontFamily: 'Nunito',
-                              color: colors.textSecondary,
-                              letterSpacing: 0,
+                            text: TextSpan(
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontFamily: 'Nunito',
+                                color: colors.textSecondary,
+                                letterSpacing: 0,
+                              ),
+                              children: [
+                                const TextSpan(text: "Cho tài khoản "),
+                                TextSpan(
+                                  text: widget.email,
+                                  style: const TextStyle(fontWeight: FontWeight.w700),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -210,7 +218,9 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                           ],
                         ],
                         Container(height: AppSpacing.sm),
-                        FilledButton(
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(minHeight: 48, maxHeight: 48),
+                          child: FilledButton(
                           onPressed: _isLoading ? null : _handleSetPassword,
                           child: _isLoading
                               ? Row(
@@ -230,6 +240,7 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                                   ],
                                 )
                               : const Text(S.setPasswordButton),
+                        ),
                         ),
                       ],
                     ),
@@ -343,7 +354,7 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          S.passwordConfirmLabel,
+          S.passwordConfirmLabelShort,
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,

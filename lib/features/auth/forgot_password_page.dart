@@ -181,7 +181,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         Container(height: AppSpacing.md),
         _buildEmailField(colors),
         Container(height: AppSpacing.sm),
-        FilledButton(
+        ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 48, maxHeight: 48),
+          child: FilledButton(
           onPressed: _isLoading ? null : _handleSendResetLink,
           child: _isLoading
               ? Row(
@@ -201,6 +203,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   ],
                 )
               : const Text(S.sendResetLink),
+        ),
         ),
       ],
     );
@@ -251,11 +254,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           ),
         ),
         Container(height: AppSpacing.lg),
-        FilledButton(
+        ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 48, maxHeight: 48),
+          child: FilledButton(
           onPressed: () {
             Navigator.of(context).pop();
           },
           child: const Text(S.backToSignInButton),
+        ),
         ),
       ],
     );

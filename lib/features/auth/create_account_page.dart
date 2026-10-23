@@ -192,7 +192,9 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                         Container(height: AppSpacing.md),
                         _buildConfirmPasswordField(colors),
                         Container(height: AppSpacing.sm),
-                        FilledButton(
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(minHeight: 48, maxHeight: 48),
+                          child: FilledButton(
                           onPressed: _isLoading ? null : _handleCreateAccount,
                           child: _isLoading
                               ? Row(
@@ -212,6 +214,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                                   ],
                                 )
                               : const Text(S.createAccount),
+                        ),
                         ),
                         Container(height: AppSpacing.sm),
                         _buildSignInFooter(colors),

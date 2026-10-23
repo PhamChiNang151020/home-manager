@@ -14,6 +14,7 @@ abstract final class S {
   static const passwordPlaceholder8 = "Ít nhất 8 ký tự";
   static const passwordNewLabel = "Mật khẩu mới";
   static const passwordConfirmLabel = "Nhập lại mật khẩu";
+  static const passwordConfirmLabelShort = "Nhập lại";
   static const passwordConfirmPlaceholder = "Nhập lại mật khẩu";
   static const passwordNewPlaceholder = "Ít nhất 8 ký tự";
   static const forgotPassword = "Quên mật khẩu?";

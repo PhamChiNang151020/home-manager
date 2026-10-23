@@ -145,7 +145,9 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
           ),
         ],
         SizedBox(height: AppSpacing.sm),
-        FilledButton(
+        ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 48, maxHeight: 48),
+          child: FilledButton(
           onPressed: _isLoading ? null : _handleSignIn,
           child: _isLoading
               ? Row(
@@ -165,6 +167,7 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
                   ],
                 )
               : const Text(S.signIn),
+        ),
         ),
         SizedBox(height: AppSpacing.lg),
         _buildDivider(colors),
@@ -405,7 +408,9 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
         TextButton(
           onPressed: widget.onCreateAccount,
           style: TextButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
+            padding: EdgeInsets.zero,
+            minimumSize: Size.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
           child: const Text(S.createAccount),
         ),
