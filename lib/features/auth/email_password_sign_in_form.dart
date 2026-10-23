@@ -74,6 +74,11 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
       return;
     }
 
+    // Collapse selection before showing loading state
+    _passwordController.selection = TextSelection.collapsed(
+      offset: _passwordController.text.length,
+    );
+
     setState(() {
       _isLoading = true;
     });
@@ -146,9 +151,7 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
           ),
         ],
         SizedBox(height: AppSpacing.sm),
-        ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 48, maxHeight: 48),
-          child: FilledButton(
+        FilledButton(
           onPressed: _isLoading ? null : _handleSignIn,
           style: authButtonStyle(context),
           child: _isLoading
@@ -169,7 +172,6 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
                   ],
                 )
               : const Text(S.signIn),
-        ),
         ),
         SizedBox(
           height: 40,
@@ -202,6 +204,7 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.next,
           autofillHints: const [AutofillHints.email],
+          style: const TextStyle(fontSize: 14),
           onChanged: (_) {
             if (_emailError != null) {
               setState(() {
@@ -279,6 +282,7 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
           obscureText: _obscurePassword,
           textInputAction: TextInputAction.done,
           autofillHints: const [AutofillHints.password],
+          style: const TextStyle(fontSize: 14),
           onChanged: (_) {
             if (_passwordError != null) {
               setState(() {
@@ -390,6 +394,7 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
       onPressed: () async {
         await widget.authService.signInWithGoogle();
       },
+      style: authOutlinedButtonStyle(context),
       icon: SvgPicture.asset(
         'assets/brand/google_logo_18.svg',
         width: 18,

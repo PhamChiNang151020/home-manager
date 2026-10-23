@@ -137,7 +137,10 @@ abstract final class AppTheme {
           borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
           borderSide: BorderSide(color: colors.accent, width: 1.5),
         ),
-        hintStyle: textTheme.bodyMedium?.copyWith(color: colors.textMuted),
+        hintStyle: textTheme.bodyMedium?.copyWith(
+          color: colors.textMuted,
+          fontSize: 14,
+        ),
         helperStyle: textTheme.bodySmall?.copyWith(color: colors.textSecondary),
       ),
       filledButtonTheme: FilledButtonThemeData(

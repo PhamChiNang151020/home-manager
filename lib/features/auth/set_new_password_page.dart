@@ -6,6 +6,7 @@ import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/core/theme/mobile_viewport.dart";
 import "package:home_manager/features/shared/app_brand_logo.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
+import "package:home_manager/features/auth/auth_button_theme.dart";
 import "package:home_manager/features/shared/auth_card.dart";
 
 class SetNewPasswordPage extends StatefulWidget {
@@ -218,10 +219,9 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                           ],
                         ],
                         Container(height: AppSpacing.sm),
-                        ConstrainedBox(
-                          constraints: const BoxConstraints(minHeight: 48, maxHeight: 48),
-                          child: FilledButton(
+                        FilledButton(
                           onPressed: _isLoading ? null : _handleSetPassword,
+                          style: authButtonStyle(context),
                           child: _isLoading
                               ? Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -240,7 +240,6 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                                   ],
                                 )
                               : const Text(S.setPasswordButton),
-                        ),
                         ),
                       ],
                     ),
@@ -274,6 +273,7 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
           obscureText: _obscurePassword,
           textInputAction: TextInputAction.next,
           enabled: !_isLoading,
+          style: const TextStyle(fontSize: 14),
           autofillHints: const [AutofillHints.newPassword],
           onChanged: (_) {
             if (_passwordError != null) {
@@ -368,6 +368,7 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
           obscureText: _obscureConfirmPassword,
           textInputAction: TextInputAction.done,
           enabled: !_isLoading,
+          style: const TextStyle(fontSize: 14),
           autofillHints: const [AutofillHints.newPassword],
           onChanged: (_) {
             if (_confirmPasswordError != null) {

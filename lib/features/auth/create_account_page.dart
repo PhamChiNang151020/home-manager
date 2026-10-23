@@ -6,6 +6,7 @@ import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/core/theme/mobile_viewport.dart";
 import "package:home_manager/features/shared/app_brand_logo.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
+import "package:home_manager/features/auth/auth_button_theme.dart";
 import "package:home_manager/features/shared/auth_card.dart";
 
 class CreateAccountPage extends StatefulWidget {
@@ -192,10 +193,9 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                         Container(height: AppSpacing.md),
                         _buildConfirmPasswordField(colors),
                         Container(height: AppSpacing.sm),
-                        ConstrainedBox(
-                          constraints: const BoxConstraints(minHeight: 48, maxHeight: 48),
-                          child: FilledButton(
+                        FilledButton(
                           onPressed: _isLoading ? null : _handleCreateAccount,
+                          style: authButtonStyle(context),
                           child: _isLoading
                               ? Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -214,7 +214,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                                   ],
                                 )
                               : const Text(S.createAccount),
-                        ),
                         ),
                         Container(height: AppSpacing.md),
                         _buildSignInFooter(colors),
@@ -265,6 +264,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.next,
           enabled: !_isLoading,
+          style: const TextStyle(fontSize: 14),
           autofillHints: const [AutofillHints.email],
           onChanged: (_) {
             if (_emailError != null) {
@@ -345,6 +345,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           obscureText: _obscurePassword,
           textInputAction: TextInputAction.next,
           enabled: !_isLoading,
+          style: const TextStyle(fontSize: 14),
           autofillHints: const [AutofillHints.newPassword],
           onChanged: (_) {
             if (_passwordError != null) {
@@ -439,6 +440,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           obscureText: _obscureConfirmPassword,
           textInputAction: TextInputAction.done,
           enabled: !_isLoading,
+          style: const TextStyle(fontSize: 14),
           autofillHints: const [AutofillHints.newPassword],
           onChanged: (_) {
             if (_confirmPasswordError != null) {

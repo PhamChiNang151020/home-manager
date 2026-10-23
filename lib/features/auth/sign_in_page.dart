@@ -7,7 +7,6 @@ import "package:home_manager/core/theme/mobile_viewport.dart";
 import "package:home_manager/features/auth/create_account_page.dart";
 import "package:home_manager/features/auth/email_password_sign_in_form.dart";
 import "package:home_manager/features/auth/forgot_password_page.dart";
-import "package:home_manager/features/pwa/install_home_screen_banner.dart";
 import "package:home_manager/features/shared/app_brand_logo.dart";
 import "package:home_manager/features/shared/auth_card.dart";
 
@@ -44,7 +43,6 @@ class SignInPage extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const InstallHomeScreenBanner(),
                       AuthCard(
                         padding: const EdgeInsets.all(AppSpacing.lg),
                         child: Column(
