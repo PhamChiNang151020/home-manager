@@ -342,6 +342,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           onSubmitted: (_) => _handleSendResetLink(),
           decoration: InputDecoration(
             hintText: S.emailPlaceholder,
+            filled: true,
+            fillColor: const Color(0xFFFFFFFF),
+            hoverColor: Colors.transparent,
             errorText: null,
             errorBorder: _emailError != null
                 ? OutlineInputBorder(

@@ -157,8 +157,15 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
         ],
         SizedBox(height: AppSpacing.sm),
         FilledButton(
-          onPressed: _isLoading ? null : _handleSignIn,
-          style: authButtonStyle(context),
+          onPressed: _isLoading ? () {} : _handleSignIn,
+          style: _isLoading
+              ? authButtonStyle(context).copyWith(
+                  backgroundColor: WidgetStateProperty.all(
+                    const Color(0xFFA8602B),
+                  ),
+                  foregroundColor: WidgetStateProperty.all(Colors.white),
+                )
+              : authButtonStyle(context),
           child: _isLoading
               ? Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -220,7 +227,10 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
           onSubmitted: (_) {
           },
           decoration: InputDecoration(
-            hintText: S.emailPlaceholder,
+            hintText: S.emailPlaceholderSignIn,
+            filled: true,
+            fillColor: const Color(0xFFFFFFFF),
+            hoverColor: Colors.transparent,
             errorText: null,
             errorBorder: _emailError != null
                 ? OutlineInputBorder(
@@ -298,6 +308,9 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
           onSubmitted: (_) => _handleSignIn(),
           decoration: InputDecoration(
             hintText: S.passwordPlaceholder,
+            filled: true,
+            fillColor: const Color(0xFFFFFFFF),
+            hoverColor: Colors.transparent,
             errorText: null,
             errorBorder: _passwordError != null
                 ? OutlineInputBorder(

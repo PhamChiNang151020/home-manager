@@ -287,6 +287,9 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
           },
           decoration: InputDecoration(
             hintText: S.passwordNewPlaceholder,
+            filled: true,
+            fillColor: const Color(0xFFFFFFFF),
+            hoverColor: Colors.transparent,
             errorText: null,
             errorBorder: _passwordError != null
                 ? OutlineInputBorder(
@@ -381,7 +384,10 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
           },
           onSubmitted: (_) => _handleSetPassword(),
           decoration: InputDecoration(
-            hintText: S.passwordConfirmPlaceholder,
+            hintText: S.passwordConfirmNewPlaceholder,
+            filled: true,
+            fillColor: const Color(0xFFFFFFFF),
+            hoverColor: Colors.transparent,
             errorText: null,
             errorBorder: _confirmPasswordError != null
                 ? OutlineInputBorder(

@@ -9,6 +9,7 @@ abstract final class S {
   // Email/Password Auth
   static const emailLabel = "Email";
   static const emailPlaceholder = "ban@email.com";
+  static const emailPlaceholderSignIn = "ví dụ: ban@email.com";
   static const passwordLabel = "Mật khẩu";
   static const passwordPlaceholder = "••••••••";
   static const passwordPlaceholder8 = "Ít nhất 8 ký tự";
@@ -16,6 +17,7 @@ abstract final class S {
   static const passwordConfirmLabel = "Nhập lại mật khẩu";
   static const passwordConfirmLabelShort = "Nhập lại";
   static const passwordConfirmPlaceholder = "Nhập lại mật khẩu";
+  static const passwordConfirmNewPlaceholder = "Nhập lại mật khẩu mới";
   static const passwordNewPlaceholder = "Ít nhất 8 ký tự";
   static const forgotPassword = "Quên mật khẩu?";
   static const signIn = "Đăng nhập";

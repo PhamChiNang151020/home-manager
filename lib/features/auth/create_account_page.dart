@@ -277,6 +277,9 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           },
           decoration: InputDecoration(
             hintText: S.emailPlaceholder,
+            filled: true,
+            fillColor: const Color(0xFFFFFFFF),
+            hoverColor: Colors.transparent,
             errorText: null,
             errorBorder: _emailError != null
                 ? OutlineInputBorder(
@@ -359,6 +362,9 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           },
           decoration: InputDecoration(
             hintText: S.passwordPlaceholder8,
+            filled: true,
+            fillColor: const Color(0xFFFFFFFF),
+            hoverColor: Colors.transparent,
             errorText: null,
             errorBorder: _passwordError != null
                 ? OutlineInputBorder(
@@ -454,6 +460,9 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           onSubmitted: (_) => _handleCreateAccount(),
           decoration: InputDecoration(
             hintText: S.passwordConfirmPlaceholder,
+            filled: true,
+            fillColor: const Color(0xFFFFFFFF),
+            hoverColor: Colors.transparent,
             errorText: null,
             errorBorder: _confirmPasswordError != null
                 ? OutlineInputBorder(
