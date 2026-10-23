@@ -13,9 +13,7 @@ class AuthCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
-      child: DecoratedBox(
+    return DecoratedBox(
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
@@ -39,7 +37,6 @@ class AuthCard extends StatelessWidget {
           padding: padding,
           child: child,
         ),
-      ),
-    );
+      );
   }
 }

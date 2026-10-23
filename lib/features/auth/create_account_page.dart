@@ -57,11 +57,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
 
     setState(() {
       _emailError = null;
-      _emailFocusNode.requestFocus();
       _passwordError = null;
-      _passwordFocusNode.requestFocus();
       _confirmPasswordError = null;
-      _confirmPasswordFocusNode.requestFocus();
     });
 
     bool hasError = false;
@@ -69,7 +66,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     if (email.isEmpty || !_isValidEmail(email)) {
       setState(() {
         _emailError = S.errorInvalidEmail;
-      _emailFocusNode.requestFocus();
       });
       hasError = true;
     }
@@ -77,7 +73,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     if (password.length < 8) {
       setState(() {
         _passwordError = S.errorPasswordTooShort;
-      _passwordFocusNode.requestFocus();
       });
       hasError = true;
     }
@@ -85,7 +80,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     if (password != confirmPassword) {
       setState(() {
         _confirmPasswordError = S.errorPasswordMismatch;
-      _confirmPasswordFocusNode.requestFocus();
       });
       hasError = true;
     }
@@ -109,26 +103,21 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             e.message.contains("email_exists") ||
             e.message.contains("already been registered")) {
           _emailError = S.errorEmailExists;
-      _emailFocusNode.requestFocus();
         } else if (e.message.contains("weak_password") ||
             e.message.contains("Password")) {
           _passwordError = S.errorPasswordTooShort;
-      _passwordFocusNode.requestFocus();
         } else if (e.message.contains("rate_limit") ||
             e.message.contains("over_request_rate_limit") ||
             e.message.contains("over_email_send_rate_limit")) {
           _passwordError = S.errorRateLimit;
-      _passwordFocusNode.requestFocus();
         } else {
           _passwordError = S.errorGeneric;
-      _passwordFocusNode.requestFocus();
         }
       });
     } catch (e) {
       if (!mounted) return;
       setState(() {
         _passwordError = S.errorNetwork;
-      _passwordFocusNode.requestFocus();
       });
     } finally {
       if (mounted) {
@@ -244,15 +233,14 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   Widget _buildBackButton(AppColorScheme colors) {
     return Align(
       alignment: Alignment.centerLeft,
-      child: Transform.translate(
-        offset: const Offset(-8, -8),
-        child: TextButton(
-          onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
-          style: TextButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-          ),
-          child: const Text(S.backToSignIn),
+      child: TextButton(
+        onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
+        style: TextButton.styleFrom(
+          padding: EdgeInsets.zero,
+          minimumSize: const Size(0, 24),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
+        child: const Text(S.backToSignIn),
       ),
     );
   }
@@ -282,12 +270,10 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             if (_emailError != null) {
               setState(() {
                 _emailError = null;
-      _emailFocusNode.requestFocus();
               });
             }
           },
           onSubmitted: (_) {
-            _passwordFocusNode.requestFocus();
           },
           decoration: InputDecoration(
             hintText: S.emailPlaceholder,
@@ -364,12 +350,10 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             if (_passwordError != null) {
               setState(() {
                 _passwordError = null;
-      _passwordFocusNode.requestFocus();
               });
             }
           },
           onSubmitted: (_) {
-            _confirmPasswordFocusNode.requestFocus();
           },
           decoration: InputDecoration(
             hintText: S.passwordPlaceholder8,
@@ -460,7 +444,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             if (_confirmPasswordError != null) {
               setState(() {
                 _confirmPasswordError = null;
-      _confirmPasswordFocusNode.requestFocus();
               });
             }
           },

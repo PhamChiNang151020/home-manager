@@ -78,7 +78,6 @@ flutter:
   uses-material-design: true
   assets:
     - assets/brand/logo.png
-    - assets/brand/google_g_logo.svg
     - assets/brand/google_logo_18.svg
   fonts:
     - family: Nunito

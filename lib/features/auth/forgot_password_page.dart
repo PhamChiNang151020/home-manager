@@ -295,15 +295,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   Widget _buildBackButton(AppColorScheme colors) {
     return Align(
       alignment: Alignment.centerLeft,
-      child: Transform.translate(
-        offset: const Offset(-8, -8),
-        child: TextButton(
-          onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
-          style: TextButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-          ),
-          child: const Text(S.backToSignIn),
+      child: TextButton(
+        onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
+        style: TextButton.styleFrom(
+          padding: EdgeInsets.zero,
+          minimumSize: const Size(0, 24),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
+        child: const Text(S.backToSignIn),
       ),
     );
   }

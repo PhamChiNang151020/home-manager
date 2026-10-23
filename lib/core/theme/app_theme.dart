@@ -50,7 +50,6 @@ abstract final class AppTheme {
       brightness: brightness,
       colorScheme: scheme,
       fontFamily: AppFonts.nunito,
-      visualDensity: VisualDensity.standard,
       textTheme: textTheme,
       primaryTextTheme: textTheme,
       scaffoldBackgroundColor: glass ? Colors.transparent : colors.bgBase,
@@ -142,22 +141,19 @@ abstract final class AppTheme {
         helperStyle: textTheme.bodySmall?.copyWith(color: colors.textSecondary),
       ),
       filledButtonTheme: FilledButtonThemeData(
-        style: ButtonStyle(
-          backgroundColor: WidgetStateProperty.all(colors.accent),
-          foregroundColor: WidgetStateProperty.all(onPrimary),
-          overlayColor: WidgetStateProperty.all(Colors.transparent),
-          textStyle: WidgetStateProperty.all(
-            textTheme.labelMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              fontSize: 14,
-            ),
+        style: FilledButton.styleFrom(
+          backgroundColor: colors.accent,
+          foregroundColor: onPrimary,
+          disabledBackgroundColor: colors.accent,
+          disabledForegroundColor: onPrimary,
+          textStyle: textTheme.labelMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
           ),
-          minimumSize: WidgetStateProperty.all(const Size.fromHeight(AppSpacing.touchMin)),
+          minimumSize: const Size.fromHeight(AppSpacing.touchMin),
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          shape: WidgetStateProperty.all(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-            ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
           ),
         ),
       ),

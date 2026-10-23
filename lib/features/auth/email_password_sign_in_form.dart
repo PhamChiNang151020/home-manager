@@ -6,6 +6,7 @@ import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
 
+import "package:home_manager/features/auth/auth_button_theme.dart";
 class EmailPasswordSignInForm extends StatefulWidget {
   const EmailPasswordSignInForm({
     super.key,
@@ -149,6 +150,7 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
           constraints: const BoxConstraints(minHeight: 48, maxHeight: 48),
           child: FilledButton(
           onPressed: _isLoading ? null : _handleSignIn,
+          style: authButtonStyle(context),
           child: _isLoading
               ? Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -208,7 +210,6 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
             }
           },
           onSubmitted: (_) {
-            _passwordFocusNode.requestFocus();
           },
           decoration: InputDecoration(
             hintText: S.emailPlaceholder,
@@ -350,11 +351,16 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
   Widget _buildForgotPasswordButton(AppColorScheme colors) {
     return Align(
       alignment: Alignment.centerRight,
-      child: Transform.translate(
-        offset: const Offset(0, -12),
-        child: TextButton(
-          onPressed: widget.onForgotPassword,
-          child: Text(S.forgotPassword),
+      child: TextButton(
+        onPressed: widget.onForgotPassword,
+        style: TextButton.styleFrom(
+          padding: EdgeInsets.zero,
+          minimumSize: const Size(0, 24),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+        child: Text(
+          S.forgotPassword,
+          style: TextStyle(color: colors.accent),
         ),
       ),
     );

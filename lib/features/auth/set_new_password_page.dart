@@ -50,9 +50,7 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
 
     setState(() {
       _passwordError = null;
-      _passwordFocusNode.requestFocus();
       _confirmPasswordError = null;
-      _confirmPasswordFocusNode.requestFocus();
       _generalError = null;
     });
 
@@ -61,7 +59,6 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
     if (password.length < 8) {
       setState(() {
         _passwordError = S.errorPasswordTooShort;
-      _passwordFocusNode.requestFocus();
       });
       hasError = true;
     }
@@ -69,7 +66,6 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
     if (password != confirmPassword) {
       setState(() {
         _confirmPasswordError = S.errorPasswordMismatch;
-      _confirmPasswordFocusNode.requestFocus();
       });
       hasError = true;
     }
@@ -91,7 +87,6 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
         } else if (e.message.contains("weak_password") ||
             e.message.contains("Password")) {
           _passwordError = S.errorPasswordTooShort;
-      _passwordFocusNode.requestFocus();
         } else if (e.message.contains("expired") ||
             e.message.contains("invalid") ||
             e.statusCode == "401") {
@@ -284,12 +279,10 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
             if (_passwordError != null) {
               setState(() {
                 _passwordError = null;
-      _passwordFocusNode.requestFocus();
               });
             }
           },
           onSubmitted: (_) {
-            _confirmPasswordFocusNode.requestFocus();
           },
           decoration: InputDecoration(
             hintText: S.passwordNewPlaceholder,
@@ -380,7 +373,6 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
             if (_confirmPasswordError != null) {
               setState(() {
                 _confirmPasswordError = null;
-      _confirmPasswordFocusNode.requestFocus();
               });
             }
           },
