@@ -140,7 +140,7 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
         SizedBox(
           height: 36,
           child: Align(
-            alignment: Alignment.centerRight,
+            alignment: Alignment(1.0, -0.65),
             child: _buildForgotPasswordButton(colors),
           ),
         ),
