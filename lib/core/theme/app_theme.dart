@@ -137,19 +137,24 @@ abstract final class AppTheme {
           borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
           borderSide: BorderSide(color: colors.accent, width: 1.5),
         ),
-        hintStyle: textTheme.bodyMedium?.copyWith(color: colors.textMuted),
+        hintStyle: textTheme.bodyMedium?.copyWith(
+          color: colors.textMuted,
+          fontSize: 14,
+        ),
         helperStyle: textTheme.bodySmall?.copyWith(color: colors.textSecondary),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           backgroundColor: colors.accent,
           foregroundColor: onPrimary,
+          disabledBackgroundColor: colors.accent,
+          disabledForegroundColor: onPrimary,
           textStyle: textTheme.labelMedium?.copyWith(
             fontWeight: FontWeight.w600,
             fontSize: 14,
           ),
-          // Finite width — Size.fromHeight(∞) stacks AlertDialog actions.
-          minimumSize: const Size(64, AppSpacing.touchMin),
+          minimumSize: const Size.fromHeight(AppSpacing.touchMin),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
           ),
@@ -163,7 +168,7 @@ abstract final class AppTheme {
             fontSize: 14,
           ),
           side: BorderSide(color: colors.border),
-          minimumSize: const Size(64, AppSpacing.touchMin),
+          minimumSize: const Size.fromHeight(AppSpacing.touchMin),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
           ),

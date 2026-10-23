@@ -10,10 +10,12 @@ import "package:home_manager/core/state/theme_controller.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_theme.dart";
 import "package:home_manager/core/theme/pwa_viewport_scope.dart";
+import "package:home_manager/features/auth/set_new_password_page.dart";
 import "package:home_manager/features/auth/sign_in_page.dart";
 import "package:home_manager/features/lock/lock_screen.dart";
 import "package:home_manager/features/shared/app_loading.dart";
 import "package:home_manager/features/shell/app_shell.dart";
+import "package:supabase_flutter/supabase_flutter.dart";
 
 class HomeManagerApp extends StatelessWidget {
   const HomeManagerApp({
@@ -124,12 +126,16 @@ class _AppHome extends StatefulWidget {
 }
 
 class _AppHomeState extends State<_AppHome> with WidgetsBindingObserver {
+  bool _showPasswordRecovery = false;
+  String? _recoveryEmail;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     installPwaHistoryGuard();
     widget.session.addListener(_onSessionChange);
+    widget.session.auth.onAuthStateChange.listen(_handleAuthStateChange);
     if (widget.session.user != null) {
       resetPwaBrowserHistory();
     }
@@ -161,6 +167,24 @@ class _AppHomeState extends State<_AppHome> with WidgetsBindingObserver {
     }
   }
 
+  void _handleAuthStateChange(AuthState state) {
+    if (state.event == AuthChangeEvent.passwordRecovery) {
+      if (mounted) {
+        setState(() {
+          _showPasswordRecovery = true;
+          _recoveryEmail = state.session?.user.email ?? "";
+        });
+      }
+    } else if (state.event == AuthChangeEvent.signedIn) {
+      if (mounted) {
+        setState(() {
+          _showPasswordRecovery = false;
+          _recoveryEmail = null;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final session = widget.session;
@@ -172,7 +196,16 @@ class _AppHomeState extends State<_AppHome> with WidgetsBindingObserver {
           return const BrandedLoadingScreen();
         }
         if (session.user == null) {
-          return SignInPage(onGoogle: session.signIn, error: session.error);
+          if (_showPasswordRecovery && _recoveryEmail != null) {
+            return SetNewPasswordPage(
+              authService: session.auth,
+              email: _recoveryEmail!,
+            );
+          }
+          return SignInPage(
+            authService: session.auth,
+            error: session.error,
+          );
         }
         if (lock.isLocked) {
           return LockScreen(lock: lock);
