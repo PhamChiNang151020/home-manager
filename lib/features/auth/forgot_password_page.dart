@@ -231,7 +231,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             ),
           ),
         ),
-        Container(height: 14),
+        Container(height: 16),
         Text(
           S.resetLinkSentTitle,
           textAlign: TextAlign.center,
@@ -255,7 +255,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             children: _buildResetMessageSpans(colors),
           ),
         ),
-        Container(height: 8),
+        Container(height: 24),
         ConstrainedBox(
           constraints: const BoxConstraints(minHeight: 48, maxHeight: 48),
           child: FilledButton(

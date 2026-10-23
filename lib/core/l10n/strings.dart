@@ -2,7 +2,7 @@ abstract final class S {
   static const appName = "Tổ Ấm";
   static const appTagline = "Giữ ấm tổ ấm, giữ vững chi tiêu";
   static const signInGoogle = "Đăng nhập bằng Google";
-  static const signInHint = "Đăng nhập để đồng bộ dữ liệu với gia\u00A0đình.";
+  static const signInHint = "Đăng nhập để đồng bộ dữ liệu với gia\u{00A0}đình.";
   static const missingConfig =
       "Chưa cấu hình Supabase. Chạy với --dart-define=SUPABASE_URL và SUPABASE_ANON_KEY.";
   
