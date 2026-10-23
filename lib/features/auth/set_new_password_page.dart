@@ -169,24 +169,17 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                           ),
                         ),
                         Container(height: AppSpacing.xs),
-                        RichText(
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          text: TextSpan(
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            "Cho tài khoản \${widget.email}",
+                            textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 14,
                               fontFamily: 'Nunito',
                               color: colors.textSecondary,
                               letterSpacing: 0,
                             ),
-                            children: [
-                              const TextSpan(text: "Cho tài khoản "),
-                              TextSpan(
-                                text: widget.email,
-                                style: const TextStyle(fontWeight: FontWeight.w700),
-                              ),
-                            ],
                           ),
                         ),
                         Container(height: AppSpacing.md),

@@ -528,10 +528,13 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         TextButton(
           onPressed: _isLoading ? () {} : () => Navigator.of(context).pop(),
           style: TextButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-          ),
-            overlayColor: Colors.transparent,
+            padding: EdgeInsets.zero,
+            minimumSize: Size.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ).copyWith(
+            overlayColor: WidgetStateProperty.all(Colors.transparent),
             splashFactory: NoSplash.splashFactory,
+          ),
           child: const Text(S.signIn),
         ),
       ],

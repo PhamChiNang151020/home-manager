@@ -158,9 +158,8 @@ class _LightPanel extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0F172A).withValues(alpha: 0.12),
-            blurRadius: 12,
-            spreadRadius: 0,
+            color: const Color(0xFF0F172A).withValues(alpha: 0.08),
+            blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
