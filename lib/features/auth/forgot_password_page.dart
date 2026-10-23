@@ -6,7 +6,6 @@ import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/core/theme/mobile_viewport.dart";
 import "package:home_manager/features/shared/app_brand_logo.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
-import "package:home_manager/features/auth/auth_button_theme.dart";
 import "package:home_manager/features/shared/auth_card.dart";
 
 class ForgotPasswordPage extends StatefulWidget {
@@ -190,7 +189,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               ? Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Container(
+                    SizedBox(
                       width: 18,
                       height: 18,
                       child: CircularProgressIndicator(

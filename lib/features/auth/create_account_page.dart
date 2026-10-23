@@ -200,7 +200,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                               ? Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Container(
+                                    SizedBox(
                                       width: 18,
                                       height: 18,
                                       child: CircularProgressIndicator(
