@@ -140,13 +140,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       children: [
         _buildBackButton(colors),
         const Center(child: AppBrandLogo(size: 64)),
-        const Container(height: AppSpacing.md),
+        Container(height: AppSpacing.md),
         Text(
           S.appName,
           style: Theme.of(context).textTheme.headlineMedium,
           textAlign: TextAlign.center,
         ),
-        const Container(height: AppSpacing.xs),
+        Container(height: AppSpacing.xs),
         Text(
           S.appTagline,
           textAlign: TextAlign.center,
@@ -157,7 +157,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             fontWeight: FontWeight.w600,
           ),
         ),
-        const Container(height: AppSpacing.md),
+        Container(height: AppSpacing.md),
         Text(
           S.forgotPasswordTitle,
           textAlign: TextAlign.center,
@@ -167,7 +167,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             color: colors.textPrimary,
           ),
         ),
-        const Container(height: AppSpacing.sm),
+        Container(height: AppSpacing.sm),
         Text(
           S.forgotPasswordHint,
           textAlign: TextAlign.center,
@@ -176,9 +176,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             color: colors.textSecondary,
           ),
         ),
-        const Container(height: AppSpacing.md),
+        Container(height: AppSpacing.md),
         _buildEmailField(colors),
-        const Container(height: AppSpacing.sm),
+        Container(height: AppSpacing.sm),
         FilledButton(
           onPressed: _isLoading ? null : _handleSendResetLink,
           child: _isLoading
@@ -195,7 +195,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         ),
                       ),
                     ),
-                    const Container(width: 8),
+                    Container(width: 8),
                     Text(S.sendResetLinkLoading),
                   ],
                 )
@@ -225,7 +225,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             ),
           ),
         ),
-        const Container(height: AppSpacing.md),
+        Container(height: AppSpacing.md),
         Text(
           S.resetLinkSentTitle,
           textAlign: TextAlign.center,
@@ -236,7 +236,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             color: colors.textPrimary,
           ),
         ),
-        const Container(height: AppSpacing.sm),
+        Container(height: AppSpacing.sm),
         RichText(
           textAlign: TextAlign.center,
           text: TextSpan(
@@ -248,7 +248,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             children: _buildResetMessageSpans(colors),
           ),
         ),
-        const Container(height: AppSpacing.lg),
+        Container(height: AppSpacing.lg),
         FilledButton(
           onPressed: () {
             Navigator.of(context).pop();
@@ -312,7 +312,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             color: colors.textSecondary,
           ),
         ),
-        const Container(height: 4),
+        Container(height: 4),
         TextField(
           controller: _emailController,
           focusNode: _emailFocusNode,

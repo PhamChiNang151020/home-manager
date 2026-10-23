@@ -157,13 +157,13 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                       children: [
                         _buildBackButton(colors),
                         const Center(child: AppBrandLogo(size: 64)),
-                        const Container(height: AppSpacing.md),
+                        Container(height: AppSpacing.md),
                         Text(
                           S.appName,
                           style: Theme.of(context).textTheme.headlineMedium,
                           textAlign: TextAlign.center,
                         ),
-                        const Container(height: AppSpacing.xs),
+                        Container(height: AppSpacing.xs),
                         Text(
                           S.appTagline,
                           textAlign: TextAlign.center,
@@ -174,7 +174,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        const Container(height: AppSpacing.md),
+                        Container(height: AppSpacing.md),
                         Text(
                           S.createAccount,
                           textAlign: TextAlign.center,
@@ -184,13 +184,13 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                             color: colors.textPrimary,
                           ),
                         ),
-                        const Container(height: AppSpacing.md),
+                        Container(height: AppSpacing.md),
                         _buildEmailField(colors),
-                        const Container(height: AppSpacing.md),
+                        Container(height: AppSpacing.md),
                         _buildPasswordField(colors),
-                        const Container(height: AppSpacing.md),
+                        Container(height: AppSpacing.md),
                         _buildConfirmPasswordField(colors),
-                        const Container(height: AppSpacing.sm),
+                        Container(height: AppSpacing.sm),
                         FilledButton(
                           onPressed: _isLoading ? null : _handleCreateAccount,
                           child: _isLoading
@@ -207,13 +207,13 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                                         ),
                                       ),
                                     ),
-                                    const Container(width: 8),
+                                    Container(width: 8),
                                     Text(S.createAccountLoading),
                                   ],
                                 )
                               : const Text(S.createAccount),
                         ),
-                        const Container(height: AppSpacing.sm),
+                        Container(height: AppSpacing.sm),
                         _buildSignInFooter(colors),
                       ],
                     ),
@@ -255,7 +255,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             color: colors.textSecondary,
           ),
         ),
-        const Container(height: 4),
+        Container(height: 4),
         TextField(
           controller: _emailController,
           focusNode: _emailFocusNode,
@@ -335,7 +335,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             color: colors.textSecondary,
           ),
         ),
-        const Container(height: 4),
+        Container(height: 4),
         TextField(
           controller: _passwordController,
           focusNode: _passwordFocusNode,
@@ -429,7 +429,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             color: colors.textSecondary,
           ),
         ),
-        const Container(height: 4),
+        Container(height: 4),
         TextField(
           controller: _confirmPasswordController,
           focusNode: _confirmPasswordFocusNode,
@@ -520,7 +520,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             color: colors.textSecondary,
           ),
         ),
-        const Container(width: 4),
+        Container(width: 4),
         TextButton(
           onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
           style: TextButton.styleFrom(

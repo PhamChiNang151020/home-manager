@@ -52,13 +52,13 @@ class SignInPage extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             const Center(child: AppBrandLogo(size: 64)),
-                            const SizedBox(height: AppSpacing.md),
+                            SizedBox(height: AppSpacing.md),
                             Text(
                               S.appName,
                               style: Theme.of(context).textTheme.headlineMedium,
                               textAlign: TextAlign.center,
                             ),
-                            const SizedBox(height: AppSpacing.xs),
+                            SizedBox(height: AppSpacing.xs),
                             Text(
                               S.appTagline,
                               textAlign: TextAlign.center,
@@ -70,7 +70,7 @@ class SignInPage extends StatelessWidget {
                               ),
                             ),
                             if (error != null) ...[
-                              const SizedBox(height: AppSpacing.md),
+                              SizedBox(height: AppSpacing.md),
                               Text(
                                 error!,
                                 textAlign: TextAlign.center,

@@ -119,7 +119,7 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
-        const SizedBox(height: AppSpacing.md),
+        SizedBox(height: AppSpacing.md),
         Text(
           S.signInHint,
           textAlign: TextAlign.center,
@@ -127,13 +127,13 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
             color: colors.textSecondary,
           ),
         ),
-        const SizedBox(height: AppSpacing.md),
+        SizedBox(height: AppSpacing.md),
         _buildEmailField(colors),
-        const SizedBox(height: AppSpacing.md),
+        SizedBox(height: AppSpacing.md),
         _buildPasswordField(colors),
         _buildForgotPasswordButton(colors),
         if (_generalError != null) ...[
-          const SizedBox(height: AppSpacing.sm),
+          SizedBox(height: AppSpacing.sm),
           Text(
             _generalError!,
             style: TextStyle(
@@ -143,7 +143,7 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
             textAlign: TextAlign.center,
           ),
         ],
-        const SizedBox(height: AppSpacing.sm),
+        SizedBox(height: AppSpacing.sm),
         FilledButton(
           onPressed: _isLoading ? null : _handleSignIn,
           child: _isLoading
@@ -166,11 +166,11 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
                 )
               : const Text(S.signIn),
         ),
-        const SizedBox(height: AppSpacing.lg),
+        SizedBox(height: AppSpacing.lg),
         _buildDivider(colors),
-        const SizedBox(height: AppSpacing.lg),
+        SizedBox(height: AppSpacing.lg),
         _buildGoogleButton(colors),
-        const SizedBox(height: AppSpacing.sm),
+        SizedBox(height: AppSpacing.sm),
         _buildCreateAccountFooter(colors),
       ],
     );
@@ -188,7 +188,7 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
             color: colors.textSecondary,
           ),
         ),
-        const SizedBox(height: 4),
+        SizedBox(height: 4),
         TextField(
           controller: _emailController,
           focusNode: _emailFocusNode,
@@ -265,7 +265,7 @@ class _EmailPasswordSignInFormState extends State<EmailPasswordSignInForm> {
             color: colors.textSecondary,
           ),
         ),
-        const SizedBox(height: 4),
+        SizedBox(height: 4),
         TextField(
           controller: _passwordController,
           focusNode: _passwordFocusNode,

@@ -140,13 +140,13 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const Center(child: AppBrandLogo(size: 64)),
-                        const Container(height: AppSpacing.md),
+                        Container(height: AppSpacing.md),
                         Text(
                           S.appName,
                           style: Theme.of(context).textTheme.headlineMedium,
                           textAlign: TextAlign.center,
                         ),
-                        const Container(height: AppSpacing.xs),
+                        Container(height: AppSpacing.xs),
                         Text(
                           S.appTagline,
                           textAlign: TextAlign.center,
@@ -157,7 +157,7 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        const Container(height: AppSpacing.md),
+                        Container(height: AppSpacing.md),
                         Text(
                           S.setPasswordTitle,
                           textAlign: TextAlign.center,
@@ -167,7 +167,7 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                             color: colors.textPrimary,
                           ),
                         ),
-                        const Container(height: AppSpacing.xs),
+                        Container(height: AppSpacing.xs),
                         Text(
                           "Cho tài khoản ${widget.email}",
                           textAlign: TextAlign.center,
@@ -177,12 +177,12 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                             color: colors.textSecondary,
                           ),
                         ),
-                        const Container(height: AppSpacing.md),
+                        Container(height: AppSpacing.md),
                         _buildPasswordField(colors),
-                        const Container(height: AppSpacing.md),
+                        Container(height: AppSpacing.md),
                         _buildConfirmPasswordField(colors),
                         if (_generalError != null) ...[
-                          const Container(height: AppSpacing.sm),
+                          Container(height: AppSpacing.sm),
                           Text(
                             _generalError!,
                             style: TextStyle(
@@ -192,7 +192,7 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                             textAlign: TextAlign.center,
                           ),
                           if (_generalError == S.errorLinkExpired) ...[
-                            const Container(height: AppSpacing.xs),
+                            Container(height: AppSpacing.xs),
                             TextButton(
                               onPressed: _isLoading
                                   ? null
@@ -204,7 +204,7 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                             ),
                           ],
                         ],
-                        const Container(height: AppSpacing.sm),
+                        Container(height: AppSpacing.sm),
                         FilledButton(
                           onPressed: _isLoading ? null : _handleSetPassword,
                           child: _isLoading
@@ -221,7 +221,7 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                                         ),
                                       ),
                                     ),
-                                    const Container(width: 8),
+                                    Container(width: 8),
                                     Text(S.setPasswordLoading),
                                   ],
                                 )
@@ -251,7 +251,7 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
             color: colors.textSecondary,
           ),
         ),
-        const Container(height: 4),
+        Container(height: 4),
         TextField(
           controller: _passwordController,
           focusNode: _passwordFocusNode,
@@ -345,7 +345,7 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
             color: colors.textSecondary,
           ),
         ),
-        const Container(height: 4),
+        Container(height: 4),
         TextField(
           controller: _confirmPasswordController,
           focusNode: _confirmPasswordFocusNode,
