@@ -29,7 +29,7 @@ Consult this file before grepping the repo. Update when adding modules under `li
 |------|------|
 | Sign in | `lib/features/auth/sign_in_page.dart` |
 | Create home | `lib/features/homes/create_home_dialog.dart` |
-| Overview dashboard | `lib/features/overview/overview_page.dart` — hero net worth + `overview_income_spend_chart.dart` + category donut + compact quick-access grid; legacy `overview_summary_card.dart`, `overview_shortcut_grid.dart`, `overview_spend_trend_chart.dart` |
+| Overview dashboard | `lib/features/overview/overview_page.dart` — hero net worth + `overview_income_spend_chart.dart` + category donut + compact quick-access grid |
 | Transactions hub | `lib/features/transactions/transactions_hub_page.dart` (sub-tabs: Điện·Nước / Hàng ngày / Tín dụng·Nợ / Tiết kiệm) |
 | Notifications | `lib/features/notifications/notifications_page.dart` |
 | Personal hub | `lib/features/personal/personal_hub_page.dart` (Thông tin / Chia sẻ / Cài đặt / Đăng xuất); `managed_home_page.dart` (đổi nhà + rời nhà); `leave_home_sheet.dart` |
@@ -37,12 +37,12 @@ Consult this file before grepping the repo. Update when adding modules under `li
 | Water | `lib/features/water/` (mirror of electricity) |
 | Expenses / quick-add | `lib/features/expenses/` (list, form, `quick_add_sheet.dart`, presets, OCR) |
 | Income | `lib/features/income/income_page.dart` |
-| Finance hub | `lib/features/finance/finance_hub_page.dart` (optional push target; primary path is Transactions hub) |
+| Finance (module) | `lib/features/finance/` (bank credit, personal debts, savings; no hub page; primary path is Transactions hub) |
 | Bank credit | `lib/features/bank_credit/` |
 | Personal debts | `lib/features/personal_debts/` |
 | Savings | `lib/features/savings/` |
 | App lock | `lib/features/lock/` (lock screen, setup PIN) |
-| Settings (nested) | `settings_home_page.dart`, `settings_schedule_page.dart`, `settings_members_page.dart`, `settings_account_page.dart`, `settings_appearance_page.dart`, `settings_security_page.dart`; legacy `settings_hub_page.dart` |
+| Settings (nested) | `settings_home_page.dart`, `settings_schedule_page.dart`, `settings_members_page.dart`, `settings_account_page.dart`, `settings_appearance_page.dart`, `settings_security_page.dart` |
 | PWA install | `lib/features/pwa/install_home_screen_banner.dart`, `install_home_screen_page.dart` |
 | iOS Web Clip | `web/install-ios.html`, `web/to-am.mobileconfig`, `web/join.html`, `tool/generate_ios_webclip_profile.dart` |
 
@@ -73,7 +73,7 @@ Consult this file before grepping the repo. Update when adding modules under `li
 | Theme | `lib/core/theme/app_theme.dart` (Nunito, `glass:`), `app_color_scheme.dart` (glass tokens + ambient), `app_spacing.dart`, `safe_bottom_padding.dart` |
 | Theme state | `lib/core/state/theme_controller.dart` — mode, accent, glass |
 | Fonts | `assets/fonts/Nunito/static/` (Regular 400 · Medium 500 · SemiBold 600 · Bold 700) |
-| Domain | `electricity_validation.dart`, `water_validation.dart`, `meter_math.dart`, `month_balance.dart`, `month_clamp.dart`, `expense_totals.dart`, `net_worth.dart`, `reminder_aggregator.dart`, `receipt_amount_parser.dart`, `selected_home.dart`, `period_history_filter.dart`, `pwa_install.dart`, `bank_brand.dart`, `join_link.dart`, `invite_email.dart`, `oauth_launch.dart`, `oauth_redirect.dart`, `safe_bottom_inset.dart`, `form_dirty.dart` |
+| Domain | `electricity_validation.dart`, `water_validation.dart`, `meter_math.dart`, `month_balance.dart`, `month_clamp.dart`, `expense_totals.dart`, `net_worth.dart`, `reminder_aggregator.dart`, `receipt_amount_parser.dart`, `selected_home.dart`, `period_history_filter.dart`, `pwa_install.dart`, `bank_brand.dart`, `join_link.dart`, `oauth_launch.dart`, `oauth_redirect.dart`, `safe_bottom_inset.dart`, `form_dirty.dart` |
 | Models | `home.dart`, `electricity_period.dart`, `water_period.dart`, `expense.dart`, `expense_preset.dart`, `income.dart`, `tracking_mode.dart`, `lock_settings.dart`, `bank_account.dart`, `personal_debt.dart`, `savings.dart`, `reminder_item.dart` |
 | Services | `home_service.dart`, `invite_service.dart`, `join_link_store.dart`, `electricity_service.dart` (`BillPhotoService`), `water_service.dart`, `expense_service.dart`, `income_service.dart`, `overview_service.dart`, `ocr_service.dart`, `lock_service.dart`, `bank_account_service.dart`, `personal_debt_service.dart`, `savings_service.dart`, `wallet_service.dart` |
 
