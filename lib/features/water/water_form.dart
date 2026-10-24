@@ -14,7 +14,7 @@ import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/electricity/bill_photo_viewer.dart";
 import "package:home_manager/features/shared/app_sheet.dart";
-import "package:home_manager/features/water/water_period_month_conflict.dart";
+import "package:home_manager/core/domain/period_month_conflict.dart";
 import "package:home_manager/features/shared/app_toast.dart";
 import "package:home_manager/features/shared/bill_photo_pick_field.dart";
 import "package:home_manager/features/shared/datetime_picker.dart";
@@ -131,14 +131,31 @@ class _WaterAddSheetState extends State<_WaterAddSheet> {
   bool get _isMeter => widget.home.trackingMode == TrackingMode.meter;
 
   void _updateDuplicateHint() {
-    final duplicate = findWaterPeriodForMonth(widget.existingPeriods, _month);
+    final duplicate = findPeriodForMonth(
+      periods: widget.existingPeriods,
+      month: _month,
+      getPeriodMonth: (p) => p.periodMonth,
+      getId: (p) => p.id,
+    );
     _duplicateHint = duplicate == null ? null : S.duplicateWaterPeriodHint;
   }
 
   Future<bool> _confirmDuplicateIfNeeded() async {
-    final duplicate = findWaterPeriodForMonth(widget.existingPeriods, _month);
+    final duplicate = findPeriodForMonth(
+      periods: widget.existingPeriods,
+      month: _month,
+      getPeriodMonth: (p) => p.periodMonth,
+      getId: (p) => p.id,
+    );
     if (duplicate == null) return true;
-    return confirmDuplicateWaterPeriodMonth(context, _month);
+    return confirmDuplicatePeriodMonth(
+      context,
+      _month,
+      title: S.duplicateWaterPeriodTitle,
+      confirmMessage: S.duplicateWaterPeriodConfirm,
+      cancelLabel: S.cancel,
+      overwriteLabel: S.overwrite,
+    );
   }
 
   @override
@@ -393,22 +410,33 @@ class _WaterPeriodDialogState extends State<_WaterPeriodDialog> {
   bool get _isMeter => widget.home.trackingMode == TrackingMode.meter;
 
   void _updateDuplicateHint() {
-    final duplicate = findWaterPeriodForMonth(
-      widget.existingPeriods,
-      _month,
+    final duplicate = findPeriodForMonth(
+      periods: widget.existingPeriods,
+      month: _month,
+      getPeriodMonth: (p) => p.periodMonth,
+      getId: (p) => p.id,
       excludeId: widget.existing.id,
     );
     _duplicateHint = duplicate == null ? null : S.duplicateWaterPeriodHint;
   }
 
   Future<bool> _confirmDuplicateIfNeeded() async {
-    final duplicate = findWaterPeriodForMonth(
-      widget.existingPeriods,
-      _month,
+    final duplicate = findPeriodForMonth(
+      periods: widget.existingPeriods,
+      month: _month,
+      getPeriodMonth: (p) => p.periodMonth,
+      getId: (p) => p.id,
       excludeId: widget.existing.id,
     );
     if (duplicate == null) return true;
-    return confirmDuplicateWaterPeriodMonth(context, _month);
+    return confirmDuplicatePeriodMonth(
+      context,
+      _month,
+      title: S.duplicateWaterPeriodTitle,
+      confirmMessage: S.duplicateWaterPeriodConfirm,
+      cancelLabel: S.cancel,
+      overwriteLabel: S.overwrite,
+    );
   }
 
   @override

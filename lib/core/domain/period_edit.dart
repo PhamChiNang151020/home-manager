@@ -1,6 +1,6 @@
 import "package:intl/intl.dart";
 
-abstract final class WaterPeriodEdit {
+abstract final class PeriodEdit {
   static String monthKey(DateTime month) =>
       DateFormat("yyyy-MM-01").format(DateTime(month.year, month.month));
 
