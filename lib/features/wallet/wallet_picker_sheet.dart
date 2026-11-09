@@ -1,3 +1,5 @@
+import "dart:math" as math;
+
 import "package:flutter/material.dart";
 import "package:home_manager/core/format/vnd_format.dart";
 import "package:home_manager/core/l10n/strings.dart";
@@ -49,74 +51,89 @@ class _WalletPickerSheet extends StatelessWidget {
   final String? selectedWalletId;
   final double? amountVnd;
 
+  /// n wallet rows + 1 "Không trừ ví"; dividers between rows add 1px each.
+  double _listHeight(int rowCount) {
+    if (rowCount <= 0) return 0;
+    return rowCount * 64.0 + (rowCount - 1) * 1.0;
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
-    final maxSheetTop = 115.0;
     final screenH = MediaQuery.sizeOf(context).height;
+    // Spec: grow up to y 115; hug content when shorter (n=2 -> sheet 532).
+    const maxSheetTop = 115.0;
     final maxHeight = screenH - maxSheetTop;
+    const headerH = 36.0 + 24.0 + 16.0; // handle + title + gap
+    final bottomPad = AppSpacing.md + bottomInset;
+    final maxListH = math.max(0.0, maxHeight - headerH - bottomPad);
+    final rowCount = wallets.length + 1;
+    final listH = _listHeight(rowCount);
+    final cappedListH = math.min(listH, maxListH);
+    final needsScroll = listH > maxListH + 0.5;
 
-    return ConstrainedBox(
-      constraints: BoxConstraints(maxHeight: maxHeight),
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(
-          AppSpacing.md,
-          0,
-          AppSpacing.md,
-          AppSpacing.md + bottomInset,
+    final list = ListGroup(
+      children: [
+        for (var i = 0; i < wallets.length; i++)
+          _WalletPickRow(
+            wallet: wallets[i],
+            selected: selectedWalletId == wallets[i].id,
+            amountLow:
+                amountVnd != null && wallets[i].balanceVnd < amountVnd!,
+            showDivider: true,
+            onTap: () => Navigator.pop(context, wallets[i].id),
+          ),
+        _NonePayRow(
+          selected: selectedWalletId == null,
+          showDivider: false,
+          onTap: () => Navigator.pop(context, walletPickerNone),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(
-              height: 36,
-              child: Center(
-                child: Container(
-                  width: 32,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: colors.border,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
+      ],
+    );
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.md,
+        0,
+        AppSpacing.md,
+        bottomPad,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(
+            height: 36,
+            child: Center(
+              child: Container(
+                width: 32,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: colors.border,
+                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
             ),
-            Text(
-              S.walletPickTitle,
-              style: const TextStyle(
-                fontFamily: AppFonts.nunito,
-                fontSize: 18,
-                height: 24 / 18,
-                fontWeight: FontWeight.w700,
-              ),
+          ),
+          Text(
+            S.walletPickTitle,
+            style: const TextStyle(
+              fontFamily: AppFonts.nunito,
+              fontSize: 18,
+              height: 24 / 18,
+              fontWeight: FontWeight.w700,
             ),
-            const SizedBox(height: AppSpacing.md),
-            Flexible(
-              child: ListGroup(
-                children: [
-                  for (var i = 0; i < wallets.length; i++)
-                    _WalletPickRow(
-                      wallet: wallets[i],
-                      selected: selectedWalletId == wallets[i].id,
-                      amountLow:
-                          amountVnd != null &&
-                          wallets[i].balanceVnd < amountVnd!,
-                      showDivider: true,
-                      onTap:
-                          () => Navigator.pop(context, wallets[i].id),
-                    ),
-                  _NonePayRow(
-                    selected: selectedWalletId == null,
-                    showDivider: false,
-                    onTap: () => Navigator.pop(context, walletPickerNone),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          SizedBox(
+            height: cappedListH,
+            child:
+                needsScroll
+                    ? SingleChildScrollView(child: list)
+                    : list,
+          ),
+        ],
       ),
     );
   }

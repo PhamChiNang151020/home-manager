@@ -111,6 +111,14 @@ Future<void> _loadNunito() async {
           rootBundle.load("assets/fonts/Nunito/static/Nunito-ExtraBold.ttf"),
         );
   await loader.load();
+  final materialPath =
+      "${Platform.environment["HOME"]}/flutter/bin/cache/artifacts/material_fonts/MaterialIcons-Regular.otf";
+  final material =
+      FontLoader("MaterialIcons")
+        ..addFont(
+          File(materialPath).readAsBytes().then((b) => ByteData.view(b.buffer)),
+        );
+  await material.load();
 }
 
 void _setPhone(WidgetTester tester) {
@@ -135,6 +143,7 @@ Widget _frame({required Widget child}) {
           textScaler: TextScaler.noScaling,
         ),
         child: MaterialApp(
+          debugShowCheckedModeBanner: false,
           theme: AppTheme.build(
             brightness: Brightness.light,
             accent: AppAccent.amber,

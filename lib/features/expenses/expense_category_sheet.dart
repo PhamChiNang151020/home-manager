@@ -256,6 +256,8 @@ class _ExpenseCategorySheetState extends State<_ExpenseCategorySheet> {
                 ),
               ),
             ),
+            // Spec 06: field 450–498, error slot 502–518 (4px gap).
+            const SizedBox(height: 4),
             SizedBox(
               height: 16,
               child:
@@ -326,25 +328,31 @@ class _ExpenseCategorySheetState extends State<_ExpenseCategorySheet> {
                 child: const Text(S.save),
               ),
             ),
+            // Spec 07: Lưu 658–706, error 714–746 (32), Xoá 754–802.
             if (_deleteError != null) ...[
               const SizedBox(height: 8),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(Icons.error_outline, size: 16, color: colors.error),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      _deleteError!,
-                      style: TextStyle(
-                        fontFamily: AppFonts.nunito,
-                        fontSize: 12,
-                        height: 16 / 12,
-                        color: colors.error,
+              SizedBox(
+                height: 32,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Icons.error_outline, size: 16, color: colors.error),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        _deleteError!,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontFamily: AppFonts.nunito,
+                          fontSize: 12,
+                          height: 16 / 12,
+                          color: colors.error,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
             if (_canDelete) ...[

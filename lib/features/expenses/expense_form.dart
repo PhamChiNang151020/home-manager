@@ -351,6 +351,8 @@ class _ExpenseFormSheetState extends State<_ExpenseFormSheet> {
                 overBalance: _overBalance,
                 onTap: _pickWallet,
               ),
+              // Spec: field B+36–B+100, over-balance B+104–B+120 (4px gap).
+              const SizedBox(height: 4),
               // Always reserve error line height (16) so layout does not jump.
               SizedBox(
                 height: 16,

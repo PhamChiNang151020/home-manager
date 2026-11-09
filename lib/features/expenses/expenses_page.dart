@@ -268,6 +268,7 @@ class ExpensesPageState extends State<ExpensesPage> {
           AnimatedEntrance(
             index: 1,
             child: _SummaryCard(
+              key: const ValueKey("expenses-summary-card"),
               month: _month.month,
               total: total,
               incomeTotal: _incomeTotal,
@@ -293,12 +294,17 @@ class ExpensesPageState extends State<ExpensesPage> {
             const SizedBox(height: AppSpacing.sm),
             AnimatedEntrance(
               index: 3,
-              child: _WhoSpentCard(rows: who, monthTotal: total),
+              child: _WhoSpentCard(
+                key: const ValueKey("expenses-who-card"),
+                rows: who,
+                monthTotal: total,
+              ),
             ),
             const SizedBox(height: AppSpacing.lg),
             AnimatedEntrance(
               index: 4,
               child: SectionHeader(
+                key: const ValueKey("expenses-items-header"),
                 title: S.expenseItems,
                 linkLabel: "${S.category} ›",
                 onLink: _openCategories,
@@ -307,6 +313,7 @@ class ExpensesPageState extends State<ExpensesPage> {
             for (var d = 0; d < days.length; d++) ...[
               SizedBox(height: d == 0 ? AppSpacing.sm : 12),
               Text(
+                key: d == 0 ? const ValueKey("expenses-day0") : null,
                 DateFormat("EEEE, dd/MM", "vi").format(days[d]),
                 style: TextStyle(
                   fontFamily: AppFonts.nunito,
@@ -318,6 +325,7 @@ class ExpensesPageState extends State<ExpensesPage> {
               ),
               const SizedBox(height: AppSpacing.sm),
               ListGroup(
+                key: d == 0 ? const ValueKey("expenses-day0-list") : null,
                 children: [
                   for (var i = 0; i < byDay[days[d]]!.length; i++)
                     _ExpenseRow(
@@ -357,6 +365,7 @@ class ExpensesPageState extends State<ExpensesPage> {
 
 class _SummaryCard extends StatelessWidget {
   const _SummaryCard({
+    super.key,
     required this.month,
     required this.total,
     required this.incomeTotal,
@@ -392,8 +401,10 @@ class _SummaryCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                // Spec amount band 272–311 (39) for 28/36 text.
+                // Spec amount band 272–311 (39) for 28/36 text; full row width.
                 SizedBox(
+                  key: const ValueKey("expenses-summary-amount"),
+                  width: double.infinity,
                   height: 39,
                   child: Text(
                     VndFormat.format(total),
@@ -464,7 +475,11 @@ class _SummaryCard extends StatelessWidget {
 }
 
 class _WhoSpentCard extends StatelessWidget {
-  const _WhoSpentCard({required this.rows, required this.monthTotal});
+  const _WhoSpentCard({
+    super.key,
+    required this.rows,
+    required this.monthTotal,
+  });
 
   final List<WhoSpentRow> rows;
   final double monthTotal;
@@ -476,6 +491,7 @@ class _WhoSpentCard extends StatelessWidget {
       children: [
         for (var i = 0; i < rows.length; i++)
           _WhoSpentRow(
+            key: ValueKey("who-row-$i"),
             row: rows[i],
             ratio: monthTotal <= 0 ? 0 : rows[i].amountVnd / monthTotal,
             showDivider: i < rows.length - 1,
@@ -488,6 +504,7 @@ class _WhoSpentCard extends StatelessWidget {
 
 class _WhoSpentRow extends StatelessWidget {
   const _WhoSpentRow({
+    super.key,
     required this.row,
     required this.ratio,
     required this.showDivider,
@@ -562,7 +579,10 @@ class _WhoSpentRow extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 6),
-                      ProgressBar(value: ratio),
+                      ProgressBar(
+                        key: ValueKey("who-bar-${row.userId}"),
+                        value: ratio,
+                      ),
                     ],
                   ),
                 ),
