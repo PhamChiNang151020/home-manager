@@ -12,13 +12,14 @@ Future<T?> showAppSheet<T>({
   required WidgetBuilder builder,
   bool isScrollControlled = true,
   bool useRootNavigator = false,
+  bool showDragHandle = true,
 }) {
   return showModalBottomSheet<T>(
     context: context,
     isScrollControlled: isScrollControlled,
     useRootNavigator: useRootNavigator,
     useSafeArea: true,
-    showDragHandle: true,
+    showDragHandle: showDragHandle,
     builder: (sheetContext) {
       final child = builder(sheetContext);
       if (!sheetContext.appColors.glass) return child;

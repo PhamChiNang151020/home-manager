@@ -39,9 +39,11 @@ void main() {
       final size = tester.getSize(find.byType(AppBottomNav));
       expect(
         size.height,
-        AppSpacing.touchMin + AppSpacing.md + AppSpacing.sm + 34,
+        AppSpacing.touchMin + AppSpacing.md + 34,
       );
       expect(find.text(S.overview), findsOneWidget);
+      expect(find.text(S.dues), findsOneWidget);
+      expect(find.text(S.assets), findsOneWidget);
     } finally {
       debugDefaultTargetPlatformOverride = null;
     }
@@ -86,7 +88,7 @@ void main() {
     await tester.tap(find.text(S.overview));
     expect(hapticCalls, isEmpty);
 
-    await tester.tap(find.text(S.personal));
+    await tester.tap(find.text(S.assets));
     expect(selected, 3);
     expect(hapticCalls, hasLength(1));
   });

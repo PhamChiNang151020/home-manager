@@ -6,7 +6,8 @@ enum AppToastKind { success, destructive, info }
 
 /// Gap above the scaffold bottom chrome when a bottom nav is present.
 /// Floating [SnackBar] already clears the nav; only this extra gap is needed.
-const _toastGapAboveNav = AppSpacing.sm; // 8 -> toast y 724–772 on 393×852
+/// From Đợt 1 (nav top 754): toast y 698–746. Without nav: y 754–802.
+const _toastGapAboveNav = AppSpacing.sm; // 8
 
 /// Bottom inset when there is no bottom nav (Members, etc.): y 754–802.
 const _toastBottomWithoutNav = 50.0;
