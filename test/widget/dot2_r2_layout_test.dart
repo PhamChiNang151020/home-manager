@@ -1,7 +1,5 @@
-import "dart:io";
 
 import "package:flutter/material.dart";
-import "package:flutter/services.dart";
 import "package:flutter_test/flutter_test.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/models/expense.dart";
@@ -30,6 +28,7 @@ import "package:mocktail/mocktail.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
 
 import "../support/mock_supabase.dart";
+import "../support/shots.dart";
 
 class MockExpenseService extends Mock implements ExpenseService {}
 
@@ -69,27 +68,7 @@ final _catCustom = ExpenseCategory(
 );
 
 Future<void> _loadFonts() async {
-  final nunito =
-      FontLoader("Nunito")
-        ..addFont(rootBundle.load("assets/fonts/Nunito/static/Nunito-Regular.ttf"))
-        ..addFont(rootBundle.load("assets/fonts/Nunito/static/Nunito-Medium.ttf"))
-        ..addFont(
-          rootBundle.load("assets/fonts/Nunito/static/Nunito-SemiBold.ttf"),
-        )
-        ..addFont(rootBundle.load("assets/fonts/Nunito/static/Nunito-Bold.ttf"))
-        ..addFont(
-          rootBundle.load("assets/fonts/Nunito/static/Nunito-ExtraBold.ttf"),
-        );
-  await nunito.load();
-  // MaterialIcons from the Flutter SDK cache (bundled into test via engine).
-  final materialPath =
-      "${Platform.environment["HOME"]}/flutter/bin/cache/artifacts/material_fonts/MaterialIcons-Regular.otf";
-  final material =
-      FontLoader("MaterialIcons")
-        ..addFont(
-          File(materialPath).readAsBytes().then((b) => ByteData.view(b.buffer)),
-        );
-  await material.load();
+  await loadShotFonts();
 }
 
 void _phone(WidgetTester tester) {

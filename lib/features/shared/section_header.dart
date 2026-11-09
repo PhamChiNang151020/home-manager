@@ -7,8 +7,8 @@ import "package:home_manager/core/theme/app_spacing.dart";
 /// Default: 16/24 w700 (proposal component table).
 /// [dense]: 12/16 w700 muted (members / home-empty 08).
 ///
-/// Link touch target is 48px tall centered on the 24px title band
-/// (spec 02: title 646–670, link touch 634–682).
+/// Link touch: 48 tall, x 286–385 inside a MobileViewport content band
+/// (content right 377 → overflow 8px into the screen margin).
 class SectionHeader extends StatelessWidget {
   const SectionHeader({
     super.key,
@@ -24,6 +24,12 @@ class SectionHeader extends StatelessWidget {
   final String? linkLabel;
   final VoidCallback? onLink;
   final bool dense;
+
+  /// Spec touch width (286–385).
+  static const linkTouchWidth = 99.0;
+
+  /// Extend past content right (377) to screen x 385.
+  static const linkOverflowRight = 8.0;
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +65,8 @@ class SectionHeader extends StatelessWidget {
       style: TextButton.styleFrom(
         foregroundColor: colors.accent,
         padding: const EdgeInsets.symmetric(horizontal: 8),
-        minimumSize: const Size(48, 48),
+        minimumSize: const Size(linkTouchWidth, AppSpacing.touchMin),
+        maximumSize: const Size(linkTouchWidth, AppSpacing.touchMin),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
       child: Text(
@@ -80,12 +87,13 @@ class SectionHeader extends StatelessWidget {
             children: [
               Expanded(child: titleText),
               if (trailing != null) trailing!,
-              // Horizontal reserve; real control is Positioned (48 tall).
-              const SizedBox(width: 99),
+              // Reserve in-flow width so title does not run under the link.
+              SizedBox(width: linkTouchWidth - linkOverflowRight),
             ],
           ),
           Positioned(
-            right: 0,
+            right: -linkOverflowRight,
+            width: linkTouchWidth,
             top: (bandH - AppSpacing.touchMin) / 2,
             height: AppSpacing.touchMin,
             child: link,

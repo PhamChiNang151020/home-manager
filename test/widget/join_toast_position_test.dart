@@ -1,10 +1,9 @@
-import "dart:io";
 import "dart:ui" as ui;
 
 import "package:flutter/material.dart";
 import "package:flutter/rendering.dart";
-import "package:flutter/services.dart";
 import "package:flutter_test/flutter_test.dart";
+import "../support/shots.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/theme/app_accent.dart";
 import "package:home_manager/core/theme/app_theme.dart";
@@ -13,7 +12,6 @@ import "package:home_manager/features/shared/app_toast.dart";
 import "package:home_manager/features/shell/app_bottom_nav.dart";
 import "package:home_manager/features/shell/empty_home_view.dart";
 
-const _outDir = "/opt/cursor/artifacts/dot1";
 
 /// Mirrors AppShell join timing: flag after accept, toast post-frame with nav.
 class _JoinFlowShell extends StatefulWidget {
@@ -74,18 +72,7 @@ class _JoinFlowShellState extends State<_JoinFlowShell> {
 }
 
 Future<void> _loadNunito() async {
-  final loader =
-      FontLoader("Nunito")
-        ..addFont(rootBundle.load("assets/fonts/Nunito/static/Nunito-Regular.ttf"))
-        ..addFont(rootBundle.load("assets/fonts/Nunito/static/Nunito-Medium.ttf"))
-        ..addFont(
-          rootBundle.load("assets/fonts/Nunito/static/Nunito-SemiBold.ttf"),
-        )
-        ..addFont(rootBundle.load("assets/fonts/Nunito/static/Nunito-Bold.ttf"))
-        ..addFont(
-          rootBundle.load("assets/fonts/Nunito/static/Nunito-ExtraBold.ttf"),
-        );
-  await loader.load();
+  await loadShotFonts();
 }
 
 Future<void> _savePng(WidgetTester tester) async {
@@ -99,9 +86,7 @@ Future<void> _savePng(WidgetTester tester) async {
     final data = await image.toByteData(format: ui.ImageByteFormat.png);
     return data!.buffer.asUint8List();
   });
-  final dir = Directory(_outDir);
-  if (!dir.existsSync()) dir.createSync(recursive: true);
-  File("$_outDir/07_join_toast_tong_quan.png").writeAsBytesSync(bytes!);
+  writeShotBytes("07_join_toast_tong_quan.png", bytes!);
 }
 
 void main() {
@@ -178,17 +163,14 @@ void main() {
       expect(toastRect.top, closeTo(698, 0.5));
       expect(toastRect.bottom, closeTo(746, 0.5));
 
-      final outDir = Directory(_outDir);
-      if (outDir.existsSync() || Directory("/opt/cursor/artifacts").existsSync()) {
-        outDir.createSync(recursive: true);
+      if (shouldCaptureShots) {
         await _savePng(tester);
-        File("$_outDir/measured.join_toast_y.txt").writeAsStringSync(
+        writeShotText(
+          "measured.join_toast_y.txt",
           "toast_top=${toastRect.top}\n"
           "toast_bottom=${toastRect.bottom}\n"
           "nav_top=${navRect.top}\n"
-          "gap_above_nav=${navRect.top - toastRect.bottom}\n"
-          "viewport=393x852\n"
-          "expected_band=698-746\n",
+          "gap=${navRect.top - toastRect.bottom}\n",
         );
       }
     },

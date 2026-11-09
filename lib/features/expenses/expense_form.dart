@@ -14,13 +14,13 @@ import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/core/theme/app_theme.dart";
 import "package:home_manager/features/electricity/bill_photo_viewer.dart";
 import "package:home_manager/features/expenses/expense_category_style.dart";
+import "package:home_manager/features/expenses/expense_wallet_field.dart";
 import "package:home_manager/features/shared/app_sheet.dart";
 import "package:home_manager/features/shared/app_toast.dart";
 import "package:home_manager/features/shared/datetime_picker.dart";
 import "package:home_manager/features/shared/form_title.dart";
 import "package:home_manager/features/shared/labeled_money_field.dart";
 import "package:home_manager/features/shared/labeled_text_field.dart";
-import "package:home_manager/features/shared/list_group.dart";
 import "package:home_manager/features/wallet/wallet_picker_sheet.dart";
 import "package:image_picker/image_picker.dart";
 import "package:intl/intl.dart";
@@ -99,6 +99,9 @@ class _ExpenseFormSheetState extends State<_ExpenseFormSheet> {
   String? _error;
   bool _overBalance = false;
   bool _saving = false;
+  /// Set after a successful insert when wallet debit may still fail; retry
+  /// updates this id instead of inserting a duplicate.
+  String? _createdExpenseId;
 
   @override
   void initState() {
@@ -224,7 +227,7 @@ class _ExpenseFormSheetState extends State<_ExpenseFormSheet> {
       setState(() => _error = S.invalidExpenseAmount);
       return;
     }
-    if (_overBalance) return;
+    if (_overBalance || _saving) return;
     setState(() {
       _error = null;
       _saving = true;
@@ -233,14 +236,28 @@ class _ExpenseFormSheetState extends State<_ExpenseFormSheet> {
       final existing = widget.existing;
       late final Expense saved;
       if (existing == null) {
-        saved = await widget.expenses.insert(
-          homeId: widget.home.id,
-          categoryId: _categoryId,
-          paidBy: _paidBy,
-          amountVnd: money,
-          expenseDate: _date,
-          note: _note.text.trim().isEmpty ? null : _note.text.trim(),
-        );
+        final retryId = _createdExpenseId;
+        if (retryId != null) {
+          // Wallet debit failed earlier — update the same row, do not insert.
+          saved = await widget.expenses.update(
+            id: retryId,
+            categoryId: _categoryId,
+            paidBy: _paidBy,
+            amountVnd: money,
+            expenseDate: _date,
+            note: _note.text.trim().isEmpty ? null : _note.text.trim(),
+          );
+        } else {
+          saved = await widget.expenses.insert(
+            homeId: widget.home.id,
+            categoryId: _categoryId,
+            paidBy: _paidBy,
+            amountVnd: money,
+            expenseDate: _date,
+            note: _note.text.trim().isEmpty ? null : _note.text.trim(),
+          );
+          _createdExpenseId = saved.id;
+        }
       } else {
         saved = await widget.expenses.update(
           id: existing.id,
@@ -275,8 +292,13 @@ class _ExpenseFormSheetState extends State<_ExpenseFormSheet> {
 
       final walletSvc = widget.walletService;
       if (walletSvc != null) {
-        if (existing != null) {
-          await walletSvc.revertExpense(saved.id);
+        if (existing != null || _createdExpenseId != null) {
+          // Revert any prior debit before (re)applying.
+          try {
+            await walletSvc.revertExpense(saved.id);
+          } catch (_) {
+            // First apply has nothing to revert.
+          }
         }
         final selected = _walletId;
         if (selected != null && selected.isNotEmpty) {
@@ -289,6 +311,7 @@ class _ExpenseFormSheetState extends State<_ExpenseFormSheet> {
       }
 
       if (!mounted) return;
+      _createdExpenseId = null;
       popWithAppToast(
         context,
         existing == null ? S.toastExpenseAdded : S.toastExpenseSaved,
@@ -345,7 +368,7 @@ class _ExpenseFormSheetState extends State<_ExpenseFormSheet> {
             LabeledMoneyField(label: S.amount, controller: _amount),
             const SizedBox(height: AppSpacing.formFieldGap),
             if (_walletReady) ...[
-              _WalletField(
+              ExpenseWalletField(
                 wallet: _selectedWallet,
                 enabled: widget.wallets.isNotEmpty,
                 overBalance: _overBalance,
@@ -507,144 +530,6 @@ class _ExpenseFormSheetState extends State<_ExpenseFormSheet> {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _WalletField extends StatelessWidget {
-  const _WalletField({
-    required this.wallet,
-    required this.enabled,
-    required this.overBalance,
-    required this.onTap,
-  });
-
-  final Wallet? wallet;
-  final bool enabled;
-  final bool overBalance;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.appColors;
-    final borderColor = overBalance ? colors.error : colors.border;
-    final borderWidth = overBalance ? 1.5 : 1.0;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(
-          S.walletPayFrom,
-          style: TextStyle(
-            fontFamily: AppFonts.nunito,
-            fontSize: 12,
-            height: 16 / 12,
-            fontWeight: FontWeight.w600,
-            color: colors.textSecondary,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Material(
-          color: colors.bgSurface,
-          borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-          child: InkWell(
-            key: const ValueKey("expense-wallet-field"),
-            onTap: enabled ? onTap : null,
-            borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-            child: Container(
-              height: 64,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-                border: Border.all(color: borderColor, width: borderWidth),
-              ),
-              child:
-                  wallet == null
-                      ? Row(
-                        children: [
-                          Container(
-                            width: 36,
-                            height: 36,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: colors.bgElevated,
-                            ),
-                            child: Icon(
-                              Icons.money_off,
-                              size: 20,
-                              color: colors.textSecondary,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              S.walletPayFromNone,
-                              style: TextStyle(
-                                fontFamily: AppFonts.nunito,
-                                fontSize: 16,
-                                height: 24 / 16,
-                                fontWeight: FontWeight.w700,
-                                color: colors.textSecondary,
-                              ),
-                            ),
-                          ),
-                          if (enabled)
-                            Icon(
-                              Icons.chevron_right,
-                              size: 20,
-                              color: colors.textMuted,
-                            ),
-                        ],
-                      )
-                      : Row(
-                        children: [
-                          ListGroupIcon(
-                            icon: walletKindIcon(wallet!.kind),
-                            color: colors.accent,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  wallet!.name,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontFamily: AppFonts.nunito,
-                                    fontSize: 16,
-                                    height: 24 / 16,
-                                    fontWeight: FontWeight.w700,
-                                    color: colors.textPrimary,
-                                  ),
-                                ),
-                                Text(
-                                  S.walletBalanceOf(
-                                    VndFormat.format(wallet!.balanceVnd),
-                                  ),
-                                  style: TextStyle(
-                                    fontFamily: AppFonts.nunito,
-                                    fontSize: 12,
-                                    height: 16 / 12,
-                                    color: colors.textSecondary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Icon(
-                            Icons.chevron_right,
-                            size: 20,
-                            color: colors.textMuted,
-                          ),
-                        ],
-                      ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

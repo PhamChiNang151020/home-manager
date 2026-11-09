@@ -79,6 +79,8 @@ flutter:
   assets:
     - assets/brand/logo.png
     - assets/brand/google_logo_18.svg
+    # Portable MaterialIcons for widget-test / screenshot FontLoader (no $HOME).
+    - assets/fonts/MaterialIcons-Regular.otf
   fonts:
     - family: Nunito
       fonts:

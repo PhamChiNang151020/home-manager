@@ -1,10 +1,8 @@
 import "dart:convert";
-import "dart:io";
 import "dart:ui" as ui;
 
 import "package:flutter/material.dart";
 import "package:flutter/rendering.dart";
-import "package:flutter/services.dart";
 import "package:flutter_test/flutter_test.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/models/expense.dart";
@@ -38,6 +36,7 @@ import "package:mocktail/mocktail.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
 
 import "../support/mock_supabase.dart";
+import "../support/shots.dart";
 
 class MockExpenseService extends Mock implements ExpenseService {}
 
@@ -49,7 +48,6 @@ class MockIncomeService extends Mock implements IncomeService {}
 
 class MockWalletService extends Mock implements WalletService {}
 
-const _outDir = "/cursor/stores/self/artifacts/dot2/r2";
 
 const _owner = Home(
   id: "h1",
@@ -117,26 +115,7 @@ final _wallets = [
 ];
 
 Future<void> _loadFonts() async {
-  final nunito =
-      FontLoader("Nunito")
-        ..addFont(rootBundle.load("assets/fonts/Nunito/static/Nunito-Regular.ttf"))
-        ..addFont(rootBundle.load("assets/fonts/Nunito/static/Nunito-Medium.ttf"))
-        ..addFont(
-          rootBundle.load("assets/fonts/Nunito/static/Nunito-SemiBold.ttf"),
-        )
-        ..addFont(rootBundle.load("assets/fonts/Nunito/static/Nunito-Bold.ttf"))
-        ..addFont(
-          rootBundle.load("assets/fonts/Nunito/static/Nunito-ExtraBold.ttf"),
-        );
-  await nunito.load();
-  final materialPath =
-      "${Platform.environment["HOME"]}/flutter/bin/cache/artifacts/material_fonts/MaterialIcons-Regular.otf";
-  final material =
-      FontLoader("MaterialIcons")
-        ..addFont(
-          File(materialPath).readAsBytes().then((b) => ByteData.view(b.buffer)),
-        );
-  await material.load();
+  await loadShotFonts();
 }
 
 void _phone(WidgetTester tester) {
@@ -233,9 +212,7 @@ Future<void> _savePng(WidgetTester tester, String name) async {
     final data = await image.toByteData(format: ui.ImageByteFormat.png);
     return data!.buffer.asUint8List();
   });
-  final dir = Directory(_outDir);
-  if (!dir.existsSync()) dir.createSync(recursive: true);
-  File("$_outDir/$name.png").writeAsBytesSync(bytes!);
+  writeShotBytes("$name.png", bytes!);
 }
 
 List<num> _yxyx(Rect r) => [
@@ -260,6 +237,12 @@ Map<String, Object?> _cmp(List<num> measured, List<num> spec, {double tol = 3}) 
 }
 
 void main() {
+  // Entire screenshot suite is opt-in via HM_SHOTS=1 + HM_SHOTS_DIR.
+  if (!shouldCaptureShots) {
+    test("screenshots skipped without HM_SHOTS", () {});
+    return;
+  }
+
   TestWidgetsFlutterBinding.ensureInitialized();
   late MockExpenseService expenses;
   late MockHomeService homes;
@@ -311,10 +294,12 @@ void main() {
   });
 
   tearDownAll(() {
-    Directory(_outDir).createSync(recursive: true);
-    File("$_outDir/measured.json").writeAsStringSync(
-      const JsonEncoder.withIndent("  ").convert(measured),
-    );
+    if (shouldCaptureShots) {
+      writeShotText(
+        "measured.json",
+        const JsonEncoder.withIndent("  ").convert(measured),
+      );
+    }
   });
 
   testWidgets("r2 02 full measure", (tester) async {

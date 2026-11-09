@@ -106,6 +106,8 @@ class _QuickAddPickerState extends State<_QuickAddPicker> {
       categories: categories,
       members: members,
       currentUserId: widget.currentUserId,
+      wallets: wallets,
+      walletService: _services.wallets,
       onSaved: _onSaved,
     );
     if (openFull && caller.mounted) {
