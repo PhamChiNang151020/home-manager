@@ -68,6 +68,8 @@ abstract final class S {
   static const water = "Nước";
   static const overview = "Tổng quan";
   static const transactions = "Sổ giao dịch";
+  static const dues = "Cần trả";
+  static const assets = "Tài sản";
   static const notifications = "Thông báo";
   static const personal = "Cá nhân";
   static const personalInfo = "Thông tin";
@@ -77,7 +79,9 @@ abstract final class S {
       "Nhà, lịch nhắc, giao diện, bảo mật · cài ra Màn hình chính";
   static const netWorth = "Tài sản ròng";
   static String netWorthHomeLabel(String homeName) =>
-      "Tài sản ròng · Nhà $homeName";
+      "Tài sản ròng · $homeName";
+  static String monthSpentLabel(int month) => "Đã chi tháng $month";
+  static String monthIncomeLabel(int month) => "Thu nhập tháng $month";
   static const incomeSpendTrend = "Thu/Chi 6 tháng gần nhất";
   static const managedHome = "Nhà đang quản lý";
   static const quickAddPickTitle = "Thêm nhanh";
@@ -86,6 +90,8 @@ abstract final class S {
   static const tabCreditDebt = "Tín dụng · Nợ";
   static const tabWallet = "Ví";
   static const tabSavings = "Tiết kiệm";
+  static const loadFailedTitle = "Không tải được dữ liệu";
+  static const loadFailedHint = "Kiểm tra mạng rồi thử lại.";
   static const filterOverdue = "Quá hạn";
   static const filterUpcoming = "Sắp đến hạn";
   static const filterDone = "Đã xử lý";

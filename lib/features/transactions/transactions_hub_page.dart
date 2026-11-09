@@ -2,12 +2,10 @@ import "package:flutter/material.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/models/home.dart";
 import "package:home_manager/core/services/app_services.dart";
-import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/electricity/electricity_page.dart";
 import "package:home_manager/features/expenses/expenses_page.dart";
-import "package:home_manager/features/savings/savings_page.dart";
-import "package:home_manager/features/wallet/wallet_hub_page.dart";
+import "package:home_manager/features/shared/segmented_track.dart";
 import "package:home_manager/features/water/water_page.dart";
 
 class TransactionsHubPage extends StatefulWidget {
@@ -16,107 +14,46 @@ class TransactionsHubPage extends StatefulWidget {
     required this.home,
     required this.services,
     required this.currentUserId,
+    this.initialSegment = 0,
   });
 
   final Home home;
   final AppServices services;
   final String currentUserId;
+  final int initialSegment;
 
   @override
   State<TransactionsHubPage> createState() => _TransactionsHubPageState();
 }
 
-class _TransactionsHubPageState extends State<TransactionsHubPage>
-    with SingleTickerProviderStateMixin {
-  late final TabController _tabs;
-  int _utilitySegment = 0;
-
-  /// The four labels never fit a phone width, so each edge fades only while
-  /// there is really something scrolled past it.
-  bool _canScrollLeft = false;
-  bool _canScrollRight = true;
-
-  bool _onTabScroll(ScrollNotification notification) {
-    final metrics = notification.metrics;
-    if (metrics.axis != Axis.horizontal) return false;
-    final left = metrics.extentBefore > 1;
-    final right = metrics.extentAfter > 1;
-    if (left != _canScrollLeft || right != _canScrollRight) {
-      setState(() {
-        _canScrollLeft = left;
-        _canScrollRight = right;
-      });
-    }
-    return false;
-  }
+class _TransactionsHubPageState extends State<TransactionsHubPage> {
+  late int _segment;
 
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: 4, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabs.dispose();
-    super.dispose();
+    _segment = widget.initialSegment.clamp(0, 2);
   }
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.appColors;
-
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Stack(
-          children: [
-            NotificationListener<ScrollNotification>(
-              onNotification: _onTabScroll,
-              child: Material(
-                color: colors.bgBase,
-                child: TabBar(
-                  controller: _tabs,
-                  isScrollable: true,
-                  // Material's scrollable default is startOffset, which
-                  // indents the first tab 52px past everything else.
-                  tabAlignment: TabAlignment.start,
-                  labelColor: colors.accent,
-                  unselectedLabelColor: colors.textMuted,
-                  indicatorColor: colors.accent,
-                  tabs: const [
-                    Tab(text: S.tabUtilities),
-                    Tab(text: S.tabDaily),
-                    Tab(text: S.tabWallet),
-                    Tab(text: S.tabSavings),
-                  ],
-                ),
-              ),
-            ),
-            _TabEdgeFade(visible: _canScrollLeft, trailing: false),
-            _TabEdgeFade(visible: _canScrollRight, trailing: true),
-          ],
+        Padding(
+          // Horizontal inset comes from MobileViewport; only vertical here.
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+          child: SegmentedTrack(
+            key: const ValueKey("tx-segmented"),
+            labels: const [S.expenses, S.electricity, S.water],
+            index: _segment,
+            onChanged: (i) => setState(() => _segment = i),
+          ),
         ),
         Expanded(
-          child: TabBarView(
-            controller: _tabs,
+          child: IndexedStack(
+            index: _segment,
             children: [
-              _SegmentedHost(
-                labels: const [S.electricity, S.water],
-                index: _utilitySegment,
-                onChanged: (i) => setState(() => _utilitySegment = i),
-                child:
-                    _utilitySegment == 0
-                        ? ElectricityPage(
-                          home: widget.home,
-                          electricity: widget.services.electricity,
-                          photos: widget.services.photos,
-                        )
-                        : WaterPage(
-                          home: widget.home,
-                          water: widget.services.water,
-                          photos: widget.services.photos,
-                        ),
-              ),
               ExpensesPage(
                 home: widget.home,
                 expenses: widget.services.expenses,
@@ -125,88 +62,19 @@ class _TransactionsHubPageState extends State<TransactionsHubPage>
                 currentUserId: widget.currentUserId,
                 wallets: widget.services.wallets,
               ),
-              WalletHubPage(
+              ElectricityPage(
                 home: widget.home,
-                services: widget.services,
-                currentUserId: widget.currentUserId,
-                embedded: true,
+                electricity: widget.services.electricity,
+                photos: widget.services.photos,
               ),
-              SavingsPage(home: widget.home, savings: widget.services.savings),
+              WaterPage(
+                home: widget.home,
+                water: widget.services.water,
+                photos: widget.services.photos,
+              ),
             ],
           ),
         ),
-      ],
-    );
-  }
-}
-
-/// Softens whichever edge of the tab strip has labels scrolled past it.
-class _TabEdgeFade extends StatelessWidget {
-  const _TabEdgeFade({required this.visible, required this.trailing});
-
-  final bool visible;
-  final bool trailing;
-
-  @override
-  Widget build(BuildContext context) {
-    final base = context.appColors.bgBase;
-    return Positioned(
-      top: 0,
-      bottom: 0,
-      left: trailing ? null : 0,
-      right: trailing ? 0 : null,
-      child: IgnorePointer(
-        child: AnimatedOpacity(
-          opacity: visible ? 1 : 0,
-          duration: const Duration(milliseconds: 150),
-          child: Container(
-            width: AppSpacing.lg,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: trailing ? Alignment.centerLeft : Alignment.centerRight,
-                end: trailing ? Alignment.centerRight : Alignment.centerLeft,
-                colors: [base.withValues(alpha: 0), base],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SegmentedHost extends StatelessWidget {
-  const _SegmentedHost({
-    required this.labels,
-    required this.index,
-    required this.onChanged,
-    required this.child,
-  });
-
-  final List<String> labels;
-  final int index;
-  final ValueChanged<int> onChanged;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      // Stretch so the control lines up with the page content instead of
-      // sitting centred at its intrinsic width.
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-          child: SegmentedButton<int>(
-            segments: [
-              for (var i = 0; i < labels.length; i++)
-                ButtonSegment(value: i, label: Text(labels[i])),
-            ],
-            selected: {index},
-            onSelectionChanged: (set) => onChanged(set.first),
-          ),
-        ),
-        Expanded(child: child),
       ],
     );
   }

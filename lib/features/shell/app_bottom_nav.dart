@@ -8,7 +8,7 @@ import "package:home_manager/core/theme/safe_bottom_padding.dart";
 import "package:home_manager/features/shared/app_asset_icon.dart";
 import "package:home_manager/features/shared/app_glass_surface.dart";
 
-/// Custom 5-slot bottom bar: Overview | Transactions | (+) | Notifications | Personal.
+/// Custom 5-slot bottom bar: Overview | Transactions | (+) | Due | Assets.
 class AppBottomNav extends StatelessWidget {
   const AppBottomNav({
     super.key,
@@ -24,10 +24,8 @@ class AppBottomNav extends StatelessWidget {
   final VoidCallback onQuickAdd;
   final int notificationBadge;
 
-  static const _barHeight = AppSpacing.touchMin + AppSpacing.md; // 64
-
-  /// Visible bar block above the home-indicator inset (64 + 8 = 72).
-  static const barBodyHeight = _barHeight + AppSpacing.sm;
+  /// Visible bar block above the home-indicator inset (64).
+  static const barBodyHeight = AppSpacing.touchMin + AppSpacing.md; // 64
 
   /// Full bottom-nav height including safe-area padding under the bar.
   static double heightOf(BuildContext context) =>
@@ -47,47 +45,61 @@ class AppBottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final bottomInset = safeBottomPaddingOf(context);
-    final row = Padding(
-      padding: EdgeInsets.only(bottom: bottomInset),
-      child: SizedBox(
-        height: barBodyHeight,
-        child: Row(
-          children: [
-            Expanded(
-              child: _NavItem(
-                icon: AppIcons.dashboard,
-                label: S.overview,
-                selected: tabIndex == 0,
-                onTap: () => _selectTab(0),
+    final row = DecoratedBox(
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: colors.border, width: 1)),
+      ),
+      child: Padding(
+        padding: EdgeInsets.only(bottom: bottomInset),
+        child: SizedBox(
+          height: barBodyHeight,
+          child: Row(
+            children: [
+              Expanded(
+                child: _NavItem(
+                  key: const ValueKey("nav-item-0"),
+                  icon: AppIcons.dashboard,
+                  label: S.overview,
+                  selected: tabIndex == 0,
+                  onTap: () => _selectTab(0),
+                ),
               ),
-            ),
-            Expanded(
-              child: _NavItem(
-                icon: AppIcons.expenses,
-                label: S.transactions,
-                selected: tabIndex == 1,
-                onTap: () => _selectTab(1),
+              Expanded(
+                child: _NavItem(
+                  key: const ValueKey("nav-item-1"),
+                  icon: AppIcons.expenses,
+                  label: S.transactions,
+                  selected: tabIndex == 1,
+                  onTap: () => _selectTab(1),
+                ),
               ),
-            ),
-            Expanded(child: _QuickAddButton(onTap: _quickAdd)),
-            Expanded(
-              child: _NavItem(
-                icon: AppIcons.reminder,
-                label: S.notifications,
-                selected: tabIndex == 2,
-                onTap: () => _selectTab(2),
-                badgeCount: notificationBadge,
+              Expanded(
+                child: _QuickAddButton(
+                  key: const ValueKey("nav-plus"),
+                  onTap: _quickAdd,
+                ),
               ),
-            ),
-            Expanded(
-              child: _NavItem(
-                icon: AppIcons.settings,
-                label: S.personal,
-                selected: tabIndex == 3,
-                onTap: () => _selectTab(3),
+              Expanded(
+                child: _NavItem(
+                  key: const ValueKey("nav-item-2"),
+                  icon: Icons.event_available_rounded,
+                  label: S.dues,
+                  selected: tabIndex == 2,
+                  onTap: () => _selectTab(2),
+                  badgeCount: notificationBadge,
+                ),
               ),
-            ),
-          ],
+              Expanded(
+                child: _NavItem(
+                  key: const ValueKey("nav-item-3"),
+                  icon: Icons.account_balance_wallet_outlined,
+                  label: S.assets,
+                  selected: tabIndex == 3,
+                  onTap: () => _selectTab(3),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -104,7 +116,7 @@ class AppBottomNav extends StatelessWidget {
 }
 
 class _QuickAddButton extends StatelessWidget {
-  const _QuickAddButton({required this.onTap});
+  const _QuickAddButton({super.key, required this.onTap});
 
   final VoidCallback onTap;
 
@@ -112,22 +124,18 @@ class _QuickAddButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final onAccent = Theme.of(context).colorScheme.onPrimary;
-    return Transform.translate(
-      offset: const Offset(0, -AppSpacing.sm),
-      child: Center(
-        child: Material(
-          color: colors.accent,
-          shape: const CircleBorder(),
-          elevation: 4,
-          shadowColor: colors.textPrimary.withValues(alpha: 0.28),
-          child: InkWell(
-            customBorder: const CircleBorder(),
-            onTap: onTap,
-            child: SizedBox(
-              width: AppSpacing.touchMin,
-              height: AppSpacing.touchMin,
-              child: Icon(Icons.add, color: onAccent),
-            ),
+    return Center(
+      child: Material(
+        color: colors.accent,
+        shape: const CircleBorder(),
+        elevation: 0,
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: onTap,
+          child: SizedBox(
+            width: AppSpacing.touchMin,
+            height: AppSpacing.touchMin,
+            child: Icon(Icons.add, color: onAccent),
           ),
         ),
       ),
@@ -137,6 +145,7 @@ class _QuickAddButton extends StatelessWidget {
 
 class _NavItem extends StatelessWidget {
   const _NavItem({
+    super.key,
     required this.icon,
     required this.label,
     required this.selected,
@@ -161,17 +170,32 @@ class _NavItem extends StatelessWidget {
         children: [
           Stack(
             clipBehavior: Clip.none,
+            alignment: Alignment.center,
             children: [
-              AppIcon(
-                icon,
-                size: selected ? 26 : 24,
-                color: selected ? colors.accent : colors.textMuted,
+              Container(
+                key: selected ? const ValueKey("nav-pill") : null,
+                width: 48,
+                height: 28,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color:
+                      selected
+                          ? colors.accent.withValues(alpha: 0.12)
+                          : Colors.transparent,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: AppIcon(
+                  icon,
+                  size: 24,
+                  color: selected ? colors.accent : colors.textMuted,
+                ),
               ),
               if (badgeCount > 0)
                 Positioned(
-                  right: -AppSpacing.sm,
-                  top: -AppSpacing.xs,
+                  right: -2,
+                  top: -4,
                   child: Container(
+                    key: const ValueKey("nav-badge"),
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.xs,
                       vertical: 1,
@@ -179,8 +203,12 @@ class _NavItem extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: colors.error,
                       borderRadius: BorderRadius.circular(AppSpacing.sm),
+                      border: Border.all(
+                        color: Theme.of(context).colorScheme.onPrimary,
+                        width: 1.5,
+                      ),
                     ),
-                    constraints: const BoxConstraints(minWidth: 16),
+                    constraints: const BoxConstraints(minWidth: 16, minHeight: 18),
                     child: Text(
                       badgeCount > 99 ? "99+" : "$badgeCount",
                       textAlign: TextAlign.center,
@@ -188,21 +216,24 @@ class _NavItem extends StatelessWidget {
                         color: Theme.of(context).colorScheme.onPrimary,
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
+                        height: 1,
                       ),
                     ),
                   ),
                 ),
             ],
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 4),
           Text(
             label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            style: TextStyle(
               color: labelColor,
               fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-              fontSize: 10,
+              fontSize: 11,
+              height: 16 / 11,
+              fontFamily: "Nunito",
             ),
           ),
         ],

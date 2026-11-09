@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:home_manager/core/domain/month_clamp.dart";
 import "package:home_manager/core/format/vnd_format.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/logging/app_log.dart";
@@ -11,26 +12,19 @@ import "package:home_manager/core/services/water_service.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_icons.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
-import "package:home_manager/features/bank_credit/bank_credit_page.dart";
 import "package:home_manager/features/electricity/electricity_page.dart";
 import "package:home_manager/features/electricity/reminder_banner.dart";
 import "package:home_manager/features/expenses/expense_category_chart.dart";
-import "package:home_manager/features/expenses/expenses_page.dart";
 import "package:home_manager/features/income/income_page.dart";
 import "package:home_manager/features/overview/overview_income_spend_chart.dart";
-import "package:home_manager/features/personal_debts/personal_debts_page.dart";
-import "package:home_manager/features/savings/savings_page.dart";
 import "package:home_manager/features/shared/animated_entrance.dart";
 import "package:home_manager/features/shared/animated_money_text.dart";
-import "package:home_manager/features/shared/app_asset_icon.dart";
 import "package:home_manager/features/shared/app_card.dart";
-import "package:home_manager/features/shared/app_glass_surface.dart";
-import "package:home_manager/features/shared/app_loading.dart";
 import "package:home_manager/features/shared/app_refresh_indicator.dart";
+import "package:home_manager/features/shared/error_view.dart";
 import "package:home_manager/features/shared/feature_page_scaffold.dart";
-import "package:home_manager/features/shared/loading_view.dart";
+import "package:home_manager/features/shared/skeleton.dart";
 import "package:home_manager/features/shell/quick_add_picker_sheet.dart";
-import "package:home_manager/features/wallet/wallet_hub_page.dart";
 import "package:home_manager/features/water/water_page.dart";
 
 class OverviewPage extends StatefulWidget {
@@ -39,11 +33,19 @@ class OverviewPage extends StatefulWidget {
     required this.home,
     required this.services,
     required this.currentUserId,
+    this.onOpenAssets,
+    this.onOpenExpenses,
+    this.loadOverview,
   });
 
   final Home home;
   final AppServices services;
   final String currentUserId;
+  final VoidCallback? onOpenAssets;
+  final VoidCallback? onOpenExpenses;
+
+  /// Test seam: when set, skips [OverviewService] and uses this loader.
+  final Future<OverviewSnapshot> Function(String homeId)? loadOverview;
 
   @override
   State<OverviewPage> createState() => _OverviewPageState();
@@ -52,6 +54,7 @@ class OverviewPage extends StatefulWidget {
 class _OverviewPageState extends State<OverviewPage> {
   OverviewSnapshot? _snapshot;
   bool _loading = true;
+  bool _failed = false;
 
   Home get home => widget.home;
   AppServices get services => widget.services;
@@ -70,216 +73,191 @@ class _OverviewPageState extends State<OverviewPage> {
     }
   }
 
-  /// Pull-to-refresh has its own spinner, so it skips the full-page overlay —
-  /// otherwise one gesture puts two indicators on screen and veils the data
-  /// the user is looking at.
   Future<void> _refresh() => _load(showOverlay: false);
 
   Future<void> _load({bool showOverlay = true}) async {
-    if (showOverlay) setState(() => _loading = true);
+    if (showOverlay) {
+      setState(() {
+        _loading = true;
+        _failed = false;
+      });
+    }
     try {
-      final snapshot = await OverviewService(services).load(home.id);
+      final loader = widget.loadOverview;
+      final snapshot =
+          loader != null
+              ? await loader(home.id)
+              : await OverviewService(services).load(home.id);
       if (!mounted) return;
       setState(() {
         _snapshot = snapshot;
         _loading = false;
+        _failed = false;
       });
     } catch (e, st) {
       AppLog.e("Failed to load overview", error: e, stackTrace: st);
-      if (mounted) setState(() => _loading = false);
+      if (mounted) {
+        setState(() {
+          _loading = false;
+          _failed = true;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     if (_loading && _snapshot == null) {
-      return const LoadingView();
+      return ListView(
+        padding: AppSpacing.shellListPadding,
+        children: const [
+          SkeletonBox(width: double.infinity, height: 98, borderRadius: 16),
+          SizedBox(height: AppSpacing.md),
+          SkeletonBox(width: double.infinity, height: 79, borderRadius: 16),
+          SizedBox(height: AppSpacing.lg),
+          SkeletonBox(width: 200, height: 24, borderRadius: 8),
+          SizedBox(height: AppSpacing.sm),
+          SkeletonBox(width: double.infinity, height: 204, borderRadius: 16),
+        ],
+      );
+    }
+
+    if (_failed && _snapshot == null) {
+      return ListView(
+        padding: AppSpacing.shellListPadding,
+        children: [
+          ErrorView(message: S.loadFailedTitle, onRetry: _load),
+        ],
+      );
     }
 
     final snap = _snapshot;
+    if (snap == null) return const SizedBox.shrink();
+
     final colors = context.appColors;
-    final heroStyle = Theme.of(context).textTheme.displaySmall?.copyWith(
-      color: snap != null && snap.netWorth >= 0 ? colors.success : colors.error,
+    final month = currentMonth().month;
+    final netPositive = snap.netWorth >= 0;
+    final heroStyle = TextStyle(
+      color: netPositive ? colors.success : colors.error,
       fontWeight: FontWeight.w800,
-      height: 1.05,
+      fontSize: 32,
+      height: 40 / 32,
+      fontFamily: "Nunito",
     );
 
-    return LoadingOverlay(
-      loading: _loading,
-      child: AppRefreshIndicator(
-        onRefresh: _refresh,
-        child: ListView(
-          padding: AppSpacing.shellListPadding,
-          children: [
-            if (snap != null) ...[
-              ReminderBanner(
-                home: home,
-                onAction:
-                    () => showQuickAddPickerSheet(
-                      context: context,
-                      home: home,
-                      services: services,
-                      currentUserId: widget.currentUserId,
-                      onSaved: _load,
-                    ),
-              ),
-              AnimatedEntrance(
-                index: 0,
-                child: AppGlassSurface.blurred(
-                  padding: const EdgeInsets.all(AppSpacing.lg),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AnimatedMoneyText(
-                        amount: snap.netWorth,
-                        large: true,
-                        style: heroStyle,
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        S.netWorthHomeLabel(home.name),
-                        style: Theme.of(context).textTheme.bodySmall
-                            ?.copyWith(color: colors.textMuted),
-                      ),
-                    ],
-                  ),
+    return AppRefreshIndicator(
+      onRefresh: _refresh,
+      child: ListView(
+        padding: AppSpacing.shellListPadding,
+        children: [
+          ReminderBanner(
+            home: home,
+            onAction:
+                () => showQuickAddPickerSheet(
+                  context: context,
+                  home: home,
+                  services: services,
+                  currentUserId: widget.currentUserId,
+                  onSaved: _load,
                 ),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              AnimatedEntrance(
-                index: 1,
-                child: OverviewIncomeSpendChart(
-                  points: snap.incomeSpendHistory,
-                ),
-              ),
-              if (snap.categorySpend.isNotEmpty) ...[
-                const SizedBox(height: AppSpacing.md),
-                AnimatedEntrance(
-                  index: 2,
-                  child: ExpenseCategoryChart(spend: snap.categorySpend),
-                ),
-              ],
-              const SizedBox(height: AppSpacing.md),
-              AnimatedEntrance(
-                index: 3,
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  // Cards keep a vertical margin, so only the cross axis
-                  // needs the full gap spelled out.
-                  mainAxisSpacing: AppSpacing.sm,
-                  crossAxisSpacing: AppSpacing.md,
-                  childAspectRatio: 2.2,
+          ),
+          AnimatedEntrance(
+            index: 0,
+            // Spec hero y 123–221 (98): label 12/16 + gap 4 + amount 32/40,
+            // padding top/bottom 17 incl. 1px border -> layout padding 19.
+            child: SizedBox(
+              height: 98,
+              child: AppCard(
+                key: const ValueKey("overview-net-worth"),
+                onTap: widget.onOpenAssets,
+                padding: const EdgeInsets.fromLTRB(16, 19, 16, 19),
+                child: Row(
                   children: [
-                    _QuickCard(
-                      icon: AppIcons.electricity,
-                      title: S.electricity,
-                      value:
-                          snap.latestElectricity == null
-                              ? "—"
-                              : VndFormat.compact(
-                                snap.latestElectricity!.amountVnd,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            S.netWorthHomeLabel(home.name),
+                            style: TextStyle(
+                              fontSize: 12,
+                              height: 16 / 12,
+                              fontWeight: FontWeight.w600,
+                              color: colors.textSecondary,
+                              fontFamily: "Nunito",
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          SizedBox(
+                            height: 40,
+                            width: double.infinity,
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerLeft,
+                              child: AnimatedMoneyText(
+                                amount: snap.netWorth,
+                                large: true,
+                                style: heroStyle,
                               ),
-                      onTap: () => _pushElectricity(context),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    _QuickCard(
-                      icon: AppIcons.water,
-                      title: S.water,
-                      value:
-                          snap.latestWater == null
-                              ? "—"
-                              : VndFormat.compact(snap.latestWater!.amountVnd),
-                      onTap: () => _pushWater(context),
+                    Icon(Icons.chevron_right, size: 24, color: colors.textMuted),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          AnimatedEntrance(
+            index: 1,
+            child: AppCard(
+              key: const ValueKey("overview-month"),
+              padding: EdgeInsets.zero,
+              child: SizedBox(
+                height: 79,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _MonthHalf(
+                        icon: AppIcons.expenses,
+                        label: S.monthSpentLabel(month),
+                        amount: snap.monthExpenses,
+                        onTap: widget.onOpenExpenses,
+                      ),
                     ),
-                    _QuickCard(
-                      icon: AppIcons.expenses,
-                      title: S.expenses,
-                      value: VndFormat.compact(snap.monthExpenses),
-                      onTap: () => _pushExpenses(context),
-                    ),
-                    _QuickCard(
-                      icon: AppIcons.income,
-                      title: S.income,
-                      value: VndFormat.compact(snap.monthIncome),
-                      onTap: () => _pushIncome(context),
-                    ),
-                    _QuickCard(
-                      icon: Icons.account_balance_wallet_outlined,
-                      title: S.wallet,
-                      value: VndFormat.compact(snap.walletsTotal),
-                      onTap: () => _pushWallet(context),
-                    ),
-                    _QuickCard(
-                      icon: Icons.credit_card_outlined,
-                      title: S.bankCredit,
-                      value: VndFormat.compact(snap.bankUsed),
-                      onTap: () => _pushBank(context),
-                    ),
-                    _QuickCard(
-                      icon: Icons.handshake_outlined,
-                      title: S.personalDebts,
-                      value: VndFormat.compact(snap.debtNet),
-                      onTap: () => _pushDebts(context),
-                    ),
-                    _QuickCard(
-                      icon: Icons.savings_outlined,
-                      title: S.savings,
-                      value: VndFormat.compact(snap.savingsTotal),
-                      onTap: () => _pushSavings(context),
+                    Container(width: 1, color: colors.border),
+                    Expanded(
+                      child: _MonthHalf(
+                        icon: AppIcons.income,
+                        label: S.monthIncomeLabel(month),
+                        amount: snap.monthIncome,
+                        onTap: () => _pushIncome(context),
+                      ),
                     ),
                   ],
                 ),
               ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _pushElectricity(BuildContext context) {
-    Navigator.push<void>(
-      context,
-      AppPageRoute<void>(
-        page: ElectricityRoutePage(
-          home: home,
-          electricity: services.electricity,
-          photos: services.photos,
-        ),
-      ),
-    );
-  }
-
-  void _pushWater(BuildContext context) {
-    Navigator.push<void>(
-      context,
-      AppPageRoute<void>(
-        page: WaterRoutePage(
-          home: home,
-          water: services.water,
-          photos: services.photos,
-        ),
-      ),
-    );
-  }
-
-  void _pushExpenses(BuildContext context) {
-    Navigator.push<void>(
-      context,
-      AppPageRoute<void>(
-        page: FeaturePageScaffold(
-          title: S.expenses,
-          titleIcon: AppIcons.expenses,
-          body: ExpensesPage(
-            home: home,
-            expenses: services.expenses,
-            homesApi: services.homes,
-            photos: services.photos,
-            currentUserId: widget.currentUserId,
-            wallets: services.wallets,
+            ),
           ),
-        ),
+          const SizedBox(height: AppSpacing.lg),
+          AnimatedEntrance(
+            index: 2,
+            child: OverviewIncomeSpendChart(
+              points: snap.incomeSpendHistory,
+            ),
+          ),
+          if (snap.categorySpend.isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.md),
+            AnimatedEntrance(
+              index: 3,
+              child: ExpenseCategoryChart(spend: snap.categorySpend),
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -290,103 +268,75 @@ class _OverviewPageState extends State<OverviewPage> {
       AppPageRoute<void>(page: IncomeRoutePage(home: home, services: services)),
     );
   }
-
-  void _pushWallet(BuildContext context) {
-    Navigator.push<void>(
-      context,
-      AppPageRoute<void>(
-        page: WalletRoutePage(
-          home: home,
-          services: services,
-          currentUserId: widget.currentUserId,
-        ),
-      ),
-    );
-  }
-
-  void _pushBank(BuildContext context) {
-    Navigator.push<void>(
-      context,
-      AppPageRoute<void>(
-        page: BankCreditRoutePage(home: home, bank: services.bankAccounts),
-      ),
-    );
-  }
-
-  void _pushDebts(BuildContext context) {
-    Navigator.push<void>(
-      context,
-      AppPageRoute<void>(
-        page: PersonalDebtsRoutePage(
-          home: home,
-          debts: services.personalDebts,
-          currentUserId: widget.currentUserId,
-        ),
-      ),
-    );
-  }
-
-  void _pushSavings(BuildContext context) {
-    Navigator.push<void>(
-      context,
-      AppPageRoute<void>(
-        page: SavingsRoutePage(home: home, savings: services.savings),
-      ),
-    );
-  }
 }
 
-class _QuickCard extends StatelessWidget {
-  const _QuickCard({
-    required this.title,
-    required this.value,
-    required this.onTap,
-    this.icon,
+class _MonthHalf extends StatelessWidget {
+  const _MonthHalf({
+    required this.icon,
+    required this.label,
+    required this.amount,
+    this.onTap,
   });
 
-  final IconData? icon;
-  final String title;
-  final String value;
-  final VoidCallback onTap;
+  final IconData icon;
+  final String label;
+  final double amount;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
-    return AppCard(
+    return InkWell(
       onTap: onTap,
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
-      ),
-      child: Row(
-        children: [
-          if (icon != null) AppIcon(icon!, size: 22),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
               children: [
-                Text(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: colors.textSecondary,
+                Container(
+                  width: 24,
+                  height: 24,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: colors.accent.withValues(alpha: 0.12),
                   ),
+                  child: Icon(icon, size: 14, color: colors.accent),
                 ),
-                Text(
-                  value,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      height: 16 / 12,
+                      color: colors.textSecondary,
+                      fontFamily: "Nunito",
+                    ),
+                  ),
                 ),
               ],
             ),
-          ),
-        ],
+            const SizedBox(height: 4),
+            Text(
+              VndFormat.format(amount),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 16,
+                height: 24 / 16,
+                fontWeight: FontWeight.w700,
+                color: colors.textPrimary,
+                fontFamily: "Nunito",
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

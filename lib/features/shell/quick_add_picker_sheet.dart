@@ -1,6 +1,7 @@
 import "package:flutter/material.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/models/home.dart";
+import "package:home_manager/core/navigation/app_page_route.dart";
 import "package:home_manager/core/services/app_services.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_icons.dart";
@@ -9,10 +10,11 @@ import "package:home_manager/features/bank_credit/bank_credit_form.dart";
 import "package:home_manager/features/electricity/electricity_form.dart";
 import "package:home_manager/features/expenses/expense_form.dart";
 import "package:home_manager/features/expenses/quick_add_sheet.dart";
+import "package:home_manager/features/income/income_page.dart";
 import "package:home_manager/features/personal_debts/personal_debt_forms.dart";
 import "package:home_manager/features/savings/savings_forms.dart";
-import "package:home_manager/features/shared/app_asset_icon.dart";
 import "package:home_manager/features/shared/app_sheet.dart";
+import "package:home_manager/features/shared/list_group.dart";
 import "package:home_manager/features/water/water_form.dart";
 
 Future<void> showQuickAddPickerSheet({
@@ -24,6 +26,9 @@ Future<void> showQuickAddPickerSheet({
 }) {
   return showAppSheet<void>(
     context: context,
+    // Custom 36-tall handle below matches ticket sheet y 314; Material's
+    // default handle is ~48 and pushes the sheet top to ~301.
+    showDragHandle: false,
     builder:
         (sheetContext) => _QuickAddPicker(
           // The next form is shown after this sheet pops, so it needs the
@@ -83,7 +88,6 @@ class _QuickAddPickerState extends State<_QuickAddPicker> {
   }
 
   Future<void> _openExpense() async {
-    // Both queries go out together — one round trip, not two.
     final (categories, members) =
         await (
           _services.expenses.listCategories(_home.id),
@@ -115,6 +119,17 @@ class _QuickAddPickerState extends State<_QuickAddPicker> {
         onSaved: _onSaved,
       );
     }
+  }
+
+  Future<void> _openIncome() async {
+    final caller = widget.callerContext;
+    _close();
+    if (!caller.mounted) return;
+    await Navigator.of(caller).push<void>(
+      AppPageRoute<void>(
+        page: IncomeRoutePage(home: _home, services: _services),
+      ),
+    );
   }
 
   Future<void> _openElectricity() async {
@@ -186,134 +201,120 @@ class _QuickAddPickerState extends State<_QuickAddPicker> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                S.quickAddPickTitle,
-                style: Theme.of(context).textTheme.titleMedium,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.md),
-              _PickTile(
-                icon: AppIcons.expenses,
-                label: S.expenses,
-                busy: _busy == S.expenses,
-                enabled: _busy == null,
-                onTap: () => _pick(S.expenses, _openExpense),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              _PickTile(
-                icon: AppIcons.electricity,
-                label: S.electricity,
-                busy: _busy == S.electricity,
-                enabled: _busy == null,
-                onTap: () => _pick(S.electricity, _openElectricity),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              _PickTile(
-                icon: AppIcons.water,
-                label: S.water,
-                busy: _busy == S.water,
-                enabled: _busy == null,
-                onTap: () => _pick(S.water, _openWater),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              _PickTile(
-                icon: Icons.credit_card_outlined,
-                label: S.addBankAccount,
-                busy: _busy == S.addBankAccount,
-                enabled: _busy == null,
-                onTap: () => _pick(S.addBankAccount, _openBankAccount),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              _PickTile(
-                icon: Icons.handshake_outlined,
-                label: S.addDebt,
-                busy: _busy == S.addDebt,
-                enabled: _busy == null,
-                onTap: () => _pick(S.addDebt, _openDebt),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              _PickTile(
-                icon: Icons.savings_outlined,
-                label: S.addSavings,
-                busy: _busy == S.addSavings,
-                enabled: _busy == null,
-                onTap: () => _pick(S.addSavings, _openSavings),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-            ],
-          ),
-        ),
-      ),
+  Widget _row({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    bool showDivider = true,
+  }) {
+    final busy = _busy == label;
+    return ListGroupRow(
+      key: ValueKey("quick-add-$label"),
+      title: label,
+      height: ListGroupRowHeight.h56,
+      showDivider: showDivider,
+      leading: ListGroupIcon(icon: icon),
+      trailing:
+          busy
+              ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+              : null,
+      onTap: _busy == null ? onTap : null,
     );
   }
-}
-
-class _PickTile extends StatelessWidget {
-  const _PickTile({
-    required this.label,
-    required this.onTap,
-    required this.busy,
-    required this.enabled,
-    this.icon,
-  });
-
-  final IconData? icon;
-  final String label;
-  final bool busy;
-  final bool enabled;
-  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    // showAppSheet already applies useSafeArea; avoid a second SafeArea so
+    // sheet top lands at design y 314 on 393×852.
     final colors = context.appColors;
-    return Material(
-      color: colors.bgElevated,
-      borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-        onTap: enabled ? onTap : null,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: AppSpacing.md,
-          ),
-          child: Row(
-            children: [
-              if (icon != null)
-                AppIcon(icon!, size: 32)
-              else
-                Icon(Icons.circle, size: 32, color: colors.accent),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Text(
-                  label,
-                  style: Theme.of(context).textTheme.titleMedium,
+    final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.md,
+        0,
+        AppSpacing.md,
+        // Sheet bottom = 16 content + real home-indicator (0 on web → y 348).
+        AppSpacing.md + bottomInset,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(
+            height: 36,
+            child: Center(
+              child: Container(
+                width: 32,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: colors.border,
+                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              if (busy)
-                SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: colors.accent,
-                  ),
-                )
-              else
-                Icon(Icons.chevron_right, color: colors.textMuted),
+            ),
+          ),
+          Text(
+            S.quickAddPickTitle,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 18,
+              height: 24 / 18,
+              fontWeight: FontWeight.w700,
+              fontFamily: "Nunito",
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          ListGroup(
+            children: [
+              _row(
+                icon: AppIcons.expenses,
+                label: S.expenses,
+                onTap: () => _pick(S.expenses, _openExpense),
+              ),
+              _row(
+                icon: AppIcons.income,
+                label: S.income,
+                onTap: () => _pick(S.income, _openIncome),
+              ),
+              _row(
+                icon: AppIcons.electricity,
+                label: S.electricity,
+                onTap: () => _pick(S.electricity, _openElectricity),
+              ),
+              _row(
+                icon: AppIcons.water,
+                label: S.water,
+                onTap: () => _pick(S.water, _openWater),
+                showDivider: false,
+              ),
             ],
           ),
-        ),
+          const SizedBox(height: AppSpacing.md),
+          ListGroup(
+            children: [
+              _row(
+                icon: Icons.credit_card_outlined,
+                label: S.addBankAccount,
+                onTap: () => _pick(S.addBankAccount, _openBankAccount),
+              ),
+              _row(
+                icon: Icons.handshake_outlined,
+                label: S.addDebt,
+                onTap: () => _pick(S.addDebt, _openDebt),
+              ),
+              _row(
+                icon: Icons.savings_outlined,
+                label: S.addSavings,
+                onTap: () => _pick(S.addSavings, _openSavings),
+                showDivider: false,
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

@@ -13,7 +13,7 @@ import "package:home_manager/features/shared/app_toast.dart";
 import "package:home_manager/features/shell/app_bottom_nav.dart";
 import "package:home_manager/features/shell/empty_home_view.dart";
 
-const _outDir = "/opt/cursor/artifacts/dot0";
+const _outDir = "/opt/cursor/artifacts/dot1";
 
 /// Mirrors AppShell join timing: flag after accept, toast post-frame with nav.
 class _JoinFlowShell extends StatefulWidget {
@@ -107,9 +107,8 @@ Future<void> _savePng(WidgetTester tester) async {
 void main() {
   setUpAll(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
-    if (Directory("/opt/cursor/artifacts").existsSync()) {
-      await _loadNunito();
-    }
+    // Always load Nunito so layout matches QA (Ahem is wider and shifts y).
+    await _loadNunito();
   });
 
   testWidgets(
@@ -117,6 +116,9 @@ void main() {
     (tester) async {
       tester.view.physicalSize = const Size(393, 852);
       tester.view.devicePixelRatio = 1;
+      // Đợt 1 nav = 64 + 34 -> top 754; toast y 698–746.
+      tester.view.padding = const FakeViewPadding(bottom: 34);
+      tester.view.viewPadding = const FakeViewPadding(bottom: 34);
       addTearDown(tester.view.reset);
 
       await tester.pumpWidget(
@@ -133,6 +135,8 @@ void main() {
               child: MediaQuery(
                 data: MediaQueryData(
                   size: Size(393, 852),
+                  padding: EdgeInsets.only(bottom: 34),
+                  viewPadding: EdgeInsets.only(bottom: 34),
                   textScaler: TextScaler.noScaling,
                 ),
                 child: _JoinFlowShell(),
@@ -162,6 +166,7 @@ void main() {
       );
       final navRect = tester.getRect(find.byType(AppBottomNav));
 
+      expect(navRect.top, closeTo(754, 0.5));
       expect(
         toastRect.bottom,
         closeTo(navRect.top - 8, 0.5),
@@ -169,9 +174,9 @@ void main() {
             "toast bottom ${toastRect.bottom} should be 8px above "
             "nav top ${navRect.top}",
       );
-      // Expected band on 393×852 with 72px nav: toast y 724–772.
-      expect(toastRect.top, closeTo(724, 0.5));
-      expect(toastRect.bottom, closeTo(772, 0.5));
+      // Expected band on 393×852 with nav top 754: toast y 698–746.
+      expect(toastRect.top, closeTo(698, 0.5));
+      expect(toastRect.bottom, closeTo(746, 0.5));
 
       final outDir = Directory(_outDir);
       if (outDir.existsSync() || Directory("/opt/cursor/artifacts").existsSync()) {
@@ -183,8 +188,7 @@ void main() {
           "nav_top=${navRect.top}\n"
           "gap_above_nav=${navRect.top - toastRect.bottom}\n"
           "viewport=393x852\n"
-          "expected_band=724-772\n"
-          "fail_before_fix_toast_bottom=730.0\n",
+          "expected_band=698-746\n",
         );
       }
     },

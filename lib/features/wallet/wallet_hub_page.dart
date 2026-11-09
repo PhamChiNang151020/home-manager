@@ -15,12 +15,14 @@ import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/bank_credit/bank_credit_page.dart";
 import "package:home_manager/features/personal_debts/personal_debts_page.dart";
+import "package:home_manager/features/savings/savings_page.dart";
 import "package:home_manager/features/shared/app_card.dart";
 import "package:home_manager/features/shared/app_toast.dart";
 import "package:home_manager/features/shared/bank_logo.dart";
 import "package:home_manager/features/shared/empty_state_view.dart";
 import "package:home_manager/features/shared/error_view.dart";
 import "package:home_manager/features/shared/feature_page_scaffold.dart";
+import "package:home_manager/features/shared/list_group.dart";
 import "package:home_manager/features/shared/loading_view.dart";
 import "package:home_manager/features/shared/money_text.dart";
 import "package:home_manager/features/shared/section_header.dart";
@@ -65,7 +67,8 @@ class WalletHubPage extends StatefulWidget {
   final AppServices services;
   final String currentUserId;
 
-  /// When true (transactions hub), omit outer scaffold chrome.
+  /// When true (Đợt 1 Tài sản tab), show the 4 entry rows instead of the
+  /// full wallet hub body.
   final bool embedded;
 
   @override
@@ -83,13 +86,13 @@ class WalletHubPageState extends State<WalletHubPage> {
   @override
   void initState() {
     super.initState();
-    _load();
+    if (!widget.embedded) _load();
   }
 
   @override
   void didUpdateWidget(covariant WalletHubPage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.home.id != widget.home.id) _load();
+    if (!widget.embedded && oldWidget.home.id != widget.home.id) _load();
   }
 
   Future<void> _load() async {
@@ -153,8 +156,106 @@ class WalletHubPageState extends State<WalletHubPage> {
     if (mounted) _load();
   }
 
+  Widget _assetsEntry({
+    required String label,
+    required IconData icon,
+    required VoidCallback onTap,
+    bool showDivider = true,
+  }) {
+    final colors = context.appColors;
+    return ListGroupRow(
+      key: ValueKey("assets-entry-$label"),
+      title: label,
+      height: ListGroupRowHeight.h64,
+      leading: ListGroupIcon(icon: icon),
+      trailing: Icon(Icons.chevron_right, size: 24, color: colors.textMuted),
+      showDivider: showDivider,
+      onTap: onTap,
+    );
+  }
+
+  /// Temporary Đợt 1 Tài sản hub: Ví · Tiết kiệm · Tín dụng NH · Nợ vay mượn.
+  Widget _buildAssetsEntries(BuildContext context) {
+    return ListView(
+      padding: AppSpacing.shellListPadding,
+      children: [
+        ListGroup(
+          children: [
+            _assetsEntry(
+              label: S.wallet,
+              icon: Icons.account_balance_wallet_outlined,
+              onTap: () {
+                Navigator.push<void>(
+                  context,
+                  AppPageRoute<void>(
+                    page: WalletRoutePage(
+                      home: widget.home,
+                      services: widget.services,
+                      currentUserId: widget.currentUserId,
+                    ),
+                  ),
+                );
+              },
+            ),
+            _assetsEntry(
+              label: S.savings,
+              icon: Icons.savings,
+              onTap: () {
+                Navigator.push<void>(
+                  context,
+                  AppPageRoute<void>(
+                    page: SavingsRoutePage(
+                      home: widget.home,
+                      savings: widget.services.savings,
+                    ),
+                  ),
+                );
+              },
+            ),
+            _assetsEntry(
+              label: S.bankCredit,
+              icon: Icons.credit_card_outlined,
+              onTap: () {
+                Navigator.push<void>(
+                  context,
+                  AppPageRoute<void>(
+                    page: BankCreditRoutePage(
+                      home: widget.home,
+                      bank: widget.services.bankAccounts,
+                    ),
+                  ),
+                );
+              },
+            ),
+            _assetsEntry(
+              label: S.personalDebts,
+              icon: Icons.handshake_outlined,
+              showDivider: false,
+              onTap: () {
+                Navigator.push<void>(
+                  context,
+                  AppPageRoute<void>(
+                    page: PersonalDebtsRoutePage(
+                      home: widget.home,
+                      debts: widget.services.personalDebts,
+                      currentUserId: widget.currentUserId,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (widget.embedded) {
+      return _buildAssetsEntries(context);
+    }
+
     if (_error != null) {
       return ErrorView(message: _error!, onRetry: _load);
     }

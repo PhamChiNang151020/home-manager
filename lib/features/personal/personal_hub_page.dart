@@ -58,7 +58,7 @@ class PersonalHubPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentUser = user;
-    return ListView(
+    final body = ListView(
       padding: AppSpacing.shellListPadding,
       children: [
         AnimatedEntrance(
@@ -191,6 +191,21 @@ class PersonalHubPage extends StatelessWidget {
           ),
         ),
       ],
+    );
+
+    // Pushed route: AppBar "Cá nhân" + back; no bottom nav (outer shell stays).
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          S.personal,
+          style: TextStyle(
+            fontSize: 22,
+            height: 28 / 22,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+      body: MobileViewport(child: body),
     );
   }
 }
