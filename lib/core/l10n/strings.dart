@@ -22,6 +22,8 @@ abstract final class S {
   static const forgotPassword = "Quên mật khẩu?";
   static const signIn = "Đăng nhập";
   static const signInLoading = "Đang đăng nhập…";
+  static const joinInviteBanner =
+      "Bạn được mời vào một nhà. Đăng nhập hoặc tạo tài khoản để vào nhà.";
   static const createAccount = "Tạo tài khoản";
   static const createAccountLoading = "Đang tạo tài khoản…";
   static const noAccount = "Chưa có tài khoản?";
