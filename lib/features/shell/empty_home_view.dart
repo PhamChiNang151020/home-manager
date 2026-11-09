@@ -3,6 +3,7 @@ import "package:home_manager/core/domain/invite_code.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/core/theme/app_theme.dart";
 import "package:home_manager/features/shared/app_toast.dart";
 
 /// Logged-in empty-home screen: account card, add home, 6-box invite code.
@@ -165,6 +166,7 @@ class EmptyHomeViewState extends State<EmptyHomeView> {
             onPressed: widget.onAddHome,
             style: FilledButton.styleFrom(
               textStyle: const TextStyle(
+                fontFamily: AppFonts.nunito,
                 fontSize: 16,
                 height: 24 / 16,
                 fontWeight: FontWeight.w700,
@@ -196,6 +198,7 @@ class EmptyHomeViewState extends State<EmptyHomeView> {
               foregroundColor: colors.error,
               side: BorderSide(color: colors.error),
               textStyle: const TextStyle(
+                fontFamily: AppFonts.nunito,
                 fontSize: 16,
                 height: 24 / 16,
                 fontWeight: FontWeight.w700,
@@ -386,6 +389,7 @@ class _InviteCard extends StatelessWidget {
                   ),
                   disabledForegroundColor: Colors.white,
                   textStyle: const TextStyle(
+                    fontFamily: AppFonts.nunito,
                     fontSize: 16,
                     height: 24 / 16,
                     fontWeight: FontWeight.w700,
