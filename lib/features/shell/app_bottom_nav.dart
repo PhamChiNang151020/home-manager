@@ -26,6 +26,13 @@ class AppBottomNav extends StatelessWidget {
 
   static const _barHeight = AppSpacing.touchMin + AppSpacing.md; // 64
 
+  /// Visible bar block above the home-indicator inset (64 + 8 = 72).
+  static const barBodyHeight = _barHeight + AppSpacing.sm;
+
+  /// Full bottom-nav height including safe-area padding under the bar.
+  static double heightOf(BuildContext context) =>
+      barBodyHeight + safeBottomPaddingOf(context);
+
   void _selectTab(int index) {
     if (index != tabIndex) HapticFeedback.selectionClick();
     onTabSelected(index);
@@ -43,7 +50,7 @@ class AppBottomNav extends StatelessWidget {
     final row = Padding(
       padding: EdgeInsets.only(bottom: bottomInset),
       child: SizedBox(
-        height: _barHeight + AppSpacing.sm,
+        height: barBodyHeight,
         child: Row(
           children: [
             Expanded(

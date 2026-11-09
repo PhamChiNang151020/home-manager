@@ -94,17 +94,23 @@ class HomeJoinLink {
     required this.token,
     required this.homeId,
     required this.expiresAt,
+    this.code,
   });
 
   final String token;
   final String homeId;
   final DateTime expiresAt;
 
+  /// Short 6-char invite code shared with the QR/link row. Null for legacy
+  /// payloads until `create_or_get_join_link` backfills it.
+  final String? code;
+
   factory HomeJoinLink.fromJson(Map<String, dynamic> json) {
     return HomeJoinLink(
       token: json["token"] as String,
       homeId: json["home_id"] as String,
       expiresAt: DateTime.parse(json["expires_at"] as String),
+      code: json["code"] as String?,
     );
   }
 }

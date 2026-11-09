@@ -29,7 +29,7 @@ Consult this file before grepping the repo. Update when adding modules under `li
 |------|------|
 | Sign in | `lib/features/auth/sign_in_page.dart` |
 | Create home | `lib/features/homes/create_home_dialog.dart` |
-| Overview dashboard | `lib/features/overview/overview_page.dart` — hero net worth + `overview_income_spend_chart.dart` + category donut + compact quick-access grid; legacy `overview_summary_card.dart`, `overview_shortcut_grid.dart`, `overview_spend_trend_chart.dart` |
+| Overview dashboard | `lib/features/overview/overview_page.dart` — hero net worth + `overview_income_spend_chart.dart` + category donut + compact quick-access grid |
 | Transactions hub | `lib/features/transactions/transactions_hub_page.dart` (sub-tabs: Điện·Nước / Hàng ngày / Tín dụng·Nợ / Tiết kiệm) |
 | Notifications | `lib/features/notifications/notifications_page.dart` |
 | Personal hub | `lib/features/personal/personal_hub_page.dart` (Thông tin / Chia sẻ / Cài đặt / Đăng xuất); `managed_home_page.dart` (đổi nhà + rời nhà); `leave_home_sheet.dart` |
@@ -37,7 +37,7 @@ Consult this file before grepping the repo. Update when adding modules under `li
 | Water | `lib/features/water/` (mirror of electricity) |
 | Expenses / quick-add | `lib/features/expenses/` (list, form, `quick_add_sheet.dart`, presets, OCR) |
 | Income | `lib/features/income/income_page.dart` |
-| Finance hub | `lib/features/finance/finance_hub_page.dart` (optional push target; primary path is Transactions hub) |
+| Empty home + invite code | `lib/features/shell/empty_home_view.dart` — account card, 6-box code, join via code/link |
 | Bank credit | `lib/features/bank_credit/` |
 | Personal debts | `lib/features/personal_debts/` |
 | Savings | `lib/features/savings/` |
@@ -51,6 +51,7 @@ Consult this file before grepping the repo. Update when adding modules under `li
 | Item | Path |
 |------|------|
 | Card, money, badges | `lib/features/shared/app_card.dart`, `money_text.dart`, `animated_money_text.dart`, `status_badge.dart` (`success\|warning\|accent\|neutral\|error`), `trend_chip.dart`, `app_toast.dart` (`showAppToast` / `popWithAppToast`) |
+| Base components (Đợt 0) | `list_group.dart`, `section_header.dart`, `mini_button.dart`, `segmented_track.dart`, `month_stepper.dart`, `progress_bar.dart`, `avatar_button.dart` |
 | Period detail | `lib/features/shared/period_detail_view.dart` (điện / nước view-only) |
 | Fields | `labeled_text_field.dart` (`LabeledDropdownField` → select sheet), `labeled_money_field.dart`, `month_picker.dart`, `cupertino_date_sheet.dart`, `month_stepper_field.dart`, `day_stepper_field.dart`, `select_sheet.dart` |
 | Loading / error / empty | `app_loading.dart` (logo + spinning ring), `loading_view.dart`, `error_view.dart`, `empty_state_view.dart` (icon + mô tả + CTA) |
@@ -94,6 +95,7 @@ Consult this file before grepping the repo. Update when adding modules under `li
 | Drop loan category seed | `20260821110000_drop_loan_expense_category_seed.sql` |
 | Delete home RPC | `20260821120000_delete_home_rpc.sql` |
 | Join QR token | `20260825090000_home_join_links.sql` |
+| Invite short code | `20261109090000_invite_code.sql` (`code`, `accept_invite_code`, attempts lockout) |
 | Invite reject existing member | `20260827090000_invite_reject_existing.sql` |
 | Leave home RPC | `20260827100000_leave_home.sql` (`left_at`, `leave_home`) |
 | Remove member RPC | `20260827110000_remove_home_member.sql` |
@@ -122,7 +124,6 @@ Consult this file before grepping the repo. Update when adding modules under `li
 - `lib/features/water/`
 - `lib/features/expenses/`
 - `lib/features/income/`
-- `lib/features/finance/`
 - `lib/features/bank_credit/`
 - `lib/features/personal_debts/`
 - `lib/features/savings/`

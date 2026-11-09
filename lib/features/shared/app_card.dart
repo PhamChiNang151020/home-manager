@@ -1,9 +1,9 @@
 import "package:flutter/material.dart";
-import "package:home_manager/core/theme/app_motion.dart";
+import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
-import "package:home_manager/features/shared/app_glass_surface.dart";
 
-class AppCard extends StatefulWidget {
+/// Bordered surface card: white fill, 1px border, radius 16, no elevation.
+class AppCard extends StatelessWidget {
   const AppCard({
     super.key,
     required this.child,
@@ -16,49 +16,23 @@ class AppCard extends StatefulWidget {
   final VoidCallback? onTap;
 
   @override
-  State<AppCard> createState() => _AppCardState();
-}
-
-class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
-  late final AnimationController _pressController;
-  late final Animation<double> _scale;
-
-  @override
-  void initState() {
-    super.initState();
-    _pressController = AnimationController(
-      vsync: this,
-      duration: AppMotion.fast,
-      reverseDuration: AppMotion.fast,
-    );
-    _scale = Tween<double>(begin: 1, end: 0.98).animate(
-      CurvedAnimation(parent: _pressController, curve: AppCurves.press),
-    );
-  }
-
-  @override
-  void dispose() {
-    _pressController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final card = Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
-      child: AppGlassSurface.light(padding: widget.padding, child: widget.child),
-    );
+    final colors = context.appColors;
+    final radius = BorderRadius.circular(AppSpacing.cardRadius);
+    final content = Padding(padding: padding, child: child);
 
-    if (widget.onTap == null) return card;
-
-    return GestureDetector(
-      onTapDown: (_) => _pressController.forward(),
-      onTapUp: (_) {
-        _pressController.reverse();
-        widget.onTap!();
-      },
-      onTapCancel: () => _pressController.reverse(),
-      child: ScaleTransition(scale: _scale, child: card),
+    return Material(
+      color: colors.bgSurface,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: radius,
+        side: BorderSide(color: colors.border),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child:
+          onTap == null
+              ? content
+              : InkWell(onTap: onTap, borderRadius: radius, child: content),
     );
   }
 }

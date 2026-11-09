@@ -29,7 +29,8 @@ const _home = Home(
 final _joinLink = HomeJoinLink(
   token: "tok",
   homeId: "h1",
-  expiresAt: DateTime(2026, 9, 8),
+  expiresAt: DateTime(2026, 11, 6),
+  code: "K7M2QP",
 );
 
 Widget _wrap(Widget child) {
@@ -47,8 +48,11 @@ void main() {
     registerFallbackValue("");
   });
 
-  testWidgets("owner join QR shows scan hint and actions", (tester) async {
-    var copied = false;
+  testWidgets("owner join QR shows code card scan hint and actions", (
+    tester,
+  ) async {
+    var copiedLink = false;
+    var copiedCode = false;
     var regenerated = false;
     var revoked = false;
 
@@ -57,9 +61,12 @@ void main() {
         Scaffold(
           body: JoinQrSection(
             joinUrl: "https://example.test/home-manager/join.html?join=abc123",
-            expiresAt: DateTime(2026, 9, 8),
+            code: "K7M2QP",
+            expiresAt: DateTime(2026, 11, 6),
             busy: false,
-            onCopy: () => copied = true,
+            expiryLabel: S.inviteCodeExpiry("06/11/2026"),
+            onCopyLink: () => copiedLink = true,
+            onCopyCode: () => copiedCode = true,
             onRegenerate: () => regenerated = true,
             onRevoke: () => revoked = true,
           ),
@@ -68,6 +75,8 @@ void main() {
     );
 
     expect(find.text(S.joinQrHint), findsOneWidget);
+    expect(find.text("K7M 2QP"), findsOneWidget);
+    expect(find.text(S.inviteCodeLabel), findsOneWidget);
     expect(find.byType(QrImageView), findsOneWidget);
     expect(
       find.text("https://example.test/home-manager/join.html?join=abc123"),
@@ -76,7 +85,11 @@ void main() {
 
     await tester.tap(find.text(S.joinQrCopy));
     await tester.pump();
-    expect(copied, isTrue);
+    expect(copiedLink, isTrue);
+
+    await tester.tap(find.text(S.inviteCodeCopy));
+    await tester.pump();
+    expect(copiedCode, isTrue);
 
     await tester.tap(find.text(S.joinQrRegenerate));
     await tester.pump();
@@ -127,6 +140,7 @@ void main() {
 
     expect(find.byType(JoinQrPlaceholder), findsNothing);
     expect(find.byType(QrImageView), findsOneWidget);
+    expect(find.text("K7M 2QP"), findsOneWidget);
   });
 
   testWidgets("owner can remove a member, not themselves", (tester) async {

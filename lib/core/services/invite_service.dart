@@ -1,3 +1,4 @@
+import "package:home_manager/core/domain/invite_code.dart";
 import "package:home_manager/core/logging/app_log.dart";
 import "package:home_manager/core/models/home.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
@@ -64,6 +65,38 @@ class InviteService {
       throw Exception("accept_invite_token không trả về id");
     }
     return id;
+  }
+
+  /// Accepts a 6-char invite code. RPC returns jsonb
+  /// `{status:'ok',home_id}` / `{status:'invalid'}` / `{status:'locked'}`.
+  Future<String> acceptInviteCode(String code) async {
+    AppLog.i("Accepting invite code");
+    final result = await _client.rpc(
+      "accept_invite_code",
+      params: {"p_code": code},
+    );
+    final map = _asJsonMap(result);
+    final status = "${map["status"] ?? ""}".trim().toLowerCase();
+    switch (status) {
+      case "ok":
+        final id = "${map["home_id"] ?? ""}".trim();
+        if (id.isEmpty || id == "null") {
+          throw const InviteCodeException(
+            InviteCodeAcceptError.other,
+            "accept_invite_code không trả về home_id",
+          );
+        }
+        return id;
+      case "locked":
+        throw const InviteCodeException(InviteCodeAcceptError.tooManyAttempts);
+      case "invalid":
+        throw const InviteCodeException(InviteCodeAcceptError.invalidOrExpired);
+      default:
+        throw InviteCodeException(
+          InviteCodeAcceptError.other,
+          "accept_invite_code status không hợp lệ: $status",
+        );
+    }
   }
 
   Future<void> revokeJoinLink(String homeId) async {

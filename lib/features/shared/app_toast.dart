@@ -4,97 +4,178 @@ import "package:home_manager/core/theme/app_spacing.dart";
 
 enum AppToastKind { success, destructive, info }
 
+/// Gap above the scaffold bottom chrome when a bottom nav is present.
+/// Floating [SnackBar] already clears the nav; only this extra gap is needed.
+const _toastGapAboveNav = AppSpacing.sm; // 8 -> toast y 724–772 on 393×852
+
+/// Bottom inset when there is no bottom nav (Members, etc.): y 754–802.
+const _toastBottomWithoutNav = 50.0;
+
+bool _scaffoldHasBottomNav(BuildContext context) {
+  // Descendant contexts (body buttons, etc.).
+  final fromOf = Scaffold.maybeOf(context);
+  if (fromOf != null) {
+    return fromOf.widget.bottomNavigationBar != null;
+  }
+
+  // Ancestor Scaffold widget (rare).
+  final ancestor = context.findAncestorWidgetOfExactType<Scaffold>();
+  if (ancestor?.bottomNavigationBar != null) return true;
+
+  // State.context of a widget that *builds* a Scaffold (e.g. AppShell): the
+  // Scaffold is a descendant, not an ancestor — walk the element tree.
+  var hasNav = false;
+  void visitor(Element el) {
+    if (hasNav) return;
+    final widget = el.widget;
+    if (widget is Scaffold && widget.bottomNavigationBar != null) {
+      hasNav = true;
+      return;
+    }
+    el.visitChildren(visitor);
+  }
+
+  (context as Element).visitChildren(visitor);
+  return hasNav;
+}
+
+double _toastBottomMargin(BuildContext context) {
+  return _scaffoldHasBottomNav(context)
+      ? _toastGapAboveNav
+      : _toastBottomWithoutNav;
+}
+
 /// Floating toast via the nearest [ScaffoldMessenger].
+///
+/// Dark inverse bar (361×48, #0F172A). Optional action keeps the toast 5s.
 void showAppToast(
   BuildContext context,
   String message, {
   AppToastKind kind = AppToastKind.success,
+  String? actionLabel,
+  VoidCallback? onAction,
 }) {
   final messenger = ScaffoldMessenger.maybeOf(context);
   if (messenger == null) return;
-  _showOn(messenger, context.appColors, message, kind);
+  _showOn(
+    messenger,
+    context.appColors,
+    message,
+    kind,
+    bottomMargin: _toastBottomMargin(context),
+    actionLabel: actionLabel,
+    onAction: onAction,
+  );
 }
 
 /// Pop the current route, then show a toast on the parent messenger.
-///
-/// Captures [ScaffoldMessenger] and colors before pop so the toast still works
-/// when the route being closed is a modal bottom sheet.
 void popWithAppToast(
   BuildContext context,
   String message, {
   VoidCallback? then,
   Object? result,
   AppToastKind kind = AppToastKind.success,
+  String? actionLabel,
+  VoidCallback? onAction,
 }) {
   final messenger = ScaffoldMessenger.maybeOf(context);
   final colors = context.appColors;
+  final bottomMargin = _toastBottomMargin(context);
   Navigator.pop(context, result);
   then?.call();
   if (messenger == null) return;
-  _showOn(messenger, colors, message, kind);
+  _showOn(
+    messenger,
+    colors,
+    message,
+    kind,
+    bottomMargin: bottomMargin,
+    actionLabel: actionLabel,
+    onAction: onAction,
+  );
 }
 
 void _showOn(
   ScaffoldMessengerState messenger,
   AppColorScheme colors,
   String message,
-  AppToastKind kind,
-) {
-  final (accent, icon) = switch (kind) {
-    AppToastKind.success => (colors.success, Icons.check_circle_rounded),
-    AppToastKind.destructive => (colors.error, Icons.delete_outline_rounded),
-    AppToastKind.info => (colors.accent, Icons.info_outline_rounded),
+  AppToastKind kind, {
+  required double bottomMargin,
+  String? actionLabel,
+  VoidCallback? onAction,
+}) {
+  final icon = switch (kind) {
+    AppToastKind.success => Icons.check_circle,
+    AppToastKind.destructive => Icons.delete_outline_rounded,
+    AppToastKind.info => Icons.info_outline_rounded,
   };
+  final iconColor = switch (kind) {
+    AppToastKind.success => const Color(0xFF7DD3A0),
+    AppToastKind.destructive => const Color(0xFFFCA5A5),
+    AppToastKind.info => const Color(0xFFFDBA74),
+  };
+  final hasAction = actionLabel != null && onAction != null;
 
   messenger
     ..hideCurrentSnackBar()
     ..showSnackBar(
       SnackBar(
-        content: Row(
-          children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: accent.withValues(alpha: 0.22),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, color: accent, size: 22),
-            ),
-            const SizedBox(width: AppSpacing.sm),
-            Expanded(
-              child: Text(
-                message,
-                style: TextStyle(
-                  color: colors.textPrimary,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 15,
+        content: SizedBox(
+          height: 48,
+          child: Row(
+            children: [
+              Icon(icon, color: iconColor, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  message,
+                  style: const TextStyle(
+                    color: Color(0xFFFFFFFF),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                    height: 20 / 14,
+                  ),
                 ),
               ),
-            ),
-          ],
+              if (hasAction)
+                SizedBox(
+                  height: 48,
+                  child: TextButton(
+                    onPressed: () {
+                      messenger.hideCurrentSnackBar();
+                      onAction();
+                    },
+                    style: TextButton.styleFrom(
+                      foregroundColor: const Color(0xFFFDBA74),
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      minimumSize: const Size(48, 48),
+                    ),
+                    child: Text(
+                      actionLabel,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
         behavior: SnackBarBehavior.floating,
-        elevation: 8,
-        duration: const Duration(milliseconds: 2600),
-        backgroundColor: Color.alphaBlend(
-          accent.withValues(alpha: 0.16),
-          colors.bgElevated,
-        ),
+        elevation: 0,
+        duration: Duration(milliseconds: hasAction ? 5000 : 2600),
+        backgroundColor: const Color(0xFF0F172A),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-          side: BorderSide(color: accent.withValues(alpha: 0.55), width: 1.5),
         ),
-        margin: const EdgeInsets.fromLTRB(
-          AppSpacing.md,
+        margin: EdgeInsets.fromLTRB(
+          AppSpacing.screenHorizontal,
           0,
-          AppSpacing.md,
-          AppSpacing.lg,
+          AppSpacing.screenHorizontal,
+          bottomMargin,
         ),
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.sm + 2,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
       ),
     );
 }
