@@ -6,9 +6,15 @@ import "package:home_manager/features/shared/app_card.dart";
 
 /// Load-error empty: `cloud_off` tint + secondary "Thử lại".
 class ErrorView extends StatelessWidget {
-  const ErrorView({super.key, required this.message, this.onRetry});
+  const ErrorView({
+    super.key,
+    required this.message,
+    this.description,
+    this.onRetry,
+  });
 
   final String message;
+  final String? description;
   final VoidCallback? onRetry;
 
   @override
@@ -39,6 +45,18 @@ class ErrorView extends StatelessWidget {
               color: colors.textPrimary,
             ),
           ),
+          if (description != null) ...[
+            const SizedBox(height: 4),
+            Text(
+              description!,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                height: 20 / 14,
+                color: colors.textSecondary,
+              ),
+            ),
+          ],
           if (onRetry != null) ...[
             const SizedBox(height: 16),
             SizedBox(

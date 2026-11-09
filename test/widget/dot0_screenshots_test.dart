@@ -4,8 +4,8 @@ import "dart:ui" as ui;
 
 import "package:flutter/material.dart";
 import "package:flutter/rendering.dart";
-import "package:flutter/services.dart";
 import "package:flutter_test/flutter_test.dart";
+import "../support/shots.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/models/home.dart";
 import "package:home_manager/core/models/tracking_mode.dart";
@@ -22,21 +22,9 @@ class MockHomeService extends Mock implements HomeService {}
 
 class MockInviteService extends Mock implements InviteService {}
 
-const _outDir = "/opt/cursor/artifacts/dot0";
 
 Future<void> _loadNunito() async {
-  final loader =
-      FontLoader("Nunito")
-        ..addFont(rootBundle.load("assets/fonts/Nunito/static/Nunito-Regular.ttf"))
-        ..addFont(rootBundle.load("assets/fonts/Nunito/static/Nunito-Medium.ttf"))
-        ..addFont(
-          rootBundle.load("assets/fonts/Nunito/static/Nunito-SemiBold.ttf"),
-        )
-        ..addFont(rootBundle.load("assets/fonts/Nunito/static/Nunito-Bold.ttf"))
-        ..addFont(
-          rootBundle.load("assets/fonts/Nunito/static/Nunito-ExtraBold.ttf"),
-        );
-  await loader.load();
+  await loadShotFonts();
 }
 
 Future<void> _savePng(WidgetTester tester, String name) async {
@@ -50,9 +38,7 @@ Future<void> _savePng(WidgetTester tester, String name) async {
     final data = await image.toByteData(format: ui.ImageByteFormat.png);
     return data!.buffer.asUint8List();
   });
-  final dir = Directory(_outDir);
-  if (!dir.existsSync()) dir.createSync(recursive: true);
-  File("$_outDir/$name.png").writeAsBytesSync(bytes!);
+  writeShotBytes("$name.png", bytes!);
 }
 
 Widget _frame(
@@ -109,8 +95,7 @@ Widget _frame(
 double _top(WidgetTester tester, Finder f) => tester.getTopLeft(f).dy;
 
 void main() {
-  final artifactsRoot = Directory("/opt/cursor/artifacts");
-  final runShots = artifactsRoot.existsSync();
+  final runShots = shouldCaptureShots;
 
   setUpAll(() async {
     registerFallbackValue("");
@@ -188,7 +173,7 @@ void main() {
       ..writeln(
         "01,signOut,${(signOutTop - accountTop).toStringAsFixed(1)},464,${(signOutTop - accountTop - 464).toStringAsFixed(1)}",
       );
-    File("$_outDir/measured.csv").writeAsStringSync(lines.toString());
+    writeShotText("measured.csv", lines.toString());
   });
 
   testWidgets("02 typing", skip: !runShots, (tester) async {
@@ -384,7 +369,7 @@ void main() {
           .first,
     );
 
-    final existing = File("$_outDir/measured.csv").readAsStringSync();
+    final existing = File("${hmShotsDir!}/measured.csv").readAsStringSync();
     final buf =
         StringBuffer(existing)
           ..writeln(
@@ -408,6 +393,6 @@ void main() {
           ..writeln(
             "08,copyLinkBtn_from_section,${(copyLinkTop - sectionTop).toStringAsFixed(1)},414,${(copyLinkTop - sectionTop - 414).toStringAsFixed(1)}",
           );
-    File("$_outDir/measured.csv").writeAsStringSync(buf.toString());
+    writeShotText("measured.csv", buf.toString());
   });
 }
