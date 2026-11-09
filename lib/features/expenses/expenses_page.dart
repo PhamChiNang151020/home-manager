@@ -1,32 +1,37 @@
 import "package:flutter/material.dart";
 import "package:home_manager/core/domain/expense_totals.dart";
 import "package:home_manager/core/domain/month_clamp.dart";
+import "package:home_manager/core/format/vnd_format.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/logging/app_log.dart";
 import "package:home_manager/core/models/expense.dart";
 import "package:home_manager/core/models/home.dart";
 import "package:home_manager/core/models/wallet.dart";
+import "package:home_manager/core/navigation/app_page_route.dart";
+import "package:home_manager/core/services/app_services.dart";
 import "package:home_manager/core/services/electricity_service.dart";
 import "package:home_manager/core/services/expense_service.dart";
 import "package:home_manager/core/services/home_service.dart";
+import "package:home_manager/core/services/income_service.dart";
 import "package:home_manager/core/services/wallet_service.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
+import "package:home_manager/core/theme/app_icons.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
-import "package:home_manager/features/expenses/expense_category_chart.dart";
-import "package:home_manager/features/expenses/expense_category_style.dart";
+import "package:home_manager/core/theme/app_theme.dart";
+import "package:home_manager/features/expenses/expense_categories_page.dart";
 import "package:home_manager/features/expenses/expense_form.dart";
-import "package:home_manager/features/expenses/quick_add_sheet.dart";
+import "package:home_manager/features/income/income_page.dart";
 import "package:home_manager/features/shared/animated_entrance.dart";
 import "package:home_manager/features/shared/app_card.dart";
-import "package:home_manager/features/shared/app_loading.dart";
 import "package:home_manager/features/shared/app_refresh_indicator.dart";
 import "package:home_manager/features/shared/app_toast.dart";
-import "package:home_manager/features/shared/day_stepper_field.dart";
 import "package:home_manager/features/shared/empty_state_view.dart";
 import "package:home_manager/features/shared/error_view.dart";
-import "package:home_manager/features/shared/loading_view.dart";
-import "package:home_manager/features/shared/money_text.dart";
+import "package:home_manager/features/shared/list_group.dart";
+import "package:home_manager/features/shared/month_stepper.dart";
+import "package:home_manager/features/shared/progress_bar.dart";
 import "package:home_manager/features/shared/section_header.dart";
+import "package:home_manager/features/shared/skeleton.dart";
 import "package:intl/intl.dart";
 
 class ExpensesPage extends StatefulWidget {
@@ -37,6 +42,8 @@ class ExpensesPage extends StatefulWidget {
     required this.homesApi,
     required this.photos,
     required this.currentUserId,
+    required this.incomes,
+    required this.services,
     this.wallets,
   });
 
@@ -45,6 +52,8 @@ class ExpensesPage extends StatefulWidget {
   final HomeService homesApi;
   final BillPhotoService photos;
   final String currentUserId;
+  final IncomeService incomes;
+  final AppServices services;
   final WalletService? wallets;
 
   @override
@@ -56,17 +65,15 @@ class ExpensesPageState extends State<ExpensesPage> {
   List<ExpenseCategory> _categories = [];
   List<HomeMember> _members = [];
   List<Wallet> _wallets = [];
+  double _incomeTotal = 0;
   bool _loading = true;
-  String? _error;
-  late DateTime _day;
-
-  List<Expense> get _dayItems =>
-      _monthItems.where((e) => sameDay(e.expenseDate, _day)).toList();
+  bool _failed = false;
+  late DateTime _month;
 
   @override
   void initState() {
     super.initState();
-    _day = today();
+    _month = monthStart(today());
     _load();
   }
 
@@ -78,27 +85,23 @@ class ExpensesPageState extends State<ExpensesPage> {
     }
   }
 
-  /// Pull-to-refresh has its own spinner, so it skips the full-page overlay —
-  /// otherwise one gesture puts two indicators on screen and veils the data
-  /// the user is looking at.
   Future<void> _refresh() => _load(showOverlay: false);
 
   Future<void> _load({bool showOverlay = true}) async {
     setState(() {
       if (showOverlay) _loading = true;
-      _error = null;
+      _failed = false;
     });
     try {
-      // One round trip instead of three — none of the three depends on
-      // another.
       final walletsFuture =
           widget.wallets?.list(widget.home.id) ?? Future.value(<Wallet>[]);
-      final (categories, members, items, wallets) =
+      final (categories, members, items, wallets, incomes) =
           await (
             widget.expenses.listCategories(widget.home.id),
             widget.homesApi.listMembers(widget.home.id),
-            widget.expenses.list(widget.home.id, month: monthStart(_day)),
+            widget.expenses.list(widget.home.id, month: _month),
             walletsFuture,
+            widget.incomes.list(widget.home.id, month: _month),
           ).wait;
       if (!mounted) return;
       setState(() {
@@ -106,45 +109,23 @@ class ExpensesPageState extends State<ExpensesPage> {
         _members = members;
         _monthItems = items;
         _wallets = wallets;
+        _incomeTotal = incomes.fold<double>(0, (s, i) => s + i.amountVnd);
         _loading = false;
       });
     } catch (e, st) {
       AppLog.e("Failed to load expenses", error: e, stackTrace: st);
       if (mounted) {
         setState(() {
-          _error = "$e";
+          _failed = true;
           _loading = false;
         });
       }
     }
   }
 
-  void _onDayChanged(DateTime value) {
-    final previousMonth = monthStart(_day);
-    final next = today(value);
-    setState(() => _day = next);
-    if (!sameMonth(previousMonth, monthStart(next))) {
-      _load();
-    }
-  }
-
-  void openAddForm() => _openQuickAdd();
-
-  Future<void> _openQuickAdd() async {
-    if (_categories.isEmpty) return;
-    final openFull = await showQuickAddSheet(
-      context: context,
-      home: widget.home,
-      expenses: widget.expenses,
-      photos: widget.photos,
-      categories: _categories,
-      members: _members,
-      currentUserId: widget.currentUserId,
-      onSaved: _load,
-    );
-    if (openFull && mounted) {
-      await _openForm();
-    }
+  void _onMonthChanged(DateTime value) {
+    setState(() => _month = monthStart(value));
+    _load();
   }
 
   Future<void> _openForm({Expense? existing}) async {
@@ -201,139 +182,459 @@ class ExpensesPageState extends State<ExpensesPage> {
     }
   }
 
+  void _openIncome() {
+    Navigator.push<void>(
+      context,
+      AppPageRoute<void>(
+        page: IncomeRoutePage(home: widget.home, services: widget.services),
+      ),
+    );
+  }
+
+  void _openCategories() {
+    Navigator.push<void>(
+      context,
+      AppPageRoute<void>(
+        page: ExpenseCategoriesScreen(
+          home: widget.home,
+          expenses: widget.expenses,
+        ),
+      ),
+    );
+  }
+
+  Map<DateTime, List<Expense>> _groupByDay() {
+    final map = <DateTime, List<Expense>>{};
+    for (final expense in _monthItems) {
+      final day = DateTime(
+        expense.expenseDate.year,
+        expense.expenseDate.month,
+        expense.expenseDate.day,
+      );
+      (map[day] ??= []).add(expense);
+    }
+    return map;
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (_error != null) {
-      return ErrorView(message: _error!, onRetry: _load);
-    }
+    // Top inset comes from TransactionsHub segmented padding (8 under seg ->
+    // month at y 179). Do not add another shellListPadding.top here.
+    const listPadding = EdgeInsets.fromLTRB(0, 0, 0, AppSpacing.lg);
+
     if (_loading && _monthItems.isEmpty && _categories.isEmpty) {
-      return const LoadingView();
+      return ListView(
+        padding: listPadding,
+        children: const [
+          SkeletonBox(width: double.infinity, height: 110, borderRadius: 8),
+          SizedBox(height: AppSpacing.lg),
+          SkeletonBox(width: 116, height: 24, borderRadius: 8),
+          SizedBox(height: AppSpacing.sm),
+          SkeletonBox(width: double.infinity, height: 254, borderRadius: 8),
+        ],
+      );
+    }
+
+    if (_failed && _monthItems.isEmpty && _categories.isEmpty) {
+      return ListView(
+        padding: listPadding,
+        children: [
+          ErrorView(
+            message: S.loadFailedTitle,
+            description: S.loadFailedHint,
+            onRetry: _load,
+          ),
+        ],
+      );
     }
 
     final colors = context.appColors;
-    final items = _dayItems;
-    final spend = spendByCategory(items);
+    final total = totalAmount(_monthItems);
+    final who = whoSpentRows(members: _members, expenses: _monthItems);
+    final byDay = _groupByDay();
+    final days = byDay.keys.toList()..sort((a, b) => b.compareTo(a));
+    final empty = _monthItems.isEmpty;
 
-    return LoadingOverlay(
-      loading: _loading,
-      child: AppRefreshIndicator(
-        onRefresh: _refresh,
-        child: ListView(
-          padding: AppSpacing.shellListPadding,
-          children: [
-            AnimatedEntrance(
-              index: 0,
-              child: DayStepperField(day: _day, onChanged: _onDayChanged),
+    return AppRefreshIndicator(
+      onRefresh: _refresh,
+      child: ListView(
+        padding: listPadding,
+        children: [
+          AnimatedEntrance(
+            index: 0,
+            child: MonthStepper(month: _month, onChanged: _onMonthChanged),
+          ),
+          const SizedBox(height: AppSpacing.sm), // 8 -> summary at y 235
+          AnimatedEntrance(
+            index: 1,
+            child: _SummaryCard(
+              month: _month.month,
+              total: total,
+              incomeTotal: _incomeTotal,
+              onIncomeTap: _openIncome,
             ),
-            const SizedBox(height: AppSpacing.md),
-            if (items.isEmpty)
-              const EmptyStateView(
+          ),
+          if (empty) ...[
+            const SizedBox(height: AppSpacing.lg),
+            const AnimatedEntrance(
+              index: 2,
+              child: EmptyStateView(
                 message: S.noExpenses,
                 icon: Icons.shopping_bag_outlined,
                 description: S.noExpensesHint,
-              )
-            else ...[
-              AnimatedEntrance(
-                index: 1,
-                child: ExpenseCategoryChart(spend: spend),
               ),
-              const AnimatedEntrance(
-                index: 2,
-                child: SectionHeader(title: S.history),
+            ),
+          ] else ...[
+            const SizedBox(height: AppSpacing.lg),
+            AnimatedEntrance(
+              index: 2,
+              child: SectionHeader(title: S.whoSpent),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            AnimatedEntrance(
+              index: 3,
+              child: _WhoSpentCard(rows: who, monthTotal: total),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            AnimatedEntrance(
+              index: 4,
+              child: SectionHeader(
+                title: S.expenseItems,
+                linkLabel: "${S.category} ›",
+                onLink: _openCategories,
               ),
-              for (var i = 0; i < items.length; i++)
-                AnimatedEntrance(
-                  index: 3 + i,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-                    child: Builder(
-                      builder: (context) {
-                        final expense = items[i];
-                        final categoryColor = colors.categoryColor(
-                          expense.category?.colorKey ?? "other",
+            ),
+            for (var d = 0; d < days.length; d++) ...[
+              SizedBox(height: d == 0 ? AppSpacing.sm : 12),
+              Text(
+                DateFormat("EEEE, dd/MM", "vi").format(days[d]),
+                style: TextStyle(
+                  fontFamily: AppFonts.nunito,
+                  fontSize: 12,
+                  height: 16 / 12,
+                  fontWeight: FontWeight.w700,
+                  color: colors.textMuted,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              ListGroup(
+                children: [
+                  for (var i = 0; i < byDay[days[d]]!.length; i++)
+                    _ExpenseRow(
+                      expense: byDay[days[d]]![i],
+                      showDivider: i < byDay[days[d]]!.length - 1,
+                      onTap:
+                          () => _openForm(existing: byDay[days[d]]![i]),
+                      onDelete: () async {
+                        final expense = byDay[days[d]]![i];
+                        final ok = await _confirmDelete(expense);
+                        if (!ok) return false;
+                        if (!context.mounted) return false;
+                        setState(() {
+                          _monthItems =
+                              _monthItems
+                                  .where((e) => e.id != expense.id)
+                                  .toList();
+                        });
+                        showAppToast(
+                          context,
+                          S.toastExpenseDeleted,
+                          kind: AppToastKind.destructive,
                         );
-                        return Dismissible(
-                          key: ValueKey(expense.id),
-                          direction: DismissDirection.endToStart,
-                          background: Container(
-                            alignment: Alignment.centerRight,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.md,
-                            ),
-                            decoration: BoxDecoration(
-                              color: colors.error.withValues(alpha: 0.18),
-                              borderRadius: BorderRadius.circular(
-                                AppSpacing.cardRadius,
-                              ),
-                            ),
-                            child: Icon(
-                              Icons.delete_outline,
-                              color: colors.error,
-                            ),
-                          ),
-                          confirmDismiss: (_) => _confirmDelete(expense),
-                          onDismissed: (_) {
-                            setState(() {
-                              _monthItems =
-                                  _monthItems
-                                      .where((e) => e.id != expense.id)
-                                      .toList();
-                            });
-                            showAppToast(
-                              context,
-                              S.toastExpenseDeleted,
-                              kind: AppToastKind.destructive,
-                            );
-                          },
-                          child: AppCard(
-                            onTap: () => _openForm(existing: expense),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.md,
-                              vertical: AppSpacing.sm,
-                            ),
-                            child: Row(
-                              children: [
-                                ExpenseCategoryIcon(
-                                  iconKey:
-                                      expense.category?.iconKey ?? "more_horiz",
-                                  color: categoryColor,
-                                ),
-                                const SizedBox(width: AppSpacing.sm),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        expense.category?.name ?? S.category,
-                                        style:
-                                            Theme.of(
-                                              context,
-                                            ).textTheme.titleSmall,
-                                      ),
-                                      Text(
-                                        "${DateFormat("dd/MM").format(expense.expenseDate)}"
-                                        "${expense.paidByName == null ? "" : " · ${expense.paidByName}"}",
-                                        style: TextStyle(
-                                          color: colors.textMuted,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                MoneyText(amount: expense.amountVnd),
-                              ],
-                            ),
-                          ),
-                        );
+                        return true;
                       },
+                    ),
+                ],
+              ),
+            ],
+            const SizedBox(height: AppSpacing.lg),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _SummaryCard extends StatelessWidget {
+  const _SummaryCard({
+    required this.month,
+    required this.total,
+    required this.incomeTotal,
+    required this.onIncomeTap,
+  });
+
+  final int month;
+  final double total;
+  final double incomeTotal;
+  final VoidCallback onIncomeTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return AppCard(
+      padding: EdgeInsets.zero,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  S.totalSpendMonth(month),
+                  style: TextStyle(
+                    fontFamily: AppFonts.nunito,
+                    fontSize: 12,
+                    height: 16 / 12,
+                    fontWeight: FontWeight.w600,
+                    color: colors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                // Spec amount band 272–311 (39) for 28/36 text.
+                SizedBox(
+                  height: 39,
+                  child: Text(
+                    VndFormat.format(total),
+                    style: TextStyle(
+                      fontFamily: AppFonts.nunito,
+                      fontSize: 28,
+                      height: 36 / 28,
+                      fontWeight: FontWeight.w800,
+                      color: colors.accent,
                     ),
                   ),
                 ),
-            ],
-          ],
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          Divider(height: 1, thickness: 1, color: colors.border),
+          InkWell(
+            key: const ValueKey("expenses-income-row"),
+            onTap: onIncomeTap,
+            child: SizedBox(
+              height: 48,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        S.incomeMonthLabel(month),
+                        style: TextStyle(
+                          fontFamily: AppFonts.nunito,
+                          fontSize: 14,
+                          height: 20 / 14,
+                          color: colors.textSecondary,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      incomeTotal > 0
+                          ? VndFormat.format(incomeTotal)
+                          : S.incomeNone,
+                      style: TextStyle(
+                        fontFamily: AppFonts.nunito,
+                        fontSize: 14,
+                        height: 20 / 14,
+                        fontWeight: FontWeight.w700,
+                        color:
+                            incomeTotal > 0
+                                ? colors.success
+                                : colors.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.chevron_right,
+                      size: 20,
+                      color: colors.textMuted,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _WhoSpentCard extends StatelessWidget {
+  const _WhoSpentCard({required this.rows, required this.monthTotal});
+
+  final List<WhoSpentRow> rows;
+  final double monthTotal;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return ListGroup(
+      children: [
+        for (var i = 0; i < rows.length; i++)
+          _WhoSpentRow(
+            row: rows[i],
+            ratio: monthTotal <= 0 ? 0 : rows[i].amountVnd / monthTotal,
+            showDivider: i < rows.length - 1,
+            colors: colors,
+          ),
+      ],
+    );
+  }
+}
+
+class _WhoSpentRow extends StatelessWidget {
+  const _WhoSpentRow({
+    required this.row,
+    required this.ratio,
+    required this.showDivider,
+    required this.colors,
+  });
+
+  final WhoSpentRow row;
+  final double ratio;
+  final bool showDivider;
+  final AppColorScheme colors;
+
+  @override
+  Widget build(BuildContext context) {
+    final initial =
+        row.name.isNotEmpty ? row.name.characters.first.toUpperCase() : "?";
+    return Column(
+      children: [
+        SizedBox(
+          height: 64,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+            child: Row(
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: colors.accent.withValues(alpha: 0.12),
+                  ),
+                  child: Text(
+                    initial,
+                    style: TextStyle(
+                      fontFamily: AppFonts.nunito,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: colors.accent,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              row.name,
+                              style: TextStyle(
+                                fontFamily: AppFonts.nunito,
+                                fontSize: 14,
+                                height: 20 / 14,
+                                fontWeight: FontWeight.w600,
+                                color: colors.textPrimary,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            VndFormat.format(row.amountVnd),
+                            style: TextStyle(
+                              fontFamily: AppFonts.nunito,
+                              fontSize: 14,
+                              height: 20 / 14,
+                              fontWeight: FontWeight.w700,
+                              color: colors.textPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      ProgressBar(value: ratio),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
+        if (showDivider)
+          Divider(height: 1, thickness: 1, indent: 64, color: colors.border),
+      ],
+    );
+  }
+}
+
+class _ExpenseRow extends StatelessWidget {
+  const _ExpenseRow({
+    required this.expense,
+    required this.showDivider,
+    required this.onTap,
+    required this.onDelete,
+  });
+
+  final Expense expense;
+  final bool showDivider;
+  final VoidCallback onTap;
+  final Future<bool> Function() onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final categoryColor = colors.categoryColor(
+      expense.category?.colorKey ?? "other",
+    );
+    final note = expense.note?.trim();
+    final payer = expense.paidByName ?? "";
+    final subtitle = [
+      if (payer.isNotEmpty) payer,
+      if (note != null && note.isNotEmpty) note,
+    ].join(" · ");
+
+    return Dismissible(
+      key: ValueKey(expense.id),
+      direction: DismissDirection.endToStart,
+      confirmDismiss: (_) => onDelete(),
+      background: Container(
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+        color: colors.error.withValues(alpha: 0.18),
+        child: Icon(Icons.delete_outline, color: colors.error),
+      ),
+      child: ListGroupRow(
+        title: expense.category?.name ?? S.category,
+        subtitle: subtitle.isEmpty ? null : subtitle,
+        height: ListGroupRowHeight.h56,
+        showDivider: showDivider,
+        leading: ListGroupIcon(
+          icon: AppIcons.expenseCategory(
+            expense.category?.iconKey ?? "more_horiz",
+          ),
+          color: categoryColor,
+        ),
+        trailing: Text(
+          VndFormat.format(expense.amountVnd),
+          style: TextStyle(
+            fontFamily: AppFonts.nunito,
+            fontSize: 16,
+            height: 24 / 16,
+            fontWeight: FontWeight.w700,
+            color: colors.textPrimary,
+          ),
+        ),
+        onTap: onTap,
       ),
     );
   }

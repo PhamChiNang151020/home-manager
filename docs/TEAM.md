@@ -83,3 +83,9 @@ Khung 393×852 (iPhone 15 webview), an toàn trên 59 / dưới 34. Nội dung d
 - Nút (+) thêm chi tiêu không chọn được ví (quick_add_picker_sheet.dart:96-117), phải vào sửa mới chọn: chờ HM-Design chốt cố ý hay thiếu.
 - Thanh toán chi tiêu từ ví và hoàn tiền không hiện trong lịch sử ví.
 - Mở link ?join= khi chưa đăng nhập, màn đăng nhập không báo là đang được mời vào nhà.
+
+- 09/11 17:57 (HM-Design chốt, PR #11): banner mời ngắt dòng tự nhiên ("…một nhà. Đăng" / "nhập hoặc tạo…"). Giữ số: ô chữ 253, Nunito 14/20 w600, đúng 2 dòng, cao 64. Không dùng nbsp. QA chỉ kiểm 2 dòng + cao 64, không kiểm chỗ ngắt.
+- 09/11 17:59 (HM-Design chốt, Đợt 1): vùng an toàn dưới theo môi trường. Web (inset 0): nav y 788–852, nút + 797–845, toast 732–780. Máy inset 34: nav 754–852, nút + 763–811, toast 698–746. Đo theo cạnh dưới viewport, toast cách nav 8, sai số ±3. Nguồn: tickets/dot-1.md mục "Vùng an toàn dưới theo môi trường".
+- 09/11 18:13 (HM-Design chốt sau QA vòng 1 Đợt 1): Tài sản = Ví · Tiết kiệm · Tín dụng NH · Nợ vay mượn (dòng 64, icon savings vòng 36). Sheet Thêm nhanh đáy = 16 + viewPadding.bottom (web 348–852, iPhone 314–852). Tiêu đề Cá nhân x 72 (AppBar mặc định). Biểu đồ Đợt 1 giữ bản cũ (card 224, tiêu đề trong card), kiểu app-v2 để Đợt 5. Web inset trên 0, mọi phần tử trên cao hơn iPhone 59, không tính lỗi.
+- 09/11 18:41: PR #11 MERGED (squash 9a8373d, 2 vòng QA, deploy success). Đợt 1 PR #10 MERGED (squash 778464a, 2 vòng QA), deploy run 42611119994. Tồn: màn Ví còn trang Tài sản cũ (trùng Tín dụng/Nợ) → HM-Design xếp đợt sau.
+- 09/11 18:46: Audit Đợt 1 (simplify/audit/dot-1.md): không có mục chặn. Còn tồn cho PR dọn riêng: string chết S.notifications + 5 S.tab*; 4 file test hardcode /opt/cursor/artifacts; tool/dot1_nav_web_demo.dart. Màn Ví bỏ 2 section Tín dụng/Nợ → HM-Design xếp đợt. Giữ NotificationsPage cho Đợt 3.

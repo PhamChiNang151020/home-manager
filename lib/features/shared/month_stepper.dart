@@ -37,13 +37,14 @@ class MonthStepper extends StatelessWidget {
           ),
           Expanded(
             child: Text(
-              DateFormat("MM/yyyy").format(month),
+              S.monthTitle(DateFormat("MM/yyyy").format(month)),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,
                 height: 24 / 16,
                 fontWeight: FontWeight.w700,
                 color: colors.textPrimary,
+                fontFamily: "Nunito",
               ),
             ),
           ),
