@@ -7,6 +7,7 @@ revoke execute on function public.create_or_get_join_link(uuid, boolean) from pu
 grant execute on function public.accept_invite_code(text) to authenticated;
 grant execute on function public.create_or_get_join_link(uuid, boolean) to authenticated;
 
--- Body uses unqualified gen_random_bytes + public.home_join_links; keep public
--- on the path so gen_random_bytes still resolves (same as other RPCs in this repo).
-alter function public.generate_invite_code() set search_path = public, pg_temp;
+-- Body uses unqualified gen_random_bytes (extensions.pgcrypto on production) +
+-- public.home_join_links.
+alter function public.generate_invite_code()
+  set search_path = public, extensions, pg_temp;
