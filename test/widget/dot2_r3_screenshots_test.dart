@@ -17,7 +17,6 @@ import "package:home_manager/core/theme/app_theme.dart";
 import "package:home_manager/core/theme/mobile_viewport.dart";
 import "package:home_manager/features/expenses/expense_categories_page.dart";
 import "package:home_manager/features/expenses/quick_add_sheet.dart";
-import "package:home_manager/features/shared/app_toast.dart";
 import "package:home_manager/features/shared/month_stepper.dart";
 import "package:home_manager/features/shared/section_header.dart";
 import "package:home_manager/features/shared/sticky_primary_bar.dart";
@@ -268,7 +267,7 @@ void main() {
     };
   });
 
-  testWidgets("r3 month stepper + danh muc link + toast + chon vi n=2", (
+  testWidgets("r3 month stepper + danh muc link + chon vi n=2", (
     tester,
   ) async {
     _web(tester);
@@ -287,15 +286,6 @@ void main() {
                   title: S.expenseItems,
                   linkLabel: "${S.category} ›",
                   onLink: () {},
-                ),
-                Builder(
-                  builder: (context) {
-                    return FilledButton(
-                      onPressed:
-                          () => showAppToast(context, S.toastExpenseAdded),
-                      child: const Text("toast"),
-                    );
-                  },
                 ),
                 Builder(
                   builder: (context) {
@@ -338,23 +328,9 @@ void main() {
           matching: find.byType(Opacity),
         ).evaluate().isEmpty;
 
-    await tester.tap(find.text("toast"));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 50));
-    await _png(tester, "toast-so-gd");
-    final toast = _box(
-      tester,
-      find.descendant(
-        of: find.byType(SnackBar),
-        matching: find.byType(Material),
-      ),
-    );
-    final nav = _box(tester, find.byType(AppBottomNav));
-    measured["toast"] = {
-      "toast": _cmp([toast.top, toast.bottom], [732, 780]),
-      "nav_top": _cmp([nav.top], [788]),
-      "gap": nav.top - toast.bottom,
-    };
+    // Toast product evidence is NOT captured here — the old toast/picker
+    // harness shot had empty 732–780 pixels. See r4/toast-so-gd-flow.png
+    // from tool/expense_toast_web_demo.dart (web release, real quick-add).
 
     await tester.tap(find.text("picker"));
     await tester.pumpAndSettle();
