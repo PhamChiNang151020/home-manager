@@ -1,3 +1,5 @@
+import "dart:async";
+
 import "package:flutter/material.dart";
 import "package:flutter_test/flutter_test.dart";
 import "package:home_manager/core/l10n/strings.dart";
@@ -162,5 +164,78 @@ void main() {
 
     expect(acceptedToken, "tokABC");
     expect(find.text(S.joinedHome), findsOneWidget);
+  });
+
+  testWidgets("paste long invite link is not truncated by maxLength", (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(393, 852);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    // ~96 chars, longer than the old maxLength 64.
+    const longLink =
+        "https://example.test/home-manager/join.html?join=abcdef0123456789abcdef0123456789";
+    expect(longLink.length, greaterThan(64));
+
+    String? acceptedToken;
+    await tester.pumpWidget(
+      _wrap(
+        EmptyHomeView(
+          email: "a@b.com",
+          onAddHome: () {},
+          onSignOut: () {},
+          onAcceptCode: (_) async {
+            fail("should not accept code");
+          },
+          onAcceptToken: (token) async {
+            acceptedToken = token;
+          },
+        ),
+      ),
+    );
+
+    await tester.enterText(find.byType(TextField), longLink);
+    await tester.pump();
+    await tester.tap(find.text(S.enterHome));
+    await tester.pumpAndSettle();
+
+    expect(acceptedToken, "abcdef0123456789abcdef0123456789");
+  });
+
+  testWidgets("submitting enter button uses 60% accent without disabled dim", (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(393, 852);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    final gate = Completer<void>();
+    await tester.pumpWidget(
+      _wrap(
+        EmptyHomeView(
+          email: "a@b.com",
+          onAddHome: () {},
+          onSignOut: () {},
+          onAcceptCode: (_) => gate.future,
+          onAcceptToken: (_) async {},
+        ),
+      ),
+    );
+
+    await tester.enterText(find.byType(TextField), "K7M2QP");
+    await tester.pump();
+    await tester.tap(find.text(S.enterHome));
+    await tester.pump();
+
+    final button = tester.widget<FilledButton>(
+      find.widgetWithText(FilledButton, S.enteringHome),
+    );
+    expect(button.onPressed, isNotNull);
+    final bg = button.style?.backgroundColor?.resolve({});
+    expect(bg?.a, closeTo(0.6, 0.001));
+
+    gate.complete();
+    await tester.pump();
   });
 }

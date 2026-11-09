@@ -1,4 +1,5 @@
 import "package:flutter_test/flutter_test.dart";
+import "package:home_manager/core/domain/invite_code.dart";
 import "package:home_manager/core/services/invite_service.dart";
 import "package:mocktail/mocktail.dart";
 
@@ -75,10 +76,10 @@ void main() {
     ).called(1);
   });
 
-  test("acceptInviteCode returns home id", () async {
-    when(
-      () => client.rpc(any(), params: any(named: "params")),
-    ).thenAnswer((_) => ImmediateRpcResult("h1"));
+  test("acceptInviteCode returns home id from status ok", () async {
+    when(() => client.rpc(any(), params: any(named: "params"))).thenAnswer(
+      (_) => ImmediateRpcResult({"status": "ok", "home_id": "h1"}),
+    );
 
     final homeId = await service.acceptInviteCode("K7M2QP");
 
@@ -86,6 +87,40 @@ void main() {
     verify(
       () => client.rpc("accept_invite_code", params: {"p_code": "K7M2QP"}),
     ).called(1);
+  });
+
+  test("acceptInviteCode maps invalid status", () async {
+    when(() => client.rpc(any(), params: any(named: "params"))).thenAnswer(
+      (_) => ImmediateRpcResult({"status": "invalid"}),
+    );
+
+    await expectLater(
+      () => service.acceptInviteCode("BADCOD"),
+      throwsA(
+        isA<InviteCodeException>().having(
+          (e) => e.kind,
+          "kind",
+          InviteCodeAcceptError.invalidOrExpired,
+        ),
+      ),
+    );
+  });
+
+  test("acceptInviteCode maps locked status", () async {
+    when(() => client.rpc(any(), params: any(named: "params"))).thenAnswer(
+      (_) => ImmediateRpcResult({"status": "locked"}),
+    );
+
+    await expectLater(
+      () => service.acceptInviteCode("K7M2QP"),
+      throwsA(
+        isA<InviteCodeException>().having(
+          (e) => e.kind,
+          "kind",
+          InviteCodeAcceptError.tooManyAttempts,
+        ),
+      ),
+    );
   });
 
   test("invite returns invite id from RPC", () async {

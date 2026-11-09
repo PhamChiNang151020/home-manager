@@ -37,12 +37,31 @@ abstract final class InviteCode {
 
 enum InviteCodeAcceptError { invalidOrExpired, tooManyAttempts, other }
 
+class InviteCodeException implements Exception {
+  const InviteCodeException(this.kind, [this.message]);
+
+  final InviteCodeAcceptError kind;
+  final String? message;
+
+  @override
+  String toString() {
+    if (message != null && message!.isNotEmpty) return message!;
+    return switch (kind) {
+      InviteCodeAcceptError.tooManyAttempts => "too many attempts",
+      InviteCodeAcceptError.invalidOrExpired =>
+        "invalid or expired invite code",
+      InviteCodeAcceptError.other => "invite code error",
+    };
+  }
+}
+
 InviteCodeAcceptError mapInviteCodeError(Object error) {
+  if (error is InviteCodeException) return error.kind;
   final lower = "$error".toLowerCase();
-  if (lower.contains("too many attempts")) {
+  if (lower.contains("too many attempts") || lower.contains("locked")) {
     return InviteCodeAcceptError.tooManyAttempts;
   }
-  if (lower.contains("invalid or expired")) {
+  if (lower.contains("invalid or expired") || lower.contains("invalid")) {
     return InviteCodeAcceptError.invalidOrExpired;
   }
   return InviteCodeAcceptError.other;

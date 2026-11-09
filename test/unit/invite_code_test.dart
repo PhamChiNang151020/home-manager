@@ -59,5 +59,20 @@ void main() {
         InviteCodeAcceptError.other,
       );
     });
+
+    test("maps InviteCodeException kinds", () {
+      expect(
+        mapInviteCodeError(
+          const InviteCodeException(InviteCodeAcceptError.tooManyAttempts),
+        ),
+        InviteCodeAcceptError.tooManyAttempts,
+      );
+      expect(
+        mapInviteCodeError(
+          const InviteCodeException(InviteCodeAcceptError.invalidOrExpired),
+        ),
+        InviteCodeAcceptError.invalidOrExpired,
+      );
+    });
   });
 }

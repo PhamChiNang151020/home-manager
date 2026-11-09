@@ -1,12 +1,14 @@
 import "package:flutter/material.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
+import "package:home_manager/features/shell/app_bottom_nav.dart";
 
 enum AppToastKind { success, destructive, info }
 
 /// Floating toast via the nearest [ScaffoldMessenger].
 ///
-/// Dark inverse bar (361×48, #0F172A). Optional action keeps the toast 5s.
+/// Dark inverse bar (361×48, #0F172A). Sits 8px above the bottom nav
+/// (`AppBottomNav.heightOf + 8`). Optional action keeps the toast 5s.
 void showAppToast(
   BuildContext context,
   String message, {
@@ -21,6 +23,7 @@ void showAppToast(
     context.appColors,
     message,
     kind,
+    bottomMargin: AppBottomNav.heightOf(context) + AppSpacing.sm,
     actionLabel: actionLabel,
     onAction: onAction,
   );
@@ -38,6 +41,7 @@ void popWithAppToast(
 }) {
   final messenger = ScaffoldMessenger.maybeOf(context);
   final colors = context.appColors;
+  final bottomMargin = AppBottomNav.heightOf(context) + AppSpacing.sm;
   Navigator.pop(context, result);
   then?.call();
   if (messenger == null) return;
@@ -46,6 +50,7 @@ void popWithAppToast(
     colors,
     message,
     kind,
+    bottomMargin: bottomMargin,
     actionLabel: actionLabel,
     onAction: onAction,
   );
@@ -56,6 +61,7 @@ void _showOn(
   AppColorScheme colors,
   String message,
   AppToastKind kind, {
+  required double bottomMargin,
   String? actionLabel,
   VoidCallback? onAction,
 }) {
@@ -124,11 +130,11 @@ void _showOn(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
         ),
-        margin: const EdgeInsets.fromLTRB(
+        margin: EdgeInsets.fromLTRB(
           AppSpacing.screenHorizontal,
           0,
           AppSpacing.screenHorizontal,
-          50,
+          bottomMargin,
         ),
         padding: const EdgeInsets.symmetric(horizontal: 16),
       ),

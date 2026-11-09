@@ -377,43 +377,46 @@ class _InviteCard extends StatelessWidget {
           SizedBox(height: (hasError || showLockError) ? 12 : 12),
           SizedBox(
             height: 48,
-            child: Opacity(
-              opacity: submitting ? 0.6 : 1,
-              child: FilledButton(
-                onPressed: canSubmit ? onSubmit : null,
-                style: FilledButton.styleFrom(
-                  backgroundColor: colors.accent,
-                  foregroundColor: Colors.white,
-                  disabledBackgroundColor: colors.accent.withValues(
-                    alpha: 0.38,
-                  ),
-                  disabledForegroundColor: Colors.white,
-                  textStyle: const TextStyle(
-                    fontFamily: AppFonts.nunito,
-                    fontSize: 16,
-                    height: 24 / 16,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                child:
+            // Keep onPressed non-null while submitting so M3 disabled (38%)
+            // opacity is not multiplied with the loading 60% treatment.
+            child: FilledButton(
+              onPressed:
+                  submitting
+                      ? () {}
+                      : (canSubmit ? onSubmit : null),
+              style: FilledButton.styleFrom(
+                backgroundColor:
                     submitting
-                        ? const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2.5,
-                                color: Colors.white,
-                              ),
-                            ),
-                            SizedBox(width: 8),
-                            Text(S.enteringHome),
-                          ],
-                        )
-                        : const Text(S.enterHome),
+                        ? colors.accent.withValues(alpha: 0.6)
+                        : colors.accent,
+                foregroundColor: Colors.white,
+                disabledBackgroundColor: colors.accent.withValues(alpha: 0.38),
+                disabledForegroundColor: Colors.white,
+                textStyle: const TextStyle(
+                  fontFamily: AppFonts.nunito,
+                  fontSize: 16,
+                  height: 24 / 16,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
+              child:
+                  submitting
+                      ? const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              color: Colors.white,
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          Text(S.enteringHome),
+                        ],
+                      )
+                      : const Text(S.enterHome),
             ),
           ),
         ],
@@ -472,7 +475,7 @@ class InviteCodeBoxes extends StatelessWidget {
                 controller: controller,
                 focusNode: focusNode,
                 enabled: enabled,
-                maxLength: 64,
+                maxLength: 512,
                 keyboardType: TextInputType.visiblePassword,
                 autocorrect: false,
                 enableSuggestions: false,
