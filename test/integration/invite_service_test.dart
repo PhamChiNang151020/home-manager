@@ -24,6 +24,7 @@ void main() {
         "token": "abc123",
         "home_id": "h1",
         "expires_at": "2026-09-08T00:00:00.000Z",
+        "code": "K7M2QP",
       }),
     );
 
@@ -31,6 +32,7 @@ void main() {
 
     expect(link.token, "abc123");
     expect(link.homeId, "h1");
+    expect(link.code, "K7M2QP");
     expect(link.expiresAt.toUtc(), DateTime.utc(2026, 9, 8));
     verify(
       () => client.rpc(
@@ -46,6 +48,7 @@ void main() {
         "token": "newtok",
         "home_id": "h1",
         "expires_at": "2026-09-08T00:00:00.000Z",
+        "code": "ABCDEF",
       }),
     );
 
@@ -69,6 +72,19 @@ void main() {
     expect(homeId, "h1");
     verify(
       () => client.rpc("accept_invite_token", params: {"p_token": "abc123"}),
+    ).called(1);
+  });
+
+  test("acceptInviteCode returns home id", () async {
+    when(
+      () => client.rpc(any(), params: any(named: "params")),
+    ).thenAnswer((_) => ImmediateRpcResult("h1"));
+
+    final homeId = await service.acceptInviteCode("K7M2QP");
+
+    expect(homeId, "h1");
+    verify(
+      () => client.rpc("accept_invite_code", params: {"p_code": "K7M2QP"}),
     ).called(1);
   });
 

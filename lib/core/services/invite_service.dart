@@ -66,6 +66,19 @@ class InviteService {
     return id;
   }
 
+  Future<String> acceptInviteCode(String code) async {
+    AppLog.i("Accepting invite code");
+    final result = await _client.rpc(
+      "accept_invite_code",
+      params: {"p_code": code},
+    );
+    final id = "$result".trim();
+    if (id.isEmpty || id == "null") {
+      throw Exception("accept_invite_code không trả về id");
+    }
+    return id;
+  }
+
   Future<void> revokeJoinLink(String homeId) async {
     AppLog.i("Revoking join link for $homeId");
     await _client.rpc("revoke_join_link", params: {"p_home_id": homeId});

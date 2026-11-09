@@ -6,7 +6,6 @@ import "package:home_manager/core/state/reminder_controller.dart";
 import "package:home_manager/core/state/session_controller.dart";
 import "package:home_manager/core/state/theme_controller.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
-import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/core/theme/mobile_viewport.dart";
 import "package:home_manager/features/homes/create_home_dialog.dart";
 import "package:home_manager/features/notifications/notifications_page.dart";
@@ -16,6 +15,7 @@ import "package:home_manager/features/pwa/install_home_screen_banner.dart";
 import "package:home_manager/features/shared/app_ambient_background.dart";
 import "package:home_manager/features/shared/app_loading.dart";
 import "package:home_manager/features/shell/app_bottom_nav.dart";
+import "package:home_manager/features/shell/empty_home_view.dart";
 import "package:home_manager/features/shell/quick_add_picker_sheet.dart";
 import "package:home_manager/features/transactions/transactions_hub_page.dart";
 
@@ -105,47 +105,43 @@ class _AppShellState extends State<AppShell> {
                     2 => S.notifications,
                     _ => S.personal,
                   },
+              style:
+                  home == null
+                      ? const TextStyle(
+                        fontSize: 20,
+                        height: 28 / 20,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF0F172A),
+                      )
+                      : null,
             ),
           ),
           body: MobileViewport(
             child: Column(
               children: [
-                const InstallHomeScreenBanner(),
+                if (home != null) const InstallHomeScreenBanner(),
                 Expanded(
                   child: LoadingOverlay(
                     loading: session.loading,
                     child:
                         home == null
-                            ? Center(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Text(S.noHomes),
-                                  if (session.error != null) ...[
-                                    const SizedBox(height: AppSpacing.sm),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: AppSpacing.md,
-                                      ),
-                                      child: Text(
-                                        session.error!,
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(color: colors.error),
-                                      ),
-                                    ),
-                                  ],
-                                  const SizedBox(height: AppSpacing.md),
-                                  FilledButton(
-                                    onPressed:
-                                        () => showCreateHomeDialog(
-                                          context: context,
-                                          homesApi: services.homes,
-                                          onCreated: session.refreshHomes,
-                                        ),
-                                    child: const Text(S.addHome),
+                            ? EmptyHomeView(
+                              email: session.user?.email ?? "",
+                              onAddHome:
+                                  () => showCreateHomeDialog(
+                                    context: context,
+                                    homesApi: services.homes,
+                                    onCreated: session.refreshHomes,
                                   ),
-                                ],
-                              ),
+                              onSignOut: session.signOut,
+                              onAcceptCode: (code) async {
+                                await services.invites.acceptInviteCode(code);
+                                await session.refreshHomes();
+                              },
+                              onAcceptToken: (token) async {
+                                await services.invites.acceptJoinToken(token);
+                                await session.refreshHomes();
+                              },
                             )
                             : IndexedStack(
                               index: _tab,

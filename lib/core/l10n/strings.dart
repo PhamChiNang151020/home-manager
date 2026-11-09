@@ -221,6 +221,26 @@ abstract final class S {
       "Tháng này đã có kỳ nước — lưu sẽ ghi đè số cũ.";
   static const overwrite = "Ghi đè";
   static const noHomes = "Chưa có nhà. Tạo nhà hoặc nhận lời mời.";
+  static const emptyHomeTitle = "Chưa có nhà";
+  static const emptyHomeHint =
+      "Tạo nhà mới, hoặc vào nhà người thân bằng lời mời.";
+  static const signedInLabel = "Đang đăng nhập";
+  static const receiveInvite = "Nhận lời mời";
+  static const receiveInviteHint =
+      "Nhập mã 6 ký tự. Chủ nhà xem mã ở Cá nhân → Thành viên. Dán cả liên kết mời cũng được.";
+  static const enterHome = "Vào nhà";
+  static const enteringHome = "Đang vào nhà…";
+  static const joinedHome = "Đã vào nhà";
+  static const inviteCodeInvalid =
+      "Mã mời không đúng hoặc đã hết hạn. Nhờ chủ nhà tạo mã mới.";
+  static const inviteCodeLocked =
+      "Nhập sai nhiều lần. Thử lại sau 15 phút.";
+  static const inviteCodeOtherError = "Không vào được nhà. Thử lại.";
+  static const inviteCodeLabel = "Mã mời";
+  static const inviteCodeCopy = "Sao chép mã";
+  static const inviteCodeCopied = "Đã sao chép mã mời";
+  static String inviteCodeExpiry(String date) =>
+      "Hết hạn $date · dùng chung với mã QR";
   static const emptyHomeName = "Nhập tên nhà giúp mình nhé.";
   static const noPeriods = "Chưa có kỳ điện nào được ghi nhận";
   static const noPeriodsHint = "Bấm + ở thanh dưới để thêm kỳ điện đầu tiên.";
@@ -380,9 +400,9 @@ abstract final class S {
   static const cancelInviteConfirm = "Huỷ lời mời đã gửi đến";
   static const pendingInviteHint = "Đang chờ chấp nhận";
   static const sending = "Đang gửi…";
-  static const joinQrTitle = "Mã QR mời vào nhà";
+  static const joinQrTitle = "Mời vào nhà";
   static const joinQrHint =
-      "Người nhà quét mã, đăng nhập Google — sẽ thấy nhà này.";
+      "Người nhà quét mã QR hoặc nhập mã mời, đăng nhập Google — sẽ thấy nhà này.";
   static const joinQrLoading = "Đang tạo mã mời…";
   static const joinQrExpiryHint = "Mã có hạn 14 ngày. Tạo mã mới nếu cần.";
   static const joinQrCopy = "Sao chép liên kết mời";
@@ -394,7 +414,8 @@ abstract final class S {
   static const joinQrRevoked = "Đã thu hồi mã mời";
   static const paymentStatus = "Trạng thái";
   static const paid = "Đã thanh toán";
-  static const unpaid = "Chưa chốt số";
+  static const unpaid = "Chưa thanh toán";
+  static const noStatement = "Chưa có sao kê";
   static const markPaid = "Đánh dấu đã thanh toán";
   static const markUnpaid = "Bỏ đánh dấu";
   static const appVersion = "Phiên bản";

@@ -1,6 +1,5 @@
 import "package:flutter/material.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
-import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/shared/app_card.dart";
 
 class EmptyStateView extends StatelessWidget {
@@ -22,39 +21,53 @@ class EmptyStateView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
-    final textTheme = Theme.of(context).textTheme;
     return AppCard(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: AppSpacing.lg * 1.5,
-      ),
+      padding: const EdgeInsets.all(24),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 56, color: colors.textMuted),
-          const SizedBox(height: AppSpacing.md),
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: colors.bgElevated,
+            ),
+            child: Icon(icon, size: 28, color: colors.textMuted),
+          ),
+          const SizedBox(height: 16),
           Text(
             message,
             textAlign: TextAlign.center,
-            style: textTheme.titleSmall?.copyWith(
+            style: TextStyle(
+              fontSize: 16,
+              height: 24 / 16,
+              fontWeight: FontWeight.w700,
               color: colors.textPrimary,
-              height: 1.4,
             ),
           ),
           if (description != null) ...[
-            const SizedBox(height: AppSpacing.xs),
+            const SizedBox(height: 4),
             Text(
               description!,
               textAlign: TextAlign.center,
-              style: textTheme.bodyMedium?.copyWith(
+              style: TextStyle(
+                fontSize: 14,
+                height: 20 / 14,
                 color: colors.textSecondary,
-                height: 1.4,
               ),
             ),
           ],
           if (actionLabel != null && onAction != null) ...[
-            const SizedBox(height: AppSpacing.md),
-            FilledButton(onPressed: onAction, child: Text(actionLabel!)),
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 48,
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: onAction,
+                child: Text(actionLabel!),
+              ),
+            ),
           ],
         ],
       ),
