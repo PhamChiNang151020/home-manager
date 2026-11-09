@@ -231,8 +231,8 @@ void main() {
     final button = tester.widget<FilledButton>(
       find.widgetWithText(FilledButton, S.enteringHome),
     );
-    expect(button.onPressed, isNotNull);
-    final bg = button.style?.backgroundColor?.resolve({});
+    expect(button.onPressed, isNull);
+    final bg = button.style?.backgroundColor?.resolve({WidgetState.disabled});
     expect(bg?.a, closeTo(0.6, 0.001));
 
     gate.complete();

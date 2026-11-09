@@ -377,20 +377,16 @@ class _InviteCard extends StatelessWidget {
           SizedBox(height: (hasError || showLockError) ? 12 : 12),
           SizedBox(
             height: 48,
-            // Keep onPressed non-null while submitting so M3 disabled (38%)
-            // opacity is not multiplied with the loading 60% treatment.
             child: FilledButton(
-              onPressed:
-                  submitting
-                      ? () {}
-                      : (canSubmit ? onSubmit : null),
+              onPressed: canSubmit ? onSubmit : null,
               style: FilledButton.styleFrom(
-                backgroundColor:
-                    submitting
-                        ? colors.accent.withValues(alpha: 0.6)
-                        : colors.accent,
+                backgroundColor: colors.accent,
                 foregroundColor: Colors.white,
-                disabledBackgroundColor: colors.accent.withValues(alpha: 0.38),
+                // Loading uses disabled + 60% fill (no focus overlay from
+                // onPressed: () {}). Idle disabled stays at 38%.
+                disabledBackgroundColor: colors.accent.withValues(
+                  alpha: submitting ? 0.6 : 0.38,
+                ),
                 disabledForegroundColor: Colors.white,
                 textStyle: const TextStyle(
                   fontFamily: AppFonts.nunito,

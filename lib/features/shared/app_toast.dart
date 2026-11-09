@@ -1,14 +1,25 @@
 import "package:flutter/material.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
-import "package:home_manager/features/shell/app_bottom_nav.dart";
 
 enum AppToastKind { success, destructive, info }
 
+/// Gap above the scaffold bottom chrome when a bottom nav is present.
+/// Floating [SnackBar] already clears the nav; only this extra gap is needed.
+const _toastGapAboveNav = AppSpacing.sm; // 8 -> toast y 724–772 on 393×852
+
+/// Bottom inset when there is no bottom nav (Members, etc.): y 754–802.
+const _toastBottomWithoutNav = 50.0;
+
+double _toastBottomMargin(BuildContext context) {
+  final scaffold = context.findAncestorWidgetOfExactType<Scaffold>();
+  final hasBottomNav = scaffold?.bottomNavigationBar != null;
+  return hasBottomNav ? _toastGapAboveNav : _toastBottomWithoutNav;
+}
+
 /// Floating toast via the nearest [ScaffoldMessenger].
 ///
-/// Dark inverse bar (361×48, #0F172A). Sits 8px above the bottom nav
-/// (`AppBottomNav.heightOf + 8`). Optional action keeps the toast 5s.
+/// Dark inverse bar (361×48, #0F172A). Optional action keeps the toast 5s.
 void showAppToast(
   BuildContext context,
   String message, {
@@ -23,7 +34,7 @@ void showAppToast(
     context.appColors,
     message,
     kind,
-    bottomMargin: AppBottomNav.heightOf(context) + AppSpacing.sm,
+    bottomMargin: _toastBottomMargin(context),
     actionLabel: actionLabel,
     onAction: onAction,
   );
@@ -41,7 +52,7 @@ void popWithAppToast(
 }) {
   final messenger = ScaffoldMessenger.maybeOf(context);
   final colors = context.appColors;
-  final bottomMargin = AppBottomNav.heightOf(context) + AppSpacing.sm;
+  final bottomMargin = _toastBottomMargin(context);
   Navigator.pop(context, result);
   then?.call();
   if (messenger == null) return;
