@@ -189,10 +189,18 @@ class _OverviewPageState extends State<OverviewPage> {
                             ),
                           ),
                           const SizedBox(height: 4),
-                          AnimatedMoneyText(
-                            amount: snap.netWorth,
-                            large: true,
-                            style: heroStyle,
+                          SizedBox(
+                            height: 40,
+                            width: double.infinity,
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerLeft,
+                              child: AnimatedMoneyText(
+                                amount: snap.netWorth,
+                                large: true,
+                                style: heroStyle,
+                              ),
+                            ),
                           ),
                         ],
                       ),

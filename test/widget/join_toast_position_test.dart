@@ -107,9 +107,8 @@ Future<void> _savePng(WidgetTester tester) async {
 void main() {
   setUpAll(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
-    if (Directory("/opt/cursor/artifacts").existsSync()) {
-      await _loadNunito();
-    }
+    // Always load Nunito so layout matches QA (Ahem is wider and shifts y).
+    await _loadNunito();
   });
 
   testWidgets(

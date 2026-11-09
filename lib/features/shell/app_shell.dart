@@ -137,7 +137,15 @@ class _AppShellState extends State<AppShell> {
                 homesApi: widget.services.homes,
                 onCreated: session.refreshHomes,
               ),
-          onSignOut: session.signOut,
+          onSignOut: () {
+            // Pop Cá nhân (and any deeper pushed routes) so SignInPage is
+            // not left buried under the personal hub after session clears.
+            final nav = Navigator.of(context);
+            if (nav.canPop()) {
+              nav.popUntil((route) => route.isFirst);
+            }
+            session.signOut();
+          },
         ),
       ),
     );

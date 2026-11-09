@@ -19,15 +19,20 @@ import "package:home_manager/core/state/theme_controller.dart";
 import "package:home_manager/core/theme/app_accent.dart";
 import "package:home_manager/core/theme/app_theme.dart";
 import "package:home_manager/core/theme/mobile_viewport.dart";
+import "package:home_manager/core/services/auth_service.dart";
+import "package:home_manager/features/auth/sign_in_page.dart";
 import "package:home_manager/features/overview/overview_page.dart";
 import "package:home_manager/features/personal/personal_hub_page.dart";
+import "package:home_manager/features/savings/savings_page.dart";
 import "package:home_manager/features/shared/app_toast.dart";
 import "package:home_manager/features/shared/avatar_button.dart";
+import "package:home_manager/features/shared/list_group.dart";
 import "package:home_manager/features/shared/segmented_track.dart";
 import "package:home_manager/features/shell/app_bottom_nav.dart";
 import "package:home_manager/features/shell/empty_home_view.dart";
 import "package:home_manager/features/shell/quick_add_picker_sheet.dart";
 import "package:home_manager/features/transactions/transactions_hub_page.dart";
+import "package:home_manager/features/wallet/wallet_hub_page.dart";
 import "package:mocktail/mocktail.dart";
 import "package:shared_preferences/shared_preferences.dart";
 
@@ -38,6 +43,10 @@ class MockHomeService extends Mock implements HomeService {}
 class MockInviteService extends Mock implements InviteService {}
 
 class MockNotificationService extends Mock implements NotificationService {}
+
+class MockAuthService extends AuthService {
+  MockAuthService() : super(MockSupabaseClient());
+}
 
 const _home = Home(
   id: "h1",
@@ -89,7 +98,11 @@ void _setPhoneView(WidgetTester tester) {
   addTearDown(tester.view.reset);
 }
 
-Widget _phoneFrame({required Widget child}) {
+Widget _phoneFrame({
+  required Widget child,
+  double bottomInset = 34,
+  double topInset = 59,
+}) {
   // RepaintBoundary outside MaterialApp so Overlay SnackBars are captured.
   return RepaintBoundary(
     key: const ValueKey("shot"),
@@ -97,10 +110,10 @@ Widget _phoneFrame({required Widget child}) {
       width: 393,
       height: 852,
       child: MediaQuery(
-        data: const MediaQueryData(
-          size: Size(393, 852),
-          padding: EdgeInsets.only(top: 59, bottom: 34),
-          viewPadding: EdgeInsets.only(top: 59, bottom: 34),
+        data: MediaQueryData(
+          size: const Size(393, 852),
+          padding: EdgeInsets.only(top: topInset, bottom: bottomInset),
+          viewPadding: EdgeInsets.only(top: topInset, bottom: bottomInset),
           textScaler: TextScaler.noScaling,
         ),
         child: MaterialApp(
@@ -114,6 +127,14 @@ Widget _phoneFrame({required Widget child}) {
       ),
     ),
   );
+}
+
+void _setWebView(WidgetTester tester) {
+  tester.view.physicalSize = const Size(393, 852);
+  tester.view.devicePixelRatio = 1;
+  tester.view.padding = FakeViewPadding.zero;
+  tester.view.viewPadding = FakeViewPadding.zero;
+  addTearDown(tester.view.reset);
 }
 
 OverviewSnapshot _snap({
@@ -182,6 +203,7 @@ class _AvatarShell extends StatelessWidget {
     required this.homes,
     required this.invites,
     required this.notifications,
+    this.onSignOut,
   });
 
   final ThemeController theme;
@@ -189,6 +211,7 @@ class _AvatarShell extends StatelessWidget {
   final HomeService homes;
   final InviteService invites;
   final NotificationService notifications;
+  final VoidCallback? onSignOut;
 
   @override
   Widget build(BuildContext context) {
@@ -217,7 +240,8 @@ class _AvatarShell extends StatelessWidget {
                       onChanged: () {},
                       onSelectHome: (_) {},
                       onAddHome: () {},
-                      onSignOut: () {},
+                      // Mirrors AppShell._openPersonal onSignOut wiring.
+                      onSignOut: onSignOut ?? () {},
                     ),
                   ),
                 );
@@ -236,14 +260,65 @@ class _AvatarShell extends StatelessWidget {
   }
 }
 
+/// Auth gate like [_AppHome]: when signed out, [SignInPage] replaces the shell
+/// as MaterialApp.home — pushed routes must be popped or Cá nhân stays on top.
+class _SignOutAuthGate extends StatefulWidget {
+  const _SignOutAuthGate({
+    required this.theme,
+    required this.lock,
+    required this.homes,
+    required this.invites,
+    required this.notifications,
+  });
+
+  final ThemeController theme;
+  final LockController lock;
+  final HomeService homes;
+  final InviteService invites;
+  final NotificationService notifications;
+
+  @override
+  State<_SignOutAuthGate> createState() => _SignOutAuthGateState();
+}
+
+class _SignOutAuthGateState extends State<_SignOutAuthGate> {
+  bool _signedIn = true;
+
+  void _signOut() {
+    // Must match AppShell: pop Cá nhân (and any pushed routes) then sign out.
+    final nav = Navigator.of(context);
+    if (nav.canPop()) {
+      nav.popUntil((route) => route.isFirst);
+    }
+    setState(() => _signedIn = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_signedIn) {
+      return SignInPage(authService: MockAuthService());
+    }
+    return _AvatarShell(
+      theme: widget.theme,
+      lock: widget.lock,
+      homes: widget.homes,
+      invites: widget.invites,
+      notifications: widget.notifications,
+      onSignOut: _signOut,
+    );
+  }
+}
+
 void main() {
+  // Screenshots only when the artifacts dir exists; fonts always load so
+  // layout assertions match QA machines without /opt/cursor/artifacts.
   final runShots = Directory("/opt/cursor/artifacts").existsSync();
 
   setUpAll(() async {
     SharedPreferences.setMockInitialValues({});
     registerFallbackValue("");
     TestWidgetsFlutterBinding.ensureInitialized();
-    if (runShots) await _loadNunito();
+    await _loadNunito();
   });
 
   testWidgets("bottom nav geometry y 754-852 with pill and + button", (
@@ -499,6 +574,198 @@ void main() {
         "sheet_top=${sheet.top}\nsheet_bottom=${sheet.bottom}\n",
       );
     }
+  });
+
+  // D4: web inset 0 → sheet y 348–852 (no hard-coded +34).
+  testWidgets("quick add sheet 348-852 when viewPadding.bottom is 0", (
+    tester,
+  ) async {
+    _setWebView(tester);
+    final client = MockSupabaseClient();
+    final services = AppServices(client);
+
+    await tester.pumpWidget(
+      _phoneFrame(
+        bottomInset: 0,
+        topInset: 0,
+        child: Scaffold(
+          appBar: AppBar(title: const Text(S.overview)),
+          body: Builder(
+            builder:
+                (context) => Center(
+                  child: TextButton(
+                    onPressed:
+                        () => showQuickAddPickerSheet(
+                          context: context,
+                          home: _home,
+                          services: services,
+                          currentUserId: "u1",
+                        ),
+                    child: const Text("open"),
+                  ),
+                ),
+          ),
+          bottomNavigationBar: AppBottomNav(
+            tabIndex: 0,
+            onTabSelected: (_) {},
+            onQuickAdd: () {},
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text("open"));
+    await tester.pumpAndSettle();
+
+    final sheet = tester.getRect(find.byType(BottomSheet));
+    expect(sheet.top, closeTo(348, 3));
+    expect(sheet.bottom, closeTo(852, 3));
+  });
+
+  // D1: Tài sản temp hub — Ví · Tiết kiệm · Tín dụng NH · Nợ vay mượn.
+  testWidgets("assets tab rows include savings opening SavingsPage", (
+    tester,
+  ) async {
+    _setPhoneView(tester);
+    final client = MockSupabaseClient();
+    final services = AppServices(client);
+
+    await tester.pumpWidget(
+      _phoneFrame(
+        child: Scaffold(
+          appBar: AppBar(title: const Text(S.assets)),
+          body: MobileViewport(
+            child: WalletHubPage(
+              home: _home,
+              services: services,
+              currentUserId: "u1",
+              embedded: true,
+            ),
+          ),
+          bottomNavigationBar: AppBottomNav(
+            tabIndex: 3,
+            onTabSelected: (_) {},
+            onQuickAdd: () {},
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final labels = [S.wallet, S.savings, S.bankCredit, S.personalDebts];
+    for (final label in labels) {
+      expect(find.text(label), findsOneWidget, reason: label);
+    }
+
+    // Order: Ví, Tiết kiệm, Tín dụng NH, Nợ vay mượn.
+    final tops = [
+      for (final label in labels)
+        tester.getTopLeft(find.byKey(ValueKey("assets-entry-$label"))).dy,
+    ];
+    expect(tops, orderedEquals(tops.toList()..sort()));
+
+    for (final label in labels) {
+      final row = tester.getRect(find.byKey(ValueKey("assets-entry-$label")));
+      expect(row.height, closeTo(64, 1), reason: label);
+    }
+
+    final savingsIcon = tester.getRect(
+      find.descendant(
+        of: find.byKey(ValueKey("assets-entry-${S.savings}")),
+        matching: find.byType(ListGroupIcon),
+      ),
+    );
+    expect(savingsIcon.width, closeTo(36, 0.5));
+    expect(savingsIcon.height, closeTo(36, 0.5));
+
+    await tester.tap(find.byKey(ValueKey("assets-entry-${S.savings}")));
+    await tester.pumpAndSettle();
+    expect(find.byType(SavingsRoutePage), findsOneWidget);
+  });
+
+  // D2: sign-out from Cá nhân must land on SignInPage (pop pushed route).
+  testWidgets("sign-out from Cá nhân shows SignInPage and leaves personal", (
+    tester,
+  ) async {
+    _setPhoneView(tester);
+    SharedPreferences.setMockInitialValues({});
+    final theme = await ThemeController.load();
+    final lock = await LockController.load();
+    final homes = MockHomeService();
+    final invites = MockInviteService();
+    final notifications = MockNotificationService();
+    when(() => notifications.isEnabledLocally()).thenAnswer((_) async => false);
+
+    await tester.pumpWidget(
+      _phoneFrame(
+        child: _SignOutAuthGate(
+          theme: theme,
+          lock: lock,
+          homes: homes,
+          invites: invites,
+          notifications: notifications,
+        ),
+      ),
+    );
+
+    await tester.tap(find.byKey(const ValueKey("shell-avatar")));
+    await tester.pumpAndSettle();
+    expect(find.byType(PersonalHubPage), findsOneWidget);
+
+    final signOut = find.widgetWithText(OutlinedButton, S.signOut);
+    await tester.ensureVisible(signOut);
+    await tester.pumpAndSettle();
+    await tester.tap(signOut);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SignInPage), findsOneWidget);
+    expect(find.byType(PersonalHubPage), findsNothing);
+    expect(find.text(S.personal), findsNothing);
+  });
+
+  // D3: long hero amount stays 1 line inside fixed h 98 (no RenderFlex overflow).
+  testWidgets("overview hero long amount stays single line at height 98", (
+    tester,
+  ) async {
+    _setPhoneView(tester);
+    final client = MockSupabaseClient();
+    final services = AppServices(client);
+    const huge = 9999999999999.0;
+
+    await tester.pumpWidget(
+      _phoneFrame(
+        child: Scaffold(
+          appBar: AppBar(title: const Text(S.overview)),
+          body: MobileViewport(
+            child: OverviewPage(
+              home: _home,
+              services: services,
+              currentUserId: "u1",
+              loadOverview: (_) async => _snap(netWorth: huge),
+            ),
+          ),
+          bottomNavigationBar: AppBottomNav(
+            tabIndex: 0,
+            onTabSelected: (_) {},
+            onQuickAdd: () {},
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final hero = tester.getRect(find.byKey(const ValueKey("overview-net-worth")));
+    expect(hero.height, closeTo(98, 0.5));
+
+    final amountText = find.descendant(
+      of: find.byKey(const ValueKey("overview-net-worth")),
+      matching: find.textContaining("đ"),
+    );
+    expect(amountText, findsOneWidget);
+    final amountRect = tester.getRect(amountText);
+    // Single line at 32/40 — must not wrap.
+    expect(amountRect.height, lessThanOrEqualTo(40.5));
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets("IndexedStack keeps tab field state", (tester) async {

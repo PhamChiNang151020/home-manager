@@ -231,13 +231,14 @@ class _QuickAddPickerState extends State<_QuickAddPicker> {
     // showAppSheet already applies useSafeArea; avoid a second SafeArea so
     // sheet top lands at design y 314 on 393×852.
     final colors = context.appColors;
+    final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
+      padding: EdgeInsets.fromLTRB(
         AppSpacing.md,
         0,
         AppSpacing.md,
-        // Sheet bottom = 16 content + 34 home-indicator (ticket sheet chrome).
-        AppSpacing.md + 34,
+        // Sheet bottom = 16 content + real home-indicator (0 on web → y 348).
+        AppSpacing.md + bottomInset,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

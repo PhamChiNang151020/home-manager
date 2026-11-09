@@ -115,7 +115,8 @@ void main() {
   setUpAll(() async {
     registerFallbackValue("");
     TestWidgetsFlutterBinding.ensureInitialized();
-    if (runShots) await _loadNunito();
+    // Always load Nunito; only the screenshot cases stay gated by runShots.
+    await _loadNunito();
   });
 
   Future<void> prep(WidgetTester tester) async {
