@@ -16,7 +16,7 @@ import "package:home_manager/features/shared/app_refresh_indicator.dart";
 import "package:home_manager/features/shared/empty_state_view.dart";
 import "package:home_manager/features/shared/error_view.dart";
 import "package:home_manager/features/shared/animated_entrance.dart";
-import "package:home_manager/features/electricity/electricity_page_skeleton.dart";
+import "package:home_manager/features/shared/period_page_skeleton.dart";
 import "package:home_manager/features/shared/app_loading.dart";
 import "package:home_manager/features/shared/section_header.dart";
 
@@ -136,7 +136,7 @@ class ElectricityPageState extends State<ElectricityPage> {
     }
 
     if (_loading && _items.isEmpty) {
-      return const ElectricityPageSkeleton();
+      return const PeriodPageSkeleton();
     }
 
     return LoadingOverlay(

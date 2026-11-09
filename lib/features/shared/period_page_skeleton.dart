@@ -3,8 +3,8 @@ import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/shared/app_card.dart";
 import "package:home_manager/features/shared/skeleton.dart";
 
-class ElectricityPageSkeleton extends StatelessWidget {
-  const ElectricityPageSkeleton({super.key});
+class PeriodPageSkeleton extends StatelessWidget {
+  const PeriodPageSkeleton({super.key});
 
   @override
   Widget build(BuildContext context) {

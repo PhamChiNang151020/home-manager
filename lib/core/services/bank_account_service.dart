@@ -1,4 +1,4 @@
-import "package:home_manager/core/domain/electricity_period_edit.dart";
+import "package:home_manager/core/domain/period_edit.dart";
 import "package:home_manager/core/logging/app_log.dart";
 import "package:home_manager/core/models/bank_account.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
@@ -9,7 +9,7 @@ class BankAccountService {
   final SupabaseClient _client;
 
   static String monthKey(DateTime month) =>
-      ElectricityPeriodEdit.monthKey(month);
+      PeriodEdit.monthKey(month);
 
   Future<List<BankAccount>> listAccounts(String homeId) async {
     AppLog.d("list bank accounts for $homeId");
@@ -119,7 +119,7 @@ class BankAccountService {
             .select()
             .single();
 
-    final monthChanged = ElectricityPeriodEdit.shouldDeleteOriginalPeriod(
+    final monthChanged = PeriodEdit.shouldDeleteOriginalPeriod(
       editingId: editingId,
       editingOriginalMonth: editingOriginalMonth,
       periodMonth: periodMonth,

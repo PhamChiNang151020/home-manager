@@ -1,6 +1,6 @@
 import "dart:typed_data";
 
-import "package:home_manager/core/domain/electricity_period_edit.dart";
+import "package:home_manager/core/domain/period_edit.dart";
 import "package:home_manager/core/logging/app_log.dart";
 import "package:home_manager/core/models/electricity_period.dart";
 import "package:intl/intl.dart";
@@ -12,7 +12,7 @@ class ElectricityService {
   final SupabaseClient _client;
 
   static String monthKey(DateTime month) =>
-      ElectricityPeriodEdit.monthKey(month);
+      PeriodEdit.monthKey(month);
 
   Future<List<ElectricityPeriod>> list(String homeId) async {
     AppLog.d("list periods for $homeId");
@@ -89,7 +89,7 @@ class ElectricityService {
             .select()
             .single();
 
-    final monthChanged = ElectricityPeriodEdit.shouldDeleteOriginalPeriod(
+    final monthChanged = PeriodEdit.shouldDeleteOriginalPeriod(
       editingId: editingId,
       editingOriginalMonth: editingOriginalMonth,
       periodMonth: periodMonth,

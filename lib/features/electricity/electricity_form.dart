@@ -12,7 +12,7 @@ import "package:home_manager/core/services/electricity_service.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/features/electricity/bill_photo_viewer.dart";
-import "package:home_manager/features/electricity/period_month_conflict.dart";
+import "package:home_manager/core/domain/period_month_conflict.dart";
 import "package:home_manager/features/shared/app_sheet.dart";
 import "package:home_manager/features/shared/app_toast.dart";
 import "package:home_manager/features/shared/bill_photo_pick_field.dart";
@@ -130,14 +130,31 @@ class _ElectricityAddSheetState extends State<_ElectricityAddSheet> {
   bool get _isMeter => widget.home.trackingMode == TrackingMode.meter;
 
   void _updateDuplicateHint() {
-    final duplicate = findPeriodForMonth(widget.existingPeriods, _month);
+    final duplicate = findPeriodForMonth(
+      periods: widget.existingPeriods,
+      month: _month,
+      getPeriodMonth: (p) => p.periodMonth,
+      getId: (p) => p.id,
+    );
     _duplicateHint = duplicate == null ? null : S.duplicatePeriodHint;
   }
 
   Future<bool> _confirmDuplicateIfNeeded() async {
-    final duplicate = findPeriodForMonth(widget.existingPeriods, _month);
+    final duplicate = findPeriodForMonth(
+      periods: widget.existingPeriods,
+      month: _month,
+      getPeriodMonth: (p) => p.periodMonth,
+      getId: (p) => p.id,
+    );
     if (duplicate == null) return true;
-    return confirmDuplicatePeriodMonth(context, _month);
+    return confirmDuplicatePeriodMonth(
+      context,
+      _month,
+      title: S.duplicatePeriodTitle,
+      confirmMessage: S.duplicatePeriodConfirm,
+      cancelLabel: S.cancel,
+      overwriteLabel: S.overwrite,
+    );
   }
 
   @override
@@ -393,8 +410,10 @@ class _ElectricityPeriodDialogState extends State<_ElectricityPeriodDialog> {
 
   void _updateDuplicateHint() {
     final duplicate = findPeriodForMonth(
-      widget.existingPeriods,
-      _month,
+      periods: widget.existingPeriods,
+      month: _month,
+      getPeriodMonth: (p) => p.periodMonth,
+      getId: (p) => p.id,
       excludeId: widget.existing.id,
     );
     _duplicateHint = duplicate == null ? null : S.duplicatePeriodHint;
@@ -402,12 +421,21 @@ class _ElectricityPeriodDialogState extends State<_ElectricityPeriodDialog> {
 
   Future<bool> _confirmDuplicateIfNeeded() async {
     final duplicate = findPeriodForMonth(
-      widget.existingPeriods,
-      _month,
+      periods: widget.existingPeriods,
+      month: _month,
+      getPeriodMonth: (p) => p.periodMonth,
+      getId: (p) => p.id,
       excludeId: widget.existing.id,
     );
     if (duplicate == null) return true;
-    return confirmDuplicatePeriodMonth(context, _month);
+    return confirmDuplicatePeriodMonth(
+      context,
+      _month,
+      title: S.duplicatePeriodTitle,
+      confirmMessage: S.duplicatePeriodConfirm,
+      cancelLabel: S.cancel,
+      overwriteLabel: S.overwrite,
+    );
   }
 
   @override

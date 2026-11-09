@@ -17,7 +17,7 @@ import "package:home_manager/features/electricity/reminder_banner.dart";
 import "package:home_manager/features/shared/empty_state_view.dart";
 import "package:home_manager/features/shared/error_view.dart";
 import "package:home_manager/features/shared/animated_entrance.dart";
-import "package:home_manager/features/water/water_page_skeleton.dart";
+import "package:home_manager/features/shared/period_page_skeleton.dart";
 import "package:home_manager/features/shared/app_loading.dart";
 import "package:home_manager/features/shared/app_toast.dart";
 import "package:home_manager/features/shared/section_header.dart";
@@ -192,7 +192,7 @@ class WaterPageState extends State<WaterPage> {
     }
 
     if (_loading && _items.isEmpty) {
-      return const WaterPageSkeleton();
+      return const PeriodPageSkeleton();
     }
 
     return LoadingOverlay(

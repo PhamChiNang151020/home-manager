@@ -1,4 +1,4 @@
-import "package:home_manager/core/domain/water_period_edit.dart";
+import "package:home_manager/core/domain/period_edit.dart";
 import "package:home_manager/core/logging/app_log.dart";
 import "package:home_manager/core/models/water_period.dart";
 import "package:supabase_flutter/supabase_flutter.dart";
@@ -8,7 +8,7 @@ class WaterService {
 
   final SupabaseClient _client;
 
-  static String monthKey(DateTime month) => WaterPeriodEdit.monthKey(month);
+  static String monthKey(DateTime month) => PeriodEdit.monthKey(month);
 
   Future<List<WaterPeriod>> list(String homeId) async {
     AppLog.d("list water periods for $homeId");
@@ -82,7 +82,7 @@ class WaterService {
             .select()
             .single();
 
-    final monthChanged = WaterPeriodEdit.shouldDeleteOriginalPeriod(
+    final monthChanged = PeriodEdit.shouldDeleteOriginalPeriod(
       editingId: editingId,
       editingOriginalMonth: editingOriginalMonth,
       periodMonth: periodMonth,
