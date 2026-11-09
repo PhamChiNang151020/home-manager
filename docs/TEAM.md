@@ -27,6 +27,8 @@ Chủ file: HM-Lead. Cập nhật: 09/11/2026.
 - Spec 9 điểm (proposal.md) đã duyệt: thanh dưới = Tổng quan, Sổ giao dịch, (+), Cần trả, Tài sản; Cá nhân lên avatar; bỏ tab Thông báo; Tổng quan 3 thẻ; Ví/Tiết kiệm vào Tài sản; Chi tiêu theo tháng; hạn điện/nước theo ngày nhắc tháng sau.
 - Spec gốc: `/workspace/hm-ui/simplify/proposal.md`, phiếu: `/workspace/hm-ui/simplify/tickets/dot-0..5.md`.
 
+- 09/11 17:26 anh Năng duyệt: ô Ví trong form Thêm chi tiêu (Đợt 2) mặc định là ví dùng gần nhất, có lựa chọn 'Không trừ ví'. Câu báo link mời 'Bạn được mời vào một nhà. Đăng nhập hoặc tạo tài khoản để vào nhà.' làm PR riêng. Lịch sử ví hiện chi/hoàn tiền ở Đợt 4 (HM-Design chốt).
+
 ## 4. Con số spec dùng chung (theo trường hợp)
 Khung 393×852 (iPhone 15 webview), an toàn trên 59 / dưới 34. Nội dung dài quá y 754 thì cuộn. Nguồn chi tiết: `proposal.md` và các phiếu.
 | Thành phần | Trường hợp | Giá trị |
@@ -55,11 +57,15 @@ Khung 393×852 (iPhone 15 webview), an toàn trên 59 / dưới 34. Nội dung d
 - Không sửa file migration đã áp; luôn tạo file mới.
 - Tồn đọng (chưa làm): invite_code_attempts chưa có policy (INFO); nhiều RPC cũ còn WARN anon EXECUTE → HM-Audit rà sau.
 
+- 20261109100536 revoke_anon_execute_legacy_rpcs (09/11 17:05, anh Năng duyệt): thu EXECUTE của anon/public trên 20 RPC cũ, GRANT lại authenticated + service_role; revoke all invite_code_attempts từ anon/authenticated. Kiểm: anon 0/20, authenticated 20/20. File: simplify/migrations/revoke_anon_execute_legacy_rpcs.sql. Hoàn tác: grant execute ... to anon.
+- Advisors còn: cảnh báo 'authenticated chạy SECURITY DEFINER' (cố ý), invite_code_attempts không policy (cố ý, deny-all), leaked password protection chưa bật.
+
 ## 6. Dữ liệu test trên production (giữ lại, dùng tiếp cho Đợt 1)
 - Chỉ dùng 1 database (production), KHÔNG tạo project test (anh Năng chốt 09/11). Dữ liệu test luôn có tiền tố hmtest/TEST; dọn sau mỗi đợt khi anh duyệt. Migration chỉ áp sau khi HM-QA duyệt code và anh Năng đồng ý.
 - 4 tài khoản phamchinang.vn+hmtest-{owner,join,join2,join3}-20261109@gmail.com (đều đã có nhà).
 - Nhà 'TEST Đợt 0 QA' id 149f6029-f7f7-45ca-8b15-cdedea6a47ba; mã FVG7DV (hết hạn 23/11) + 1 link mời.
 - Test lại: chỉ giả lập phản hồi, KHÔNG tạo thêm tài khoản (anh Năng chốt 09/11).
+- Ví 'TEST ví' 100.000đ (id 932fd98f-…) do HM-QA tạo 09/11 17:2x khi smoke test, lịch sử có 3 dòng điều chỉnh.
 - Anh Năng chốt 09/11 16:54: GIỮ dữ liệu test để Đợt 1 dùng tiếp. Chỉ dọn khi anh duyệt lại. Không tạo thêm tài khoản.
 
 ## 7. Trạng thái các đợt
@@ -72,5 +78,8 @@ Khung 393×852 (iPhone 15 webview), an toàn trên 59 / dưới 34. Nội dung d
 ## 8. Ghi chú để sau (không thuộc Đợt 0)
 - Câu gợi ý ghi 'Cá nhân → Thành viên' nhưng menu tên 'Chia sẻ'.
 - Sau khi tạo tài khoản, màn đứng yên tới khi tải lại trang.
-- Toast không có nút hiện 2.6s (app_toast.dart:167), spec chưa có số: chờ HM-Design chốt.
+- Toast: HM-Design chốt 09/11, không có nút thì hiện 2,6s, có nút hành động thì 5s (chạm nút thì ẩn ngay). Đã khớp mục 4.
 - _scaffoldHasBottomNav duyệt cả cây element mỗi lần hiện toast: HM-Audit xem lại.
+- Nút (+) thêm chi tiêu không chọn được ví (quick_add_picker_sheet.dart:96-117), phải vào sửa mới chọn: chờ HM-Design chốt cố ý hay thiếu.
+- Thanh toán chi tiêu từ ví và hoàn tiền không hiện trong lịch sử ví.
+- Mở link ?join= khi chưa đăng nhập, màn đăng nhập không báo là đang được mời vào nhà.

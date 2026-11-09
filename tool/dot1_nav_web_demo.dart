@@ -183,6 +183,7 @@ class _Dot1DemoState extends State<_Dot1Demo> {
     final month = DateTime.now().month;
     return Scaffold(
       appBar: AppBar(
+        actionsPadding: EdgeInsets.zero,
         title: Text(
           switch (_tab) {
             0 => S.overview,
@@ -199,7 +200,11 @@ class _Dot1DemoState extends State<_Dot1Demo> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 4),
-            child: AvatarButton(label: "N", onPressed: _openPersonal),
+            child: AvatarButton(
+              key: const ValueKey("shell-avatar"),
+              label: "N",
+              onPressed: _openPersonal,
+            ),
           ),
         ],
       ),
@@ -210,42 +215,49 @@ class _Dot1DemoState extends State<_Dot1Demo> {
             ListView(
               padding: AppSpacing.shellListPadding,
               children: [
-                AppCard(
-                  onTap: () => setState(() => _tab = 3),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              S.netWorthHomeLabel(_homeName),
-                              style: TextStyle(
-                                fontSize: 12,
-                                height: 16 / 12,
-                                fontWeight: FontWeight.w600,
-                                color: colors.textSecondary,
+                SizedBox(
+                  height: 98,
+                  child: AppCard(
+                    key: const ValueKey("overview-net-worth"),
+                    onTap: () => setState(() => _tab = 3),
+                    padding: const EdgeInsets.fromLTRB(16, 19, 16, 19),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                S.netWorthHomeLabel(_homeName),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  height: 16 / 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: colors.textSecondary,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              VndFormat.format(_netWorth),
-                              style: TextStyle(
-                                fontSize: 32,
-                                height: 40 / 32,
-                                fontWeight: FontWeight.w800,
-                                color: colors.success,
+                              const SizedBox(height: 4),
+                              Text(
+                                VndFormat.format(_netWorth),
+                                style: TextStyle(
+                                  fontSize: 32,
+                                  height: 40 / 32,
+                                  fontWeight: FontWeight.w800,
+                                  color: colors.success,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      Icon(Icons.chevron_right, color: colors.textMuted),
-                    ],
+                        Icon(Icons.chevron_right, color: colors.textMuted),
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
                 AppCard(
+                  key: const ValueKey("overview-month"),
                   padding: EdgeInsets.zero,
                   child: SizedBox(
                     height: 79,

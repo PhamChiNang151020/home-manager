@@ -195,30 +195,34 @@ class _AvatarShell extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(S.overview),
+        actionsPadding: EdgeInsets.zero,
         actions: [
-          AvatarButton(
-            key: const ValueKey("shell-avatar"),
-            label: "N",
-            onPressed: () {
-              Navigator.of(context).push<void>(
-                AppPageRoute<void>(
-                  page: PersonalHubPage(
-                    home: _home,
-                    homes: const [_home],
-                    homesApi: homes,
-                    invites: invites,
-                    notifications: notifications,
-                    theme: theme,
-                    lock: lock,
-                    user: null,
-                    onChanged: () {},
-                    onSelectHome: (_) {},
-                    onAddHome: () {},
-                    onSignOut: () {},
+          Padding(
+            padding: const EdgeInsets.only(right: 4),
+            child: AvatarButton(
+              key: const ValueKey("shell-avatar"),
+              label: "N",
+              onPressed: () {
+                Navigator.of(context).push<void>(
+                  AppPageRoute<void>(
+                    page: PersonalHubPage(
+                      home: _home,
+                      homes: const [_home],
+                      homesApi: homes,
+                      invites: invites,
+                      notifications: notifications,
+                      theme: theme,
+                      lock: lock,
+                      user: null,
+                      onChanged: () {},
+                      onSelectHome: (_) {},
+                      onAddHome: () {},
+                      onSignOut: () {},
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -333,38 +337,29 @@ void main() {
     );
 
     final avatarBtn = tester.getRect(find.byKey(const ValueKey("shell-avatar")));
-    expect(avatarBtn.width, closeTo(48, 3));
-    expect(avatarBtn.height, closeTo(48, 3));
-    // Design avatar circle x 347–383; 48 hit is x 341–389.
-    expect(avatarBtn.left, closeTo(341, 6));
-    expect(avatarBtn.right, closeTo(389, 6));
+    expect(avatarBtn.width, closeTo(48, 0.5));
+    expect(avatarBtn.height, closeTo(48, 0.5));
+    // Spec: hit 341–389; circle 347–383 (right edge 10px from screen).
+    expect(avatarBtn.left, closeTo(341, 0.5));
+    expect(avatarBtn.right, closeTo(389, 0.5));
 
-    final circle = tester.getSize(
-      find.descendant(
-        of: find.byKey(const ValueKey("shell-avatar")),
-        matching: find.byWidgetPredicate(
-          (w) =>
-              w is Container &&
-              w.decoration is BoxDecoration &&
-              (w.decoration! as BoxDecoration).shape == BoxShape.circle,
-        ),
+    final circleFinder = find.descendant(
+      of: find.byKey(const ValueKey("shell-avatar")),
+      matching: find.byWidgetPredicate(
+        (w) =>
+            w is Container &&
+            w.decoration is BoxDecoration &&
+            (w.decoration! as BoxDecoration).shape == BoxShape.circle,
       ),
     );
-    expect(circle.width, closeTo(36, 0.5));
-    expect(circle.height, closeTo(36, 0.5));
-    final circleRect = tester.getRect(
-      find.descendant(
-        of: find.byKey(const ValueKey("shell-avatar")),
-        matching: find.byWidgetPredicate(
-          (w) =>
-              w is Container &&
-              w.decoration is BoxDecoration &&
-              (w.decoration! as BoxDecoration).shape == BoxShape.circle,
-        ),
-      ),
-    );
-    expect(circleRect.left, closeTo(347, 6));
-    expect(circleRect.right, closeTo(383, 6));
+    final circleRect = tester.getRect(circleFinder);
+    // Spec avatar circle rect (347,69)-(383,105).
+    expect(circleRect.left, closeTo(347, 0.5));
+    expect(circleRect.top, closeTo(69, 0.5));
+    expect(circleRect.right, closeTo(383, 0.5));
+    expect(circleRect.bottom, closeTo(105, 0.5));
+    expect(circleRect.width, closeTo(36, 0.5));
+    expect(circleRect.height, closeTo(36, 0.5));
 
     expect(find.byType(AppBottomNav), findsOneWidget);
     if (runShots) {
@@ -560,8 +555,12 @@ void main() {
                 fontWeight: FontWeight.w700,
               ),
             ),
+            actionsPadding: EdgeInsets.zero,
             actions: const [
-              AvatarButton(key: ValueKey("shell-avatar"), label: "N"),
+              Padding(
+                padding: EdgeInsets.only(right: 4),
+                child: AvatarButton(key: ValueKey("shell-avatar"), label: "N"),
+              ),
             ],
           ),
           body: MobileViewport(
@@ -583,14 +582,32 @@ void main() {
     await tester.pumpAndSettle();
 
     final hero = tester.getRect(find.byKey(const ValueKey("overview-net-worth")));
-    expect(hero.top, closeTo(123, 3));
+    // Spec hero y 123–221 (height 98).
+    expect(hero.top, closeTo(123, 0.5));
+    expect(hero.height, closeTo(98, 0.5));
 
     final month = tester.getRect(find.byKey(const ValueKey("overview-month")));
-    // No due card yet: month sits 16 below hero.
-    expect(month.top, closeTo(hero.bottom + 16, 3));
+    // No Cần trả yet: month top = hero bottom + 16 -> y 237–316 (height 79).
+    expect(month.top, closeTo(hero.bottom + 16, 0.5));
+    expect(month.top, closeTo(237, 0.5));
+    expect(month.height, closeTo(79, 0.5));
+
+    final circleRect = tester.getRect(
+      find.descendant(
+        of: find.byKey(const ValueKey("shell-avatar")),
+        matching: find.byWidgetPredicate(
+          (w) =>
+              w is Container &&
+              w.decoration is BoxDecoration &&
+              (w.decoration! as BoxDecoration).shape == BoxShape.circle,
+        ),
+      ),
+    );
+    expect(circleRect.left, closeTo(347, 0.5));
+    expect(circleRect.right, closeTo(383, 0.5));
 
     final nav = tester.getRect(find.byType(AppBottomNav));
-    expect(nav.top, closeTo(754, 3));
+    expect(nav.top, closeTo(754, 0.5));
 
     if (runShots) await _savePng(tester, "01_tong_quan");
 

@@ -163,36 +163,43 @@ class _OverviewPageState extends State<OverviewPage> {
           ),
           AnimatedEntrance(
             index: 0,
-            child: AppCard(
-              key: const ValueKey("overview-net-worth"),
-              onTap: widget.onOpenAssets,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          S.netWorthHomeLabel(home.name),
-                          style: TextStyle(
-                            fontSize: 12,
-                            height: 16 / 12,
-                            fontWeight: FontWeight.w600,
-                            color: colors.textSecondary,
-                            fontFamily: "Nunito",
+            // Spec hero y 123–221 (98): label 12/16 + gap 4 + amount 32/40,
+            // padding top/bottom 17 incl. 1px border -> layout padding 19.
+            child: SizedBox(
+              height: 98,
+              child: AppCard(
+                key: const ValueKey("overview-net-worth"),
+                onTap: widget.onOpenAssets,
+                padding: const EdgeInsets.fromLTRB(16, 19, 16, 19),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            S.netWorthHomeLabel(home.name),
+                            style: TextStyle(
+                              fontSize: 12,
+                              height: 16 / 12,
+                              fontWeight: FontWeight.w600,
+                              color: colors.textSecondary,
+                              fontFamily: "Nunito",
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        AnimatedMoneyText(
-                          amount: snap.netWorth,
-                          large: true,
-                          style: heroStyle,
-                        ),
-                      ],
+                          const SizedBox(height: 4),
+                          AnimatedMoneyText(
+                            amount: snap.netWorth,
+                            large: true,
+                            style: heroStyle,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  Icon(Icons.chevron_right, size: 24, color: colors.textMuted),
-                ],
+                    Icon(Icons.chevron_right, size: 24, color: colors.textMuted),
+                  ],
+                ),
               ),
             ),
           ),

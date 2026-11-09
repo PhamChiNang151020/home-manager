@@ -169,6 +169,8 @@ class _AppShellState extends State<AppShell> {
           appBar: AppBar(
             backgroundColor: colors.glass ? Colors.transparent : colors.bgBase,
             surfaceTintColor: Colors.transparent,
+            // Hit area x 341–389; circle x 347–383 (10px from screen right).
+            actionsPadding: EdgeInsets.zero,
             title: Text(
               home == null
                   ? S.appName
