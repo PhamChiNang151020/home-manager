@@ -132,6 +132,7 @@ void main() {
     addTearDown(tester.view.reset);
 
     String? acceptedToken;
+    var joined = false;
     await tester.pumpWidget(
       _wrap(
         EmptyHomeView(
@@ -144,6 +145,7 @@ void main() {
           onAcceptToken: (token) async {
             acceptedToken = token;
           },
+          onJoined: () => joined = true,
         ),
       ),
     );
@@ -163,7 +165,9 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(acceptedToken, "tokABC");
-    expect(find.text(S.joinedHome), findsOneWidget);
+    expect(joined, isTrue);
+    // Join toast is owned by AppShell after bottom nav is built.
+    expect(find.text(S.joinedHome), findsNothing);
   });
 
   testWidgets("paste long invite link is not truncated by maxLength", (

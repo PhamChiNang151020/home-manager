@@ -14,6 +14,7 @@ import "package:home_manager/features/personal/personal_hub_page.dart";
 import "package:home_manager/features/pwa/install_home_screen_banner.dart";
 import "package:home_manager/features/shared/app_ambient_background.dart";
 import "package:home_manager/features/shared/app_loading.dart";
+import "package:home_manager/features/shared/app_toast.dart";
 import "package:home_manager/features/shell/app_bottom_nav.dart";
 import "package:home_manager/features/shell/empty_home_view.dart";
 import "package:home_manager/features/shell/quick_add_picker_sheet.dart";
@@ -41,6 +42,9 @@ class _AppShellState extends State<AppShell> {
   int _tab = 0;
   late final ReminderController _reminders;
 
+  /// Set after a successful invite join; toast runs post-frame once nav exists.
+  bool _pendingJoinedToast = false;
+
   @override
   void initState() {
     super.initState();
@@ -49,6 +53,29 @@ class _AppShellState extends State<AppShell> {
     if (home != null) {
       _reminders.refresh(home);
     }
+  }
+
+  void _scheduleJoinedToastIfNeeded(bool hasHome) {
+    if (!_pendingJoinedToast || !hasHome) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_pendingJoinedToast) return;
+      _pendingJoinedToast = false;
+      showAppToast(context, S.joinedHome);
+    });
+  }
+
+  Future<void> _joinViaCode(String code) async {
+    await widget.services.invites.acceptInviteCode(code);
+    await widget.session.refreshHomes();
+    if (!mounted) return;
+    setState(() => _pendingJoinedToast = true);
+  }
+
+  Future<void> _joinViaToken(String token) async {
+    await widget.services.invites.acceptJoinToken(token);
+    await widget.session.refreshHomes();
+    if (!mounted) return;
+    setState(() => _pendingJoinedToast = true);
   }
 
   @override
@@ -86,6 +113,7 @@ class _AppShellState extends State<AppShell> {
     final home = session.selected;
     final services = widget.services;
     final colors = context.appColors;
+    _scheduleJoinedToastIfNeeded(home != null);
 
     return Stack(
       fit: StackFit.expand,
@@ -134,14 +162,8 @@ class _AppShellState extends State<AppShell> {
                                     onCreated: session.refreshHomes,
                                   ),
                               onSignOut: session.signOut,
-                              onAcceptCode: (code) async {
-                                await services.invites.acceptInviteCode(code);
-                                await session.refreshHomes();
-                              },
-                              onAcceptToken: (token) async {
-                                await services.invites.acceptJoinToken(token);
-                                await session.refreshHomes();
-                              },
+                              onAcceptCode: _joinViaCode,
+                              onAcceptToken: _joinViaToken,
                             )
                             : IndexedStack(
                               index: _tab,

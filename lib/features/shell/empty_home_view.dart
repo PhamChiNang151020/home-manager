@@ -4,7 +4,6 @@ import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/theme/app_color_scheme.dart";
 import "package:home_manager/core/theme/app_spacing.dart";
 import "package:home_manager/core/theme/app_theme.dart";
-import "package:home_manager/features/shared/app_toast.dart";
 
 /// Logged-in empty-home screen: account card, add home, 6-box invite code.
 class EmptyHomeView extends StatefulWidget {
@@ -104,8 +103,8 @@ class EmptyHomeViewState extends State<EmptyHomeView> {
       } else {
         await widget.onAcceptCode(_code);
       }
+      // Toast is shown by AppShell after Tổng quan + bottom nav are built.
       if (!mounted) return;
-      showAppToast(context, S.joinedHome);
       widget.onJoined?.call();
     } catch (e) {
       if (!mounted) return;

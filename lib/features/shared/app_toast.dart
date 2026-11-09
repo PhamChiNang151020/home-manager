@@ -11,10 +11,38 @@ const _toastGapAboveNav = AppSpacing.sm; // 8 -> toast y 724–772 on 393×852
 /// Bottom inset when there is no bottom nav (Members, etc.): y 754–802.
 const _toastBottomWithoutNav = 50.0;
 
+bool _scaffoldHasBottomNav(BuildContext context) {
+  // Descendant contexts (body buttons, etc.).
+  final fromOf = Scaffold.maybeOf(context);
+  if (fromOf != null) {
+    return fromOf.widget.bottomNavigationBar != null;
+  }
+
+  // Ancestor Scaffold widget (rare).
+  final ancestor = context.findAncestorWidgetOfExactType<Scaffold>();
+  if (ancestor?.bottomNavigationBar != null) return true;
+
+  // State.context of a widget that *builds* a Scaffold (e.g. AppShell): the
+  // Scaffold is a descendant, not an ancestor — walk the element tree.
+  var hasNav = false;
+  void visitor(Element el) {
+    if (hasNav) return;
+    final widget = el.widget;
+    if (widget is Scaffold && widget.bottomNavigationBar != null) {
+      hasNav = true;
+      return;
+    }
+    el.visitChildren(visitor);
+  }
+
+  (context as Element).visitChildren(visitor);
+  return hasNav;
+}
+
 double _toastBottomMargin(BuildContext context) {
-  final scaffold = context.findAncestorWidgetOfExactType<Scaffold>();
-  final hasBottomNav = scaffold?.bottomNavigationBar != null;
-  return hasBottomNav ? _toastGapAboveNav : _toastBottomWithoutNav;
+  return _scaffoldHasBottomNav(context)
+      ? _toastGapAboveNav
+      : _toastBottomWithoutNav;
 }
 
 /// Floating toast via the nearest [ScaffoldMessenger].
