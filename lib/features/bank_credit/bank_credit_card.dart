@@ -229,9 +229,11 @@ class _BankCreditCardState extends State<BankCreditCard>
                                 ? S.noStatement
                                 : (period.isPaid ? S.paid : S.unpaid),
                         variant:
-                            period?.isPaid == true
-                                ? StatusBadgeVariant.success
-                                : StatusBadgeVariant.warning,
+                            period == null
+                                ? StatusBadgeVariant.neutral
+                                : (period.isPaid
+                                    ? StatusBadgeVariant.success
+                                    : StatusBadgeVariant.warning),
                       ),
                       const Spacer(),
                       TextButton(
