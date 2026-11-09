@@ -110,7 +110,9 @@ void main() {
 
   setUpAll(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
-    if (runShots) await _loadNunito();
+    // Always load Nunito: the default test font (Ahem) is wider and overflows
+    // the sign-in footer Row at 393px. Screenshots stay optional.
+    await _loadNunito();
   });
 
   testWidgets(
@@ -128,6 +130,17 @@ void main() {
       expect(bannerRect.left, closeTo(40, 3));
       expect(bannerRect.right, closeTo(353, 3));
       expect(bannerRect.top, closeTo(83, 3));
+
+      // Natural wrap only: assert line count, not where the break falls.
+      final bannerText = tester.widget<Text>(find.text(S.joinInviteBanner));
+      final textRect = tester.getRect(find.text(S.joinInviteBanner));
+      final painter =
+          TextPainter(
+            text: TextSpan(text: S.joinInviteBanner, style: bannerText.style),
+            textDirection: TextDirection.ltr,
+            maxLines: 3,
+          )..layout(maxWidth: textRect.width);
+      expect(painter.computeLineMetrics().length, 2);
 
       final cardRect = tester.getRect(find.byType(AuthCard));
       expect(cardRect.top - bannerRect.bottom, closeTo(16, 3));
