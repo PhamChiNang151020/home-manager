@@ -61,6 +61,9 @@ class ExpensesPage extends StatefulWidget {
 }
 
 class ExpensesPageState extends State<ExpensesPage> {
+  /// Active Sổ GD instance — shell quick-add onSaved calls [refreshActive].
+  static ExpensesPageState? _active;
+
   List<Expense> _monthItems = [];
   List<ExpenseCategory> _categories = [];
   List<HomeMember> _members = [];
@@ -70,11 +73,25 @@ class ExpensesPageState extends State<ExpensesPage> {
   bool _failed = false;
   late DateTime _month;
 
+  /// Reloads the open expenses list + wallets after an external save (shell +).
+  static Future<void> refreshActive() async {
+    final page = _active;
+    if (page == null || !page.mounted) return;
+    await page._refresh();
+  }
+
   @override
   void initState() {
     super.initState();
+    _active = this;
     _month = monthStart(today());
     _load();
+  }
+
+  @override
+  void dispose() {
+    if (identical(_active, this)) _active = null;
+    super.dispose();
   }
 
   @override
@@ -597,6 +614,15 @@ class _WhoSpentRow extends StatelessWidget {
   }
 }
 
+/// Payer label for Khoản chi subtitle: email fallback → local-part before @.
+String _payerSubtitleLabel(String? paidByName) {
+  final raw = paidByName?.trim() ?? "";
+  if (raw.isEmpty) return "";
+  final at = raw.indexOf("@");
+  if (at > 0) return raw.substring(0, at);
+  return raw;
+}
+
 class _ExpenseRow extends StatelessWidget {
   const _ExpenseRow({
     required this.expense,
@@ -617,7 +643,7 @@ class _ExpenseRow extends StatelessWidget {
       expense.category?.colorKey ?? "other",
     );
     final note = expense.note?.trim();
-    final payer = expense.paidByName ?? "";
+    final payer = _payerSubtitleLabel(expense.paidByName);
     final subtitle = [
       if (payer.isNotEmpty) payer,
       if (note != null && note.isNotEmpty) note,
