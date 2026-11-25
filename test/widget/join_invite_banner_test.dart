@@ -1,9 +1,7 @@
-import "dart:io";
 import "dart:ui" as ui;
 
 import "package:flutter/material.dart";
 import "package:flutter/rendering.dart";
-import "package:flutter/services.dart";
 import "package:flutter_test/flutter_test.dart";
 import "package:home_manager/core/domain/join_link.dart";
 import "package:home_manager/core/l10n/strings.dart";
@@ -16,30 +14,15 @@ import "package:home_manager/features/shared/auth_card.dart";
 import "package:shared_preferences/shared_preferences.dart";
 
 import "../support/mock_supabase.dart";
+import "../support/shots.dart";
 
 class MockAuthService extends AuthService {
   MockAuthService() : super(MockSupabaseClient());
 }
 
-const _outDir = "/opt/cursor/artifacts/join-invite-banner";
 
 Future<void> _loadNunito() async {
-  final loader =
-      FontLoader("Nunito")
-        ..addFont(
-          rootBundle.load("assets/fonts/Nunito/static/Nunito-Regular.ttf"),
-        )
-        ..addFont(
-          rootBundle.load("assets/fonts/Nunito/static/Nunito-Medium.ttf"),
-        )
-        ..addFont(
-          rootBundle.load("assets/fonts/Nunito/static/Nunito-SemiBold.ttf"),
-        )
-        ..addFont(rootBundle.load("assets/fonts/Nunito/static/Nunito-Bold.ttf"))
-        ..addFont(
-          rootBundle.load("assets/fonts/Nunito/static/Nunito-ExtraBold.ttf"),
-        );
-  await loader.load();
+  await loadShotFonts();
 }
 
 Future<void> _savePng(WidgetTester tester, String name) async {
@@ -53,9 +36,7 @@ Future<void> _savePng(WidgetTester tester, String name) async {
     final data = await image.toByteData(format: ui.ImageByteFormat.png);
     return data!.buffer.asUint8List();
   });
-  final dir = Directory(_outDir);
-  if (!dir.existsSync()) dir.createSync(recursive: true);
-  File("$_outDir/$name.png").writeAsBytesSync(bytes!);
+  writeShotBytes("$name.png", bytes!);
 }
 
 Widget _frame(Widget home, {double viewPaddingTop = 0}) {
@@ -105,8 +86,7 @@ Future<void> _pumpSignIn(
 }
 
 void main() {
-  final artifactsRoot = Directory("/opt/cursor/artifacts");
-  final runShots = artifactsRoot.existsSync();
+  final runShots = shouldCaptureShots;
 
   setUpAll(() async {
     TestWidgetsFlutterBinding.ensureInitialized();

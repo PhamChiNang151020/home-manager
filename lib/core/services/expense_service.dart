@@ -131,4 +131,50 @@ class ExpenseService {
     AppLog.d("delete expense $id");
     await _client.from("expenses").delete().eq("id", id);
   }
+
+  Future<ExpenseCategory> createCategory({
+    required String homeId,
+    required String name,
+    required String iconKey,
+    required String colorKey,
+  }) async {
+    final row =
+        await _client
+            .from("expense_categories")
+            .insert({
+              "home_id": homeId,
+              "name": name,
+              "icon_key": iconKey,
+              "color_key": colorKey,
+              "is_default": false,
+            })
+            .select()
+            .single();
+    return ExpenseCategory.fromJson(row);
+  }
+
+  Future<ExpenseCategory> updateCategory({
+    required String id,
+    required String name,
+    required String iconKey,
+    required String colorKey,
+  }) async {
+    final row =
+        await _client
+            .from("expense_categories")
+            .update({
+              "name": name,
+              "icon_key": iconKey,
+              "color_key": colorKey,
+            })
+            .eq("id", id)
+            .select()
+            .single();
+    return ExpenseCategory.fromJson(row);
+  }
+
+  Future<void> deleteCategory(String id) async {
+    AppLog.d("delete expense category $id");
+    await _client.from("expense_categories").delete().eq("id", id);
+  }
 }

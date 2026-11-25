@@ -121,6 +121,28 @@ abstract final class S {
   static const noExpenses = "Chưa có chi tiêu nào trong tháng này";
   static const noExpensesHint = "Bấm + ở thanh dưới để ghi khoản chi đầu tiên.";
   static const category = "Danh mục";
+  static String totalSpendMonth(int month) => "Tổng chi tháng $month";
+  static String incomeMonthLabel(int month) => "Thu nhập tháng $month";
+  static const incomeNone = "Chưa có";
+  static const whoSpent = "Ai đã chi";
+  static const expenseItems = "Khoản chi";
+  static String monthTitle(String mmYyyy) => "Tháng $mmYyyy";
+  static const expenseCategoriesTitle = "Danh mục chi tiêu";
+  static const expenseCategoriesHint = "Danh mục dùng chung cho cả nhà.";
+  static const categoryDefault = "Mặc định";
+  static const addCategory = "Thêm danh mục";
+  static const editCategory = "Sửa danh mục";
+  static const categoryName = "Tên danh mục";
+  static const categoryIcon = "Biểu tượng";
+  static const categoryColor = "Màu";
+  static const deleteCategory = "Xoá danh mục";
+  static const deleteCategoryTitle = "Xoá danh mục?";
+  static const deleteCategoryConfirm = "Không hoàn tác được.";
+  static const categoriesOwnerOnly =
+      "Chỉ chủ nhà sửa được danh mục.";
+  static const categoryNameTaken = "Đã có danh mục tên này.";
+  static const categoryDeleteInUse =
+      "Danh mục này đã có khoản chi nên không xoá được. Bạn có thể đổi tên.";
   static const paidBy = "Người trả";
   static const expenseDate = "Ngày chi";
   static const receiptPhoto = "Ảnh hoá đơn";
@@ -462,8 +484,13 @@ abstract final class S {
   static const walletTransferFrom = "Từ ví";
   static const walletTransferTo = "Sang ví";
   static const walletHistory = "Lịch sử";
-  static const walletPayFrom = "Trả từ ví";
+  static const walletPayFrom = "Ví";
   static const walletPayFromNone = "Không trừ ví";
+  static const walletPickTitle = "Chọn ví";
+  static String walletBalanceOf(String amount) => "Số dư $amount";
+  static const walletPayFromNoneHint =
+      "Chỉ ghi chi tiêu, không đổi số dư ví";
+  static const walletOverBalance = "Số tiền lớn hơn số dư ví.";
   static const walletInitialBalance = "Số dư ban đầu";
   static const noWallets = "Chưa có ví nào";
   static const noWalletTxns = "Chưa có giao dịch";

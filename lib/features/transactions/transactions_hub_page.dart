@@ -60,6 +60,8 @@ class _TransactionsHubPageState extends State<TransactionsHubPage> {
                 homesApi: widget.services.homes,
                 photos: widget.services.photos,
                 currentUserId: widget.currentUserId,
+                incomes: widget.services.incomes,
+                services: widget.services,
                 wallets: widget.services.wallets,
               ),
               ElectricityPage(

@@ -153,4 +153,22 @@ class WalletService {
       params: {"p_expense_id": expenseId},
     );
   }
+
+  /// Latest wallet this user paid an expense from in [homeId], or null.
+  Future<String?> lastUsedWalletId({
+    required String homeId,
+    required String userId,
+  }) async {
+    final rows = await _client
+        .from("wallet_transactions")
+        .select("wallet_id")
+        .eq("home_id", homeId)
+        .eq("created_by", userId)
+        .eq("kind", "expense")
+        .order("created_at", ascending: false)
+        .limit(1);
+    final list = rows as List;
+    if (list.isEmpty) return null;
+    return Map<String, dynamic>.from(list.first as Map)["wallet_id"] as String?;
+  }
 }

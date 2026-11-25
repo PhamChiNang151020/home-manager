@@ -1,9 +1,7 @@
-import "dart:io";
 import "dart:ui" as ui;
 
 import "package:flutter/material.dart";
 import "package:flutter/rendering.dart";
-import "package:flutter/services.dart";
 import "package:flutter_test/flutter_test.dart";
 import "package:home_manager/core/l10n/strings.dart";
 import "package:home_manager/core/models/home.dart";
@@ -37,6 +35,7 @@ import "package:mocktail/mocktail.dart";
 import "package:shared_preferences/shared_preferences.dart";
 
 import "../support/mock_supabase.dart";
+import "../support/shots.dart";
 
 class MockHomeService extends Mock implements HomeService {}
 
@@ -57,21 +56,9 @@ const _home = Home(
   myRole: "owner",
 );
 
-const _outDir = "/opt/cursor/artifacts/dot1";
 
 Future<void> _loadNunito() async {
-  final loader =
-      FontLoader("Nunito")
-        ..addFont(rootBundle.load("assets/fonts/Nunito/static/Nunito-Regular.ttf"))
-        ..addFont(rootBundle.load("assets/fonts/Nunito/static/Nunito-Medium.ttf"))
-        ..addFont(
-          rootBundle.load("assets/fonts/Nunito/static/Nunito-SemiBold.ttf"),
-        )
-        ..addFont(rootBundle.load("assets/fonts/Nunito/static/Nunito-Bold.ttf"))
-        ..addFont(
-          rootBundle.load("assets/fonts/Nunito/static/Nunito-ExtraBold.ttf"),
-        );
-  await loader.load();
+  await loadShotFonts();
 }
 
 Future<void> _savePng(WidgetTester tester, String name) async {
@@ -85,9 +72,7 @@ Future<void> _savePng(WidgetTester tester, String name) async {
     final data = await image.toByteData(format: ui.ImageByteFormat.png);
     return data!.buffer.asUint8List();
   });
-  final dir = Directory(_outDir);
-  if (!dir.existsSync()) dir.createSync(recursive: true);
-  File("$_outDir/$name.png").writeAsBytesSync(bytes!);
+  writeShotBytes("$name.png", bytes!);
 }
 
 void _setPhoneView(WidgetTester tester) {
@@ -310,9 +295,8 @@ class _SignOutAuthGateState extends State<_SignOutAuthGate> {
 }
 
 void main() {
-  // Screenshots only when the artifacts dir exists; fonts always load so
-  // layout assertions match QA machines without /opt/cursor/artifacts.
-  final runShots = Directory("/opt/cursor/artifacts").existsSync();
+  // Screenshots only when HM_SHOTS=1 and HM_SHOTS_DIR is set.
+  final runShots = shouldCaptureShots;
 
   setUpAll(() async {
     SharedPreferences.setMockInitialValues({});
@@ -377,7 +361,7 @@ void main() {
 
     if (runShots) {
       await _savePng(tester, "01_nav_geometry");
-      File("$_outDir/measured.nav.txt").writeAsStringSync(
+      writeShotText("measured.nav.txt", 
         "nav_top=${nav.top}\n"
         "nav_bottom=${nav.bottom}\n"
         "pill=${pill.left},${pill.top},${pill.right},${pill.bottom}\n"
@@ -438,7 +422,7 @@ void main() {
 
     expect(find.byType(AppBottomNav), findsOneWidget);
     if (runShots) {
-      File("$_outDir/measured.avatar.txt").writeAsStringSync(
+      writeShotText("measured.avatar.txt", 
         "avatar_hit=${avatarBtn.left},${avatarBtn.top},${avatarBtn.right},${avatarBtn.bottom}\n"
         "avatar_circle=${circleRect.left},${circleRect.top},${circleRect.right},${circleRect.bottom}\n",
       );
@@ -570,7 +554,7 @@ void main() {
 
     if (runShots) {
       await _savePng(tester, "03_quick_add");
-      File("$_outDir/measured.sheet.txt").writeAsStringSync(
+      writeShotText("measured.sheet.txt", 
         "sheet_top=${sheet.top}\nsheet_bottom=${sheet.bottom}\n",
       );
     }
@@ -897,7 +881,7 @@ void main() {
 
     if (runShots) {
       await _savePng(tester, "02_tong_quan_toast");
-      File("$_outDir/measured.overview.txt").writeAsStringSync(
+      writeShotText("measured.overview.txt", 
         "hero_top=${hero.top}\n"
         "month_top=${month.top}\n"
         "nav_top=${nav.top}\n"

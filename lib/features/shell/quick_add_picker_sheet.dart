@@ -88,10 +88,11 @@ class _QuickAddPickerState extends State<_QuickAddPicker> {
   }
 
   Future<void> _openExpense() async {
-    final (categories, members) =
+    final (categories, members, wallets) =
         await (
           _services.expenses.listCategories(_home.id),
           _services.homes.listMembers(_home.id),
+          _services.wallets.list(_home.id),
         ).wait;
     final caller = widget.callerContext;
     _close();
@@ -105,6 +106,8 @@ class _QuickAddPickerState extends State<_QuickAddPicker> {
       categories: categories,
       members: members,
       currentUserId: widget.currentUserId,
+      wallets: wallets,
+      walletService: _services.wallets,
       onSaved: _onSaved,
     );
     if (openFull && caller.mounted) {
@@ -116,6 +119,8 @@ class _QuickAddPickerState extends State<_QuickAddPicker> {
         categories: categories,
         members: members,
         currentUserId: widget.currentUserId,
+        wallets: wallets,
+        walletService: _services.wallets,
         onSaved: _onSaved,
       );
     }

@@ -17,6 +17,7 @@ import "package:home_manager/features/shared/app_ambient_background.dart";
 import "package:home_manager/features/shared/app_loading.dart";
 import "package:home_manager/features/shared/app_toast.dart";
 import "package:home_manager/features/shared/avatar_button.dart";
+import "package:home_manager/features/expenses/expenses_page.dart";
 import "package:home_manager/features/shell/app_bottom_nav.dart";
 import "package:home_manager/features/shell/empty_home_view.dart";
 import "package:home_manager/features/shell/quick_add_picker_sheet.dart";
@@ -106,6 +107,9 @@ class _AppShellState extends State<AppShell> {
       currentUserId: widget.session.user?.id ?? "",
       onSaved: () {
         _reminders.refresh(home);
+        // D7: quick-add is hosted by the shell, not ExpensesPage's form
+        // onSaved — reload Khoản chi + wallets on the open Sổ GD tab.
+        ExpensesPageState.refreshActive();
       },
     );
   }

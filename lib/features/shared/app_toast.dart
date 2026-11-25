@@ -6,25 +6,27 @@ enum AppToastKind { success, destructive, info }
 
 /// Gap above the scaffold bottom chrome when a bottom nav is present.
 /// Floating [SnackBar] already clears the nav; only this extra gap is needed.
-/// From Đợt 1 (nav top 754): toast y 698–746. Without nav: y 754–802.
+/// Web (safe-bottom 0): nav top 788 → toast 732–780. iPhone (+34): 698–746.
 const _toastGapAboveNav = AppSpacing.sm; // 8
 
-/// Bottom inset when there is no bottom nav (Members, etc.): y 754–802.
+/// Bottom inset when there is no bottom nav (Members, etc.): y 754–802 iPhone.
 const _toastBottomWithoutNav = 50.0;
 
 bool _scaffoldHasBottomNav(BuildContext context) {
-  // Descendant contexts (body buttons, etc.).
+  // Prefer the nearest ScaffoldState (body / sheet-under-shell cases).
   final fromOf = Scaffold.maybeOf(context);
-  if (fromOf != null) {
-    return fromOf.widget.bottomNavigationBar != null;
+  if (fromOf != null && fromOf.widget.bottomNavigationBar != null) {
+    return true;
   }
 
-  // Ancestor Scaffold widget (rare).
   final ancestor = context.findAncestorWidgetOfExactType<Scaffold>();
   if (ancestor?.bottomNavigationBar != null) return true;
 
-  // State.context of a widget that *builds* a Scaffold (e.g. AppShell): the
-  // Scaffold is a descendant, not an ancestor — walk the element tree.
+  // Modal sheets / popWithAppToast: walk from the binding root so we still
+  // see the shell Scaffold that hosts AppBottomNav under the navigator.
+  final root = WidgetsBinding.instance.rootElement;
+  if (root == null) return false;
+
   var hasNav = false;
   void visitor(Element el) {
     if (hasNav) return;
@@ -36,7 +38,7 @@ bool _scaffoldHasBottomNav(BuildContext context) {
     el.visitChildren(visitor);
   }
 
-  (context as Element).visitChildren(visitor);
+  root.visitChildren(visitor);
   return hasNav;
 }
 

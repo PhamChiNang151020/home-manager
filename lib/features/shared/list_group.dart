@@ -74,6 +74,8 @@ class ListGroupRow extends StatelessWidget {
                   if (subtitle != null)
                     Text(
                       subtitle!,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 12,
                         height: 16 / 12,
